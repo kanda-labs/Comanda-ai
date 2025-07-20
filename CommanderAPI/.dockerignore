@@ -1,0 +1,42 @@
+# Version control
+.git
+.gitignore
+.github
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Build directories
+build/
+out/
+target/
+.gradle/
+bin/
+
+# Logs
+logs/
+*.log
+
+# Data files
+*.db
+*.db-journal
+
+# Environment files
+.env
+.env.*
+
+# Documentation
+*.md
+*.txt
+LICENSE
+
+# Temporary files
+*.bak
+*.tmp
+*~
+.DS_Store
+

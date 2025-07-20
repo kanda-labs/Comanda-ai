@@ -1,0 +1,37 @@
+package co.touchlab.dogify.presentation.screens.tables.listing
+
+import cafe.adriel.voyager.core.model.StateScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import co.touchlab.dogify.domain.repository.TablesRepository
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.launch
+
+internal class TablesViewModel(
+    private val repository: TablesRepository,
+) : StateScreenModel<TablesScreenState>(TablesScreenState()) {
+
+    fun retrieveTables() {
+        screenModelScope.launch {
+            mutableState.emit(TablesScreenState(isLoading = true))
+
+
+            repository.getTables()
+                .fold(
+                    onSuccess = { tables ->
+                        mutableState.emit(
+                            TablesScreenState(
+                                tables = tables.toPersistentList(),
+                                isLoading = false,
+                                error = null
+                            )
+                        )
+                    },
+                    onFailure = { error ->
+                        mutableState.emit(
+                            TablesScreenState(isLoading = false, error = error)
+                        )
+                    }
+                )
+        }
+    }
+}

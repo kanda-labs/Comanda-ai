@@ -1,0 +1,22 @@
+-- src/commonMain/sqldelight/DogifyDatabase/Breed.sq
+
+CREATE TABLE Breed (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  subBreedName TEXT,
+  url TEXT
+);
+
+retrievePage:
+SELECT * FROM Breed LIMIT :pageSize OFFSET :offset;
+
+countBreeds:
+SELECT COUNT(*) FROM Breed;
+
+updateBreed:
+INSERT OR REPLACE INTO Breed (id, name, subBreedName, url)
+VALUES (?, ?, ?, ?);
+
+createBreed:
+INSERT INTO Breed (name, subBreedName, url)
+VALUES (?, ?, ?);

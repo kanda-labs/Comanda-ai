@@ -1,0 +1,2 @@
+2025-06-23 09:31:55.965 [main] INFO  ktor.application - Application stopping: io.ktor.server.application.Application@2216effc
+2025-06-23 09:31:55.974 [main] INFO  ktor.application - Application stopped: io.ktor.server.application.Application@2216effc

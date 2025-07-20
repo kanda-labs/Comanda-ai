@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: commander-api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data  # For SQLite database persistence
+      - ./logs:/app/logs  # For log file persistence
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - LOG_LEVEL=DEBUG  # Set to DEBUG for development
+      - DATABASE_URL=jdbc:sqlite:/app/data/data.db
+      - DATABASE_DRIVER=org.sqlite.JDBC
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - commander-network
+
+networks:
+  commander-network:
+    driver: bridge
+
