@@ -13,7 +13,7 @@ import kandalabs.commander.domain.service.TableService
 import kandalabs.commander.presentation.models.request.CreateBillRequest
 
 fun Route.billRoutes(billService: BillService, tableService: TableService) {
-    route("/api/v1/bills") {
+    route("/bills") {
         get {
             val status = call.request.queryParameters["status"]?.let { BillStatus.valueOf(it) }
             call.respond(billService.getAllBills(status))

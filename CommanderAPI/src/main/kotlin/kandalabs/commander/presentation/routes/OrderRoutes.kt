@@ -14,7 +14,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 fun Route.orderRoutes(orderService: OrderService) {
-    route("/api/v1/orders") {
+    route("/orders") {
         get {
             call.respond(orderService.getAllOrders())
         }

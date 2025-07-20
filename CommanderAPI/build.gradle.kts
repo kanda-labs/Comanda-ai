@@ -20,6 +20,19 @@ val koinVersion = "3.5.3"
 val logbackVersion = "1.4.14"
 val exposedVersion = "0.46.0"
 
+// Force consistent test framework versions
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-test-junit5:2.0.0")
+        eachDependency {
+            if (requested.group == "org.jetbrains.kotlin" && requested.name == "kotlin-test-junit") {
+                useTarget("org.jetbrains.kotlin:kotlin-test-junit5:2.0.0")
+                because("Force JUnit 5 for consistency")
+            }
+        }
+    }
+}
+
 dependencies {
     // Ktor Server Core
     implementation("io.ktor:ktor-server-core:$ktorVersion")
@@ -62,14 +75,21 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
-    // Test dependencies
+    // Test dependencies - using JUnit 5 consistently
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:2.0.0")
-    testImplementation("io.insert-koin:koin-test:$koinVersion")
-    testImplementation("io.insert-koin:koin-test-junit5:$koinVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.0.0")
+    testImplementation("io.insert-koin:koin-test:$koinVersion") {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-test-junit")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-test")
+    }
+    testImplementation("io.insert-koin:koin-test-junit5:$koinVersion") {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-test-junit")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-test")
+    }
     testImplementation("io.mockk:mockk:1.13.9")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
+    
 }
 
 java {
@@ -93,5 +113,5 @@ tasks.test {
 }
 
 application {
-    mainClass.set("kandalabs.commander.ApplicationKt")
+    mainClass.set("kandalabs.commander.application.ApplicationKt")
 }

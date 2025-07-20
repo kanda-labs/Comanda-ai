@@ -4,8 +4,13 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import io.mockk.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.BeforeEach
@@ -24,6 +29,11 @@ class UserRoutesTest {
     private val mockUserService = mockk<UserService>()
     private val json = Json { ignoreUnknownKeys = true }
     
+    // Test helper for creating LocalDateTime
+    private fun testDateTime(): LocalDateTime = 
+        Instant.fromEpochMilliseconds(System.currentTimeMillis())
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+    
     @BeforeEach
     fun setup() {
         clearAllMocks()
@@ -40,8 +50,8 @@ class UserRoutesTest {
     fun `GET users returns 200 with paginated list`() = testApplication {
         // Arrange
         val mockUserRespons = listOf(
-            User(id = 1, name = "John Doe", email = "john@example.com"),
-            User(id = 2, name = "Jane Smith", email = "jane@example.com")
+            User(id = 1, name = "John Doe", email = "john@example.com", createdAt = testDateTime()),
+            User(id = 2, name = "Jane Smith", email = "jane@example.com", createdAt = testDateTime())
         )
         coEvery { mockUserService.getPaginatedUsers(1, 10) } returns Result.success(Pair(mockUserRespons, 2L))
         
@@ -87,7 +97,7 @@ class UserRoutesTest {
     fun `GET user by id returns 200 with user when found`() = testApplication {
         // Arrange
         val userId = 1
-        val mockUser = User(id = userId, name = "John Doe", email = "john@example.com")
+        val mockUser = User(id = userId, name = "John Doe", email = "john@example.com", createdAt = testDateTime())
         coEvery { mockUserService.getUserById(userId) } returns mockUser
         
         application {
@@ -143,7 +153,7 @@ class UserRoutesTest {
             name = createRequest.name,
             email = createRequest.email,
             active = createRequest.active,
-            createdAt = System.currentTimeMillis()
+            createdAt = testDateTime()
         )
         
         coEvery { mockUserService.createUser(any()) } returns Result.success(createdUser)
@@ -213,7 +223,7 @@ class UserRoutesTest {
             name = "John Doe",
             email = "john@example.com",
             active = true,
-            createdAt = System.currentTimeMillis()
+            createdAt = testDateTime()
         )
         
         val updatedUser = existingUser.copy(

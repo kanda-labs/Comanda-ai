@@ -37,8 +37,7 @@ private fun validateUserRequest(name: String, email: String?) {
  * Extension function to configure user-related routes
  */
 fun Route.userRoutes(userService: UserService) {
-    route("/api/v1") {
-        route("/users") {
+    route("/users") {
             // Get all users with pagination
             get {
                 try {
@@ -319,5 +318,4 @@ fun Route.userRoutes(userService: UserService) {
                 }
             }
         }
-    }
 }

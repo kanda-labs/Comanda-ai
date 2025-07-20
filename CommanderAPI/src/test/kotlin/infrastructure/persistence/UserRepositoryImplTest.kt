@@ -3,14 +3,25 @@ package kandalabs.commander.infrastructure.persistence
 import kandalabs.commander.data.model.sqlModels.UserTable
 import kandalabs.commander.data.repository.UserRepositoryImpl
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import mu.KotlinLogging
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.*
 import kandalabs.commander.domain.model.User
-import kotlin.test.*
 
 class UserRepositoryImplTest {
     private lateinit var repository: UserRepositoryImpl
+    private val logger = KotlinLogging.logger {}
+    
+    // Test helper for creating LocalDateTime
+    private fun testDateTime(): LocalDateTime = 
+        Instant.fromEpochMilliseconds(System.currentTimeMillis())
+            .toLocalDateTime(TimeZone.currentSystemDefault())
     
     @BeforeEach
     fun setup() {
@@ -23,7 +34,7 @@ class UserRepositoryImplTest {
             SchemaUtils.create(UserTable)
         }
         
-        repository = UserRepositoryImpl()
+        repository = UserRepositoryImpl(UserTable, logger)
     }
     
     @Test
@@ -33,7 +44,7 @@ class UserRepositoryImplTest {
             name = "Test User",
             email = "test@example.com",
             active = true,
-            createdAt = System.currentTimeMillis()
+            createdAt = testDateTime()
         )
         
         // Act
@@ -51,7 +62,8 @@ class UserRepositoryImplTest {
         // Arrange
         val user = User(
             name = "Test User",
-            email = "test@example.com"
+            email = "test@example.com",
+            createdAt = testDateTime()
         )
         val createdUser = repository.create(user)
         
@@ -76,8 +88,8 @@ class UserRepositoryImplTest {
     @Test
     fun `findAll returns all users`() = runBlocking {
         // Arrange
-        repository.create(User(name = "User 1", email = "user1@example.com"))
-        repository.create(User(name = "User 2", email = "user2@example.com"))
+        repository.create(User(name = "User 1", email = "user1@example.com", createdAt = testDateTime()))
+        repository.create(User(name = "User 2", email = "user2@example.com", createdAt = testDateTime()))
         
         // Act
         val users = repository.findAll()
@@ -89,9 +101,9 @@ class UserRepositoryImplTest {
     @Test
     fun `findByName returns users with matching name`() = runBlocking {
         // Arrange
-        repository.create(User(name = "John Doe", email = "john@example.com"))
-        repository.create(User(name = "Johnny Smith", email = "johnny@example.com"))
-        repository.create(User(name = "Jane Smith", email = "jane@example.com"))
+        repository.create(User(name = "John Doe", email = "john@example.com", createdAt = testDateTime()))
+        repository.create(User(name = "Johnny Smith", email = "johnny@example.com", createdAt = testDateTime()))
+        repository.create(User(name = "Jane Smith", email = "jane@example.com", createdAt = testDateTime()))
         
         // Act
         val usersWithJohn = repository.findByName("John")
@@ -104,7 +116,7 @@ class UserRepositoryImplTest {
     @Test
     fun `update modifies existing user`() = runBlocking {
         // Arrange
-        val user = User(name = "Original Name", email = "original@example.com")
+        val user = User(name = "Original Name", email = "original@example.com", createdAt = testDateTime())
         val createdUser = repository.create(user)
         val updatedUser = User(
             id = createdUser.id,
@@ -131,7 +143,8 @@ class UserRepositoryImplTest {
         val nonExistentUser = User(
             id = 999,
             name = "Non-existent User",
-            email = "nonexistent@example.com"
+            email = "nonexistent@example.com",
+            createdAt = testDateTime()
         )
         
         // Act
@@ -144,7 +157,7 @@ class UserRepositoryImplTest {
     @Test
     fun `delete removes user and returns true when successful`() = runBlocking {
         // Arrange
-        val user = User(name = "Test User", email = "test@example.com")
+        val user = User(name = "Test User", email = "test@example.com", createdAt = testDateTime())
         val createdUser = repository.create(user)
         
         // Act
@@ -168,7 +181,7 @@ class UserRepositoryImplTest {
     fun `findAllPaginated returns correct page of results`() = runBlocking {
         // Arrange - Create 15 users
         repeat(15) { i ->
-            repository.create(User(name = "User $i", email = "user$i@example.com"))
+            repository.create(User(name = "User $i", email = "user$i@example.com", createdAt = testDateTime()))
         }
         
         // Act - Get first page (10 items)
@@ -185,7 +198,7 @@ class UserRepositoryImplTest {
     fun `count returns total number of users`() = runBlocking {
         // Arrange - Create 5 users
         repeat(5) { i ->
-            repository.create(User(name = "User $i", email = "user$i@example.com"))
+            repository.create(User(name = "User $i", email = "user$i@example.com", createdAt = testDateTime()))
         }
         
         // Act

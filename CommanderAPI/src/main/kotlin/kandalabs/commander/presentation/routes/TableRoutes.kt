@@ -22,8 +22,7 @@ private val logger = KotlinLogging.logger {}
  * Extension function to configure table-related routes
  */
 fun Route.tableRoutes(tableService: TableService, orderService: OrderService) {
-    route("/api/v1") {
-        route("/tables") {
+    route("/tables") {
             // Get all tables
             get {
                 try {
@@ -226,5 +225,4 @@ fun Route.tableRoutes(tableService: TableService, orderService: OrderService) {
                 }
             }
         }
-    }
 }

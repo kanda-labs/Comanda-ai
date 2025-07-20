@@ -111,11 +111,13 @@ fun Application.configureRouting() {
         }
 
         // Application routes
-        userRoutes(userService)
-        tableRoutes(tableService, orderService)
-        billRoutes(billService, tableService)
-        itemRoutes(itemService)
-        orderRoutes(orderService)
+        route("/api/v1") {
+            userRoutes(userService)
+            tableRoutes(tableService, orderService)
+            billRoutes(billService, tableService)
+            itemRoutes(itemService)
+            orderRoutes(orderService)
+        }
     }
 }
 

@@ -10,7 +10,7 @@ import kandalabs.commander.domain.service.ItemService
 import kandalabs.commander.presentation.models.request.CreateItemRequest
 
 fun Route.itemRoutes(itemService: ItemService) {
-    route("/api/v1/items") {
+    route("/items") {
         get {
             call.respond(itemService.getAllItems())
         }
