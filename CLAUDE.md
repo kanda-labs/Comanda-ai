@@ -28,6 +28,14 @@ cd Comanda-ai-kmp
 ./gradlew test                   # Run tests
 ```
 
+### Root Project Tasks
+```bash
+./gradlew buildInstallStartApp   # Build, install and start Android app
+./gradlew buildAll               # Build all sub-projects
+./gradlew testAll                # Test all sub-projects
+./gradlew cleanAll               # Clean all sub-projects
+```
+
 ## 🏛️ Architecture
 
 ### CommanderAPI (Backend)

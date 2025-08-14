@@ -1,5 +1,6 @@
 package kandalabs.commander.domain.model
 
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
@@ -38,6 +39,6 @@ data class PaginatedResponse<T>(
 data class ErrorResponse(
     val status: Int,
     val message: String,
-    val timestamp: Long = System.currentTimeMillis(),
+    val timestamp: Long = Clock.System.now().toEpochMilliseconds(),
     val path: String? = null
 )

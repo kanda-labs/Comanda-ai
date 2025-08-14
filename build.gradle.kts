@@ -60,3 +60,22 @@ tasks.register("testAll") {
         }
     }
 }
+
+tasks.register("buildInstallStartApp") {
+    description = "Build, install and start Android app"
+    group = "mobile"
+    
+    doLast {
+        exec {
+            workingDir("Comanda-ai-kmp")
+            commandLine("./gradlew", ":app:assembleDebug")
+        }
+        exec {
+            workingDir("Comanda-ai-kmp")
+            commandLine("./gradlew", ":app:installDebug")
+        }
+        exec {
+            commandLine("adb", "shell", "am", "start", "-n", "co.touchlab.dogify/co.touchlab.dogify.MainActivity")
+        }
+    }
+}

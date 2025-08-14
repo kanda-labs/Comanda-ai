@@ -29,12 +29,14 @@ class OrderScreenModel(
     private val _isLoading = MutableStateFlow(false)
     private val _error = MutableStateFlow<String?>(null)
     private val _orderSubmitted = MutableStateFlow(false)
+    private val _showConfirmationModal = MutableStateFlow(false)
     
     val categories = ItemCategory.values().toList()
     val selectedCategory = _selectedCategory.asStateFlow()
     val isLoading = _isLoading.asStateFlow()
     val error = _error.asStateFlow()
     val orderSubmitted = _orderSubmitted.asStateFlow()
+    val showConfirmationModal = _showConfirmationModal.asStateFlow()
     
     val filteredItems = combine(_allItems, _selectedCategory) { items, category ->
         items.filter { it.category == category }
@@ -53,6 +55,14 @@ class OrderScreenModel(
     val totalItems = _selectedItems.map { selectedItems ->
         selectedItems.values.sum()
     }.stateIn(screenModelScope, SharingStarted.WhileSubscribed(), 0)
+    
+    val selectedItemsWithCount = combine(_allItems, _selectedItems) { allItems, selected ->
+        selected.mapNotNull { (itemId, count) ->
+            allItems.find { it.id == itemId }?.let { item ->
+                ItemWithCount(item, count)
+            }
+        }
+    }.stateIn(screenModelScope, SharingStarted.WhileSubscribed(), emptyList())
     
     init {
         loadItems()
@@ -122,6 +132,14 @@ class OrderScreenModel(
     
     fun resetOrderSubmitted() {
         _orderSubmitted.value = false
+    }
+    
+    fun showConfirmationModal() {
+        _showConfirmationModal.value = true
+    }
+    
+    fun hideConfirmationModal() {
+        _showConfirmationModal.value = false
     }
     
     private fun loadItems() {

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.dogify.components.DogifyButton
 import co.touchlab.dogify.components.DogifyTopAppBar
 import co.touchlab.dogify.presentation.screens.order.components.CategoryTabs
+import co.touchlab.dogify.presentation.screens.order.components.OrderConfirmationModal
 import co.touchlab.dogify.presentation.screens.order.components.OrderItemCard
 import kandalabs.commander.domain.model.ItemCategory
 
@@ -34,10 +35,13 @@ fun OrderScreenContent(
     val isLoading by screenModel.isLoading.collectAsState()
     val error by screenModel.error.collectAsState()
     val orderSubmitted by screenModel.orderSubmitted.collectAsState()
+    val showConfirmationModal by screenModel.showConfirmationModal.collectAsState()
+    val selectedItemsWithCount by screenModel.selectedItemsWithCount.collectAsState()
     
     // Handle order submission success
     LaunchedEffect(orderSubmitted) {
         if (orderSubmitted) {
+            screenModel.hideConfirmationModal()
             onBackClick()
             screenModel.resetOrderSubmitted()
         }
@@ -52,32 +56,33 @@ fun OrderScreenContent(
         }
     }
     
-    Scaffold(
-        topBar = {
-            DogifyTopAppBar(
-                title = "Mesa $tableNumber",
-                onBackOrClose = onBackClick,
-                icon = Icons.AutoMirrored.Filled.ArrowBack
-            )
-        },
-        bottomBar = {
-            if (canSubmit) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shadowElevation = 8.dp
-                ) {
-                    DogifyButton(
-                        text = if (isLoading) "Enviando..." else "Fazer pedido ($totalItems ${if (totalItems == 1) "item" else "itens"})",
-                        onClick = onSubmitOrder,
-                        isEnabled = !isLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                DogifyTopAppBar(
+                    title = "Mesa $tableNumber",
+                    onBackOrClose = onBackClick,
+                    icon = Icons.AutoMirrored.Filled.ArrowBack
+                )
+            },
+            bottomBar = {
+                if (canSubmit) {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shadowElevation = 8.dp
+                    ) {
+                        DogifyButton(
+                            text = "Fazer pedido ($totalItems ${if (totalItems == 1) "item" else "itens"})",
+                            onClick = { screenModel.showConfirmationModal() },
+                            isEnabled = !isLoading,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                    }
                 }
             }
-        }
-    ) { paddingValues ->
+        ) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -144,5 +149,16 @@ fun OrderScreenContent(
                 }
             }
         }
+        }
+        
+        // Order Confirmation Modal - overlays the entire screen
+        OrderConfirmationModal(
+            isVisible = showConfirmationModal,
+            selectedItems = selectedItemsWithCount,
+            totalItems = totalItems,
+            isLoading = isLoading,
+            onConfirm = onSubmitOrder,
+            onDismiss = { screenModel.hideConfirmationModal() }
+        )
     }
 }
