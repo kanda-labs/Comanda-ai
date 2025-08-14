@@ -43,7 +43,7 @@ internal data class TableDetailsScreenState(
     val primaryButton: TableDetailsScreenButton? = when (table?.status) {
         TableStatus.OCCUPIED -> TableDetailsScreenButton(
             text = "Fazer pedido",
-            action = TableDetailsAction.CLOSE_TABLE
+            action = TableDetailsAction.MAKE_ORDER
         )
 
         TableStatus.FREE -> TableDetailsScreenButton(

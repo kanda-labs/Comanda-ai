@@ -26,6 +26,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.dogify.presentation.screens.order.OrderScreen
 import co.touchlab.dogify.components.DogifyButton
 import co.touchlab.dogify.components.DogifyButtonVariant
 import co.touchlab.dogify.components.DogifyTopAppBar
@@ -54,7 +55,21 @@ public data class TableDetailsScreen(val table: Table) : Screen {
             when (action) {
                 TableDetailsAction.OPEN_TABLE -> viewModel.openTable(table)
                 TableDetailsAction.CLOSE_TABLE -> viewModel.closeTable(table)
-                TableDetailsAction.MAKE_ORDER -> viewModel.makeOrder()
+                TableDetailsAction.MAKE_ORDER -> {
+                    val billId = table.billId
+                    if (billId != null) {
+                        navigator.push(
+                            OrderScreen(
+                                tableId = table.id ?: 0,
+                                tableNumber = table.number.toString(),
+                                billId = billId
+                            )
+                        )
+                    } else {
+                        // TODO: Mostrar erro - mesa sem bill ativa
+                        println("Erro: Mesa ${table.number} não possui bill ativa")
+                    }
+                }
                 TableDetailsAction.BACK -> navigator.pop()
             }
 

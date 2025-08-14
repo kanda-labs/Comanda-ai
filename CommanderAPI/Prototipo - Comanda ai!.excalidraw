@@ -6,8 +6,8 @@
     {
       "id": "J-shutlk64e-Ck9rKA7M8",
       "type": "rectangle",
-      "x": -478.7598954055884,
-      "y": -3714.294566484939,
+      "x": -478.60408592770364,
+      "y": -3714.1575521477644,
       "width": 5221.053674548552,
       "height": 4327.061898498211,
       "angle": 0,
@@ -27,8 +27,8 @@
         "type": 3
       },
       "seed": 1446400637,
-      "version": 235,
-      "versionNonce": 1171841220,
+      "version": 238,
+      "versionNonce": 1258846148,
       "isDeleted": false,
       "boundElements": [
         {
@@ -36,15 +36,15 @@
           "id": "CG8DdwyKZdCG40Be7Wq_s"
         }
       ],
-      "updated": 1755145387844,
+      "updated": 1755149025159,
       "link": null,
       "locked": false
     },
     {
       "id": "CG8DdwyKZdCG40Be7Wq_s",
       "type": "text",
-      "x": -473.7598954055884,
-      "y": -3709.294566484939,
+      "x": -473.60408592770364,
+      "y": -3709.1575521477644,
       "width": 1393.23486328125,
       "height": 412.5,
       "angle": 0,
@@ -62,11 +62,11 @@
       "index": "bURV",
       "roundness": null,
       "seed": 779062461,
-      "version": 202,
-      "versionNonce": 755509316,
+      "version": 205,
+      "versionNonce": 908910404,
       "isDeleted": false,
       "boundElements": null,
-      "updated": 1755145387844,
+      "updated": 1755149025159,
       "link": null,
       "locked": false,
       "text": "Protótipo app mobile\n",
@@ -1055,9 +1055,9 @@
     {
       "id": "FfhrZNYGIgAZbOy0hYDDC",
       "type": "text",
-      "x": 2230.9621353792404,
+      "x": 2243.3498459505295,
       "y": -557.6641506258275,
-      "width": 148.0425262451172,
+      "width": 123.26710510253906,
       "height": 29.682011413962563,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -1072,11 +1072,11 @@
       "index": "amV",
       "roundness": null,
       "seed": 944499567,
-      "version": 512,
-      "versionNonce": 1302456828,
+      "version": 513,
+      "versionNonce": 127250940,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1755061152781,
+      "updated": 1755146522254,
       "link": null,
       "locked": false,
       "text": "Fazer pedido",
@@ -1087,7 +1087,8 @@
       "containerId": "b7l49KAKzOPxchANkMWmp",
       "originalText": "Fazer pedido",
       "autoResize": true,
-      "lineHeight": 1.25
+      "lineHeight": 1.25,
+      "baseline": 23
     },
     {
       "id": "HlIzsgs-NcaVofLWb_BQN",
@@ -2364,9 +2365,9 @@
     {
       "id": "4_cuOxiCoGejCfHZ4VX8p",
       "type": "arrow",
-      "x": 2446.1278625603763,
+      "x": 2446.2391207865544,
       "y": -542.9231449188462,
-      "width": 150.99234809898144,
+      "width": 151.20483601470232,
       "height": 271.78674978751746,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -2381,11 +2382,11 @@
       "index": "b0u",
       "roundness": null,
       "seed": 1642669151,
-      "version": 1340,
-      "versionNonce": 630223356,
+      "version": 1344,
+      "versionNonce": 452213244,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1755061152782,
+      "updated": 1755149026708,
       "link": null,
       "locked": false,
       "points": [
@@ -2402,20 +2403,20 @@
           -271.78674978751746
         ],
         [
-          150.99234809898144,
-          -271.78674978751746
+          151.20483601470232,
+          -271.7378972438795
         ]
       ],
       "lastCommittedPoint": null,
       "startBinding": {
         "elementId": "b7l49KAKzOPxchANkMWmp",
-        "focus": -0.0044920585560617185,
-        "gap": 5
+        "focus": -0.004492058556061717,
+        "gap": 5.111258226178052
       },
       "endBinding": {
         "elementId": "BPPrR0YY2FEGRnB7HZTRx",
         "focus": 0.6838383150999561,
-        "gap": 4.999999999999773
+        "gap": 4.888741773821721
       },
       "startArrowhead": null,
       "endArrowhead": "triangle",
@@ -2819,8 +2820,8 @@
     {
       "id": "BPPrR0YY2FEGRnB7HZTRx",
       "type": "rectangle",
-      "x": 2602.120210659358,
-      "y": -854.4103001880403,
+      "x": 2602.332698575078,
+      "y": -854.1978122723198,
       "width": 295.4004227952387,
       "height": 251.13989061785358,
       "angle": 0,
@@ -2840,8 +2841,8 @@
         "type": 3
       },
       "seed": 1633829087,
-      "version": 957,
-      "versionNonce": 1483326716,
+      "version": 958,
+      "versionNonce": 2125285628,
       "isDeleted": false,
       "boundElements": [
         {
@@ -2853,16 +2854,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1755061152782,
+      "updated": 1755149026706,
       "link": null,
       "locked": false
     },
     {
       "id": "EcnAYKhgM5TmqpEGA9UGa",
       "type": "text",
-      "x": 2608.5200680530706,
-      "y": -758.5223662930761,
-      "width": 282.6007080078125,
+      "x": 2633.6571470332447,
+      "y": -758.3098783773555,
+      "width": 232.75152587890625,
       "height": 59.364022827925126,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -2879,14 +2880,14 @@
       "index": "b0wl",
       "roundness": null,
       "seed": 1106139663,
-      "version": 699,
-      "versionNonce": 264116420,
+      "version": 702,
+      "versionNonce": 359881284,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1755061152783,
+      "updated": 1755149028693,
       "link": null,
       "locked": false,
-      "text": "Lista com os produtos e\nquantidades",
+      "text": "Lista com os produtos e \nquantidades",
       "fontSize": 23.74560913117005,
       "fontFamily": 5,
       "textAlign": "center",
@@ -2894,7 +2895,8 @@
       "containerId": "BPPrR0YY2FEGRnB7HZTRx",
       "originalText": "Lista com os produtos e quantidades",
       "autoResize": true,
-      "lineHeight": 1.25
+      "lineHeight": 1.25,
+      "baseline": 52
     },
     {
       "id": "olvyBpo9wDI1agJfiSvbi",

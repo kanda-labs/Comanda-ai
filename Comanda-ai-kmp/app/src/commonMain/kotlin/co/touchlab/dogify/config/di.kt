@@ -6,10 +6,13 @@ import co.touchlab.dogify.core.logger.DogifyLoggerImpl
 import co.touchlab.dogify.data.api.CommanderApi
 import co.touchlab.dogify.data.api.createCommanderApi
 import co.touchlab.dogify.data.repository.ItemsRepositoryImp
+import co.touchlab.dogify.data.repository.OrderRepositoryImpl
 import co.touchlab.dogify.data.repository.TablesRepositoryImp
 import co.touchlab.dogify.domain.repository.ItemsRepository
+import co.touchlab.dogify.domain.repository.OrderRepository
 import co.touchlab.dogify.domain.repository.TablesRepository
 import co.touchlab.dogify.presentation.screens.itemsSelection.BreedsListingViewModel
+import co.touchlab.dogify.presentation.screens.order.OrderScreenModel
 import co.touchlab.dogify.presentation.screens.tables.details.TablesDetailsViewModel
 import co.touchlab.dogify.presentation.screens.tables.listing.TablesViewModel
 import co.touchlab.dogify.sqldelight.db.DogifyDatabase
@@ -81,6 +84,12 @@ private val commonModule = DI.Module("commonModule") {
         )
     }
 
+    bindSingleton<OrderRepository> {
+        OrderRepositoryImpl(
+            commanderApi = instance()
+        )
+    }
+
     bindProvider {
         TablesViewModel(repository = instance())
     }
@@ -91,6 +100,13 @@ private val commonModule = DI.Module("commonModule") {
 
     bindProvider {
         BreedsListingViewModel(repository = instance())
+    }
+
+    bindProvider {
+        OrderScreenModel(
+            itemsRepository = instance(),
+            orderRepository = instance()
+        )
     }
 
 
