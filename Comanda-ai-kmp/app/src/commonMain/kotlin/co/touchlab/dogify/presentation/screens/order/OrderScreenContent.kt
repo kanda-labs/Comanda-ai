@@ -25,6 +25,7 @@ fun OrderScreenContent(
     screenModel: OrderScreenModel,
     onBackClick: () -> Unit,
     onSubmitOrder: () -> Unit,
+    onShowFeedback: (isSuccess: Boolean, message: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val categories = screenModel.categories
@@ -37,21 +38,20 @@ fun OrderScreenContent(
     val orderSubmitted by screenModel.orderSubmitted.collectAsState()
     val showConfirmationModal by screenModel.showConfirmationModal.collectAsState()
     val selectedItemsWithCount by screenModel.selectedItemsWithCount.collectAsState()
+    val isSubmitting by screenModel.isSubmitting.collectAsState()
     
     // Handle order submission success
     LaunchedEffect(orderSubmitted) {
         if (orderSubmitted) {
-            screenModel.hideConfirmationModal()
-            onBackClick()
+            onShowFeedback(true, "Pedido enviado com sucesso!")
             screenModel.resetOrderSubmitted()
         }
     }
     
-    // Show error snackbar
+    // Handle order submission error
     error?.let { errorMessage ->
         LaunchedEffect(errorMessage) {
-            // In a real app, you'd show a Snackbar here
-            println("Error: $errorMessage")
+            onShowFeedback(false, errorMessage)
             screenModel.clearError()
         }
     }
@@ -74,7 +74,7 @@ fun OrderScreenContent(
                         DogifyButton(
                             text = "Fazer pedido ($totalItems ${if (totalItems == 1) "item" else "itens"})",
                             onClick = { screenModel.showConfirmationModal() },
-                            isEnabled = !isLoading,
+                            isEnabled = !isLoading && !isSubmitting,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
@@ -156,7 +156,7 @@ fun OrderScreenContent(
             isVisible = showConfirmationModal,
             selectedItems = selectedItemsWithCount,
             totalItems = totalItems,
-            isLoading = isLoading,
+            isLoading = isSubmitting,
             onConfirm = onSubmitOrder,
             onDismiss = { screenModel.hideConfirmationModal() }
         )

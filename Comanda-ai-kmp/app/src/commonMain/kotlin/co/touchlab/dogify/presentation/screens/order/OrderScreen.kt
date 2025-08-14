@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.dogify.presentation.screens.feedback.FeedbackScreen
 
 class OrderScreen(
     private val tableId: Int,
@@ -22,6 +23,9 @@ class OrderScreen(
             onBackClick = { navigator.pop() },
             onSubmitOrder = { 
                 screenModel.submitOrder(tableId, billId)
+            },
+            onShowFeedback = { isSuccess, message ->
+                navigator.push(FeedbackScreen(isSuccess, message))
             }
         )
     }

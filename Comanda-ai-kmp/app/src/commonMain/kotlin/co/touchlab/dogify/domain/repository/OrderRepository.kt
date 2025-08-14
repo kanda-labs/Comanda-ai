@@ -13,6 +13,7 @@ interface OrderRepository {
 
 data class CreateOrderItemRequest(
     val itemId: Int,
+    val name: String,
     val count: Int,
     val observation: String? = null
 )

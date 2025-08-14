@@ -4,7 +4,6 @@ import co.touchlab.dogify.config.sqldelight.createDatabase
 import co.touchlab.dogify.core.logger.DogifyLogger
 import co.touchlab.dogify.core.logger.DogifyLoggerImpl
 import co.touchlab.dogify.data.api.CommanderApi
-import co.touchlab.dogify.data.api.createCommanderApi
 import co.touchlab.dogify.data.repository.ItemsRepositoryImp
 import co.touchlab.dogify.data.repository.OrderRepositoryImpl
 import co.touchlab.dogify.data.repository.TablesRepositoryImp
@@ -43,6 +42,8 @@ private val commonModule = DI.Module("commonModule") {
         val httpClient = HttpClient {
             defaultRequest {
                 header("Accept-Encoding", "identity")
+                header("Content-Type", "application/json")
+                header("Accept", "application/json")
             }
             install(Logging) {
                 logger = object : Logger {
@@ -56,6 +57,7 @@ private val commonModule = DI.Module("commonModule") {
                 json(Json {
                     ignoreUnknownKeys = true
                     isLenient = true
+                    encodeDefaults = true
                 })
             }
         }
@@ -63,7 +65,7 @@ private val commonModule = DI.Module("commonModule") {
             .baseUrl(CommanderApi.baseUrl)
             .httpClient(httpClient)
             .build()
-            .createCommanderApi()
+            .create<CommanderApi>()
     }
 
     bindSingleton<DogifyLogger> {

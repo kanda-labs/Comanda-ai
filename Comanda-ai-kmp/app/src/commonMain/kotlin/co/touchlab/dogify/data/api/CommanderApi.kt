@@ -1,6 +1,7 @@
 package co.touchlab.dogify.data.api
 
 import co.touchlab.dogify.data.repository.CreateOrderRequest
+import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
@@ -11,7 +12,7 @@ import kandalabs.commander.domain.model.Table
 
 internal interface CommanderApi {
     companion object {
-        const val baseUrl = "http://10.0.2.2:8081/"
+        const val baseUrl = "http://10.0.2.2:8080/"
     }
 
     @GET("api/v1/items")

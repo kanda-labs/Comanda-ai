@@ -30,6 +30,7 @@ class OrderScreenModel(
     private val _error = MutableStateFlow<String?>(null)
     private val _orderSubmitted = MutableStateFlow(false)
     private val _showConfirmationModal = MutableStateFlow(false)
+    private val _isSubmitting = MutableStateFlow(false)
     
     val categories = ItemCategory.values().toList()
     val selectedCategory = _selectedCategory.asStateFlow()
@@ -37,6 +38,7 @@ class OrderScreenModel(
     val error = _error.asStateFlow()
     val orderSubmitted = _orderSubmitted.asStateFlow()
     val showConfirmationModal = _showConfirmationModal.asStateFlow()
+    val isSubmitting = _isSubmitting.asStateFlow()
     
     val filteredItems = combine(_allItems, _selectedCategory) { items, category ->
         items.filter { it.category == category }
@@ -91,16 +93,20 @@ class OrderScreenModel(
     
     fun submitOrder(tableId: Int, billId: Int) {
         screenModelScope.launch {
-            _isLoading.value = true
+            _isSubmitting.value = true
             _error.value = null
             
             try {
-                val orderItems = _selectedItems.value.map { (itemId, count) ->
-                    CreateOrderItemRequest(
-                        itemId = itemId,
-                        count = count,
-                        observation = null
-                    )
+                val orderItems = _selectedItems.value.mapNotNull { (itemId, count) ->
+                    val item = _allItems.value.find { it.id == itemId }
+                    item?.let {
+                        CreateOrderItemRequest(
+                            itemId = itemId,
+                            name = it.name,
+                            count = count,
+                            observation = null
+                        )
+                    }
                 }
                 
                 val result = orderRepository.createOrder(
@@ -113,15 +119,18 @@ class OrderScreenModel(
                     is DogifyResult.Success -> {
                         _selectedItems.value = emptyMap()
                         _orderSubmitted.value = true
+                        _showConfirmationModal.value = false
                     }
                     is DogifyResult.Failure -> {
                         _error.value = "Erro ao criar pedido: ${result.exception.message}"
+                        _showConfirmationModal.value = false
                     }
                 }
             } catch (e: Exception) {
                 _error.value = "Erro inesperado: ${e.message}"
+                _showConfirmationModal.value = false
             } finally {
-                _isLoading.value = false
+                _isSubmitting.value = false
             }
         }
     }

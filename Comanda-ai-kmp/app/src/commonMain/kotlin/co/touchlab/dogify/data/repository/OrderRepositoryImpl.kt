@@ -24,6 +24,7 @@ internal class OrderRepositoryImpl(
                     items = items.map { 
                         CreateOrderItemDto(
                             itemId = it.itemId,
+                            name = it.name,
                             count = it.count,
                             observation = it.observation
                         )
@@ -45,6 +46,7 @@ data class CreateOrderRequest(
 @Serializable
 data class CreateOrderItemDto(
     val itemId: Int,
+    val name: String,
     val count: Int,
     val observation: String? = null
 )
