@@ -37,14 +37,57 @@ internal class TablesDetailsViewModel(
     }
 
     fun openTable(table: Table) {
+        screenModelScope.launch {
+            val tableId = table.id ?: return@launch
+            safeRunCatching {
+                repository.openTable(tableId, table.number)
+            }.fold(
+                onSuccess = {
+                    // Fetch updated table data from server to reflect status change
+                    refreshTableData(tableId)
+                },
+                onFailure = { error ->
+                    mutableState.emit(
+                        state.value.copy(error = error as? co.touchlab.dogify.core.error.ComandaAiException)
+                    )
+                }
+            )
+        }
+    }
 
+    private fun refreshTableData(tableId: Int) {
+        screenModelScope.launch {
+            mutableState.emit(state.value.copy(isLoading = true))
+            
+            repository.getTableById(tableId).fold(
+                onSuccess = { updatedTable ->
+                    setupDetails(updatedTable)
+                },
+                onFailure = { error ->
+                    mutableState.emit(
+                        state.value.copy(isLoading = false, error = error as? co.touchlab.dogify.core.error.ComandaAiException)
+                    )
+                }
+            )
+        }
     }
 
     fun closeTable(table: Table) {
-
-    }
-
-    fun makeOrder() {
-
+        screenModelScope.launch {
+            val tableId = table.id ?: return@launch
+            safeRunCatching {
+                repository.closeTable(tableId)
+            }.fold(
+                onSuccess = {
+                    // Fetch updated table data from server to reflect status change
+                    refreshTableData(tableId)
+                },
+                onFailure = { error ->
+                    mutableState.emit(
+                        state.value.copy(error = error as? co.touchlab.dogify.core.error.ComandaAiException)
+                    )
+                }
+            )
+        }
     }
 }

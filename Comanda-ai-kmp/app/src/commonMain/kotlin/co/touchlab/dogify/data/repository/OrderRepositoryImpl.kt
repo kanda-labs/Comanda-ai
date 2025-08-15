@@ -50,3 +50,15 @@ data class CreateOrderItemDto(
     val count: Int,
     val observation: String? = null
 )
+
+@Serializable
+data class CreateBillRequest(
+    val tableId: Int?,
+    val tableNumber: Int?
+)
+
+@Serializable
+data class UpdateTableRequest(
+    val billId: Int? = null,
+    val status: kandalabs.commander.domain.model.TableStatus? = null
+)
