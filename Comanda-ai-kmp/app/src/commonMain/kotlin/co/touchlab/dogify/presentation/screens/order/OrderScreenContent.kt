@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.dogify.components.DogifyButton
 import co.touchlab.dogify.components.DogifyTopAppBar
 import co.touchlab.dogify.presentation.screens.order.components.CategoryTabs
+import co.touchlab.dogify.presentation.screens.order.components.ObservationModal
 import co.touchlab.dogify.presentation.screens.order.components.OrderConfirmationModal
 import co.touchlab.dogify.presentation.screens.order.components.OrderItemCard
 import kandalabs.commander.domain.model.ItemCategory
@@ -39,6 +40,10 @@ fun OrderScreenContent(
     val showConfirmationModal by screenModel.showConfirmationModal.collectAsState()
     val selectedItemsWithCount by screenModel.selectedItemsWithCount.collectAsState()
     val isSubmitting by screenModel.isSubmitting.collectAsState()
+    val showObservationModal by screenModel.showObservationModal.collectAsState()
+    val selectedItemForObservation by screenModel.selectedItemForObservation.collectAsState()
+    val currentObservationForSelectedItem by screenModel.currentObservationForSelectedItem.collectAsState()
+    val selectedItemHasQuantity by screenModel.selectedItemHasQuantity.collectAsState()
     
     // Handle order submission success
     LaunchedEffect(orderSubmitted) {
@@ -141,6 +146,9 @@ fun OrderScreenContent(
                                         itemWithCount.item.id?.let { id ->
                                             screenModel.decrementItem(id)
                                         }
+                                    },
+                                    onLongClick = {
+                                        screenModel.showObservationModal(itemWithCount.item)
                                     }
                                 )
                             }
@@ -159,6 +167,18 @@ fun OrderScreenContent(
             isLoading = isSubmitting,
             onConfirm = onSubmitOrder,
             onDismiss = { screenModel.hideConfirmationModal() }
+        )
+        
+        // Observation Modal - overlays the entire screen
+        ObservationModal(
+            isVisible = showObservationModal,
+            item = selectedItemForObservation,
+            currentObservation = currentObservationForSelectedItem,
+            hasItemsSelected = selectedItemHasQuantity,
+            onDismiss = { screenModel.hideObservationModal() },
+            onAddWithObservation = { observation ->
+                screenModel.addItemWithObservation(observation)
+            }
         )
     }
 }

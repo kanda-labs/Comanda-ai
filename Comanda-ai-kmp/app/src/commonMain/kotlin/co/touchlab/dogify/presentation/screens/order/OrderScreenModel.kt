@@ -31,6 +31,9 @@ class OrderScreenModel(
     private val _orderSubmitted = MutableStateFlow(false)
     private val _showConfirmationModal = MutableStateFlow(false)
     private val _isSubmitting = MutableStateFlow(false)
+    private val _showObservationModal = MutableStateFlow(false)
+    private val _selectedItemForObservation = MutableStateFlow<Item?>(null)
+    private val _itemObservations = MutableStateFlow<Map<Int, String>>(emptyMap()) // itemId -> observation
     
     val categories = ItemCategory.values().toList()
     val selectedCategory = _selectedCategory.asStateFlow()
@@ -39,6 +42,22 @@ class OrderScreenModel(
     val orderSubmitted = _orderSubmitted.asStateFlow()
     val showConfirmationModal = _showConfirmationModal.asStateFlow()
     val isSubmitting = _isSubmitting.asStateFlow()
+    val showObservationModal = _showObservationModal.asStateFlow()
+    val selectedItemForObservation = _selectedItemForObservation.asStateFlow()
+    
+    val currentObservationForSelectedItem = combine(
+        _selectedItemForObservation,
+        _itemObservations
+    ) { item, observations ->
+        item?.id?.let { observations[it] }
+    }.stateIn(screenModelScope, SharingStarted.WhileSubscribed(), null)
+    
+    val selectedItemHasQuantity = combine(
+        _selectedItemForObservation,
+        _selectedItems
+    ) { item, selectedItems ->
+        item?.id?.let { selectedItems[it] ?: 0 > 0 } ?: false
+    }.stateIn(screenModelScope, SharingStarted.WhileSubscribed(), false)
     
     val filteredItems = combine(_allItems, _selectedCategory) { items, category ->
         items.filter { it.category == category }
@@ -104,7 +123,7 @@ class OrderScreenModel(
                             itemId = itemId,
                             name = it.name,
                             count = count,
-                            observation = null
+                            observation = _itemObservations.value[itemId]
                         )
                     }
                 }
@@ -118,6 +137,7 @@ class OrderScreenModel(
                 when (result) {
                     is DogifyResult.Success -> {
                         _selectedItems.value = emptyMap()
+                        _itemObservations.value = emptyMap()
                         _orderSubmitted.value = true
                         _showConfirmationModal.value = false
                     }
@@ -149,6 +169,40 @@ class OrderScreenModel(
     
     fun hideConfirmationModal() {
         _showConfirmationModal.value = false
+    }
+    
+    fun showObservationModal(item: Item) {
+        _selectedItemForObservation.value = item
+        _showObservationModal.value = true
+    }
+    
+    fun hideObservationModal() {
+        _showObservationModal.value = false
+        _selectedItemForObservation.value = null
+    }
+    
+    fun addItemWithObservation(observation: String) {
+        val item = _selectedItemForObservation.value
+        if (item?.id != null) {
+            // Add or update observation
+            val currentObservations = _itemObservations.value.toMutableMap()
+            if (observation.isNotBlank()) {
+                currentObservations[item.id] = observation
+            } else {
+                currentObservations.remove(item.id)
+            }
+            _itemObservations.value = currentObservations
+            
+            // Only add item if quantity is 0
+            val currentSelectedItems = _selectedItems.value
+            val currentQuantity = currentSelectedItems[item.id] ?: 0
+            if (currentQuantity == 0) {
+                incrementItem(item.id)
+            }
+            
+            // Hide modal
+            hideObservationModal()
+        }
     }
     
     private fun loadItems() {

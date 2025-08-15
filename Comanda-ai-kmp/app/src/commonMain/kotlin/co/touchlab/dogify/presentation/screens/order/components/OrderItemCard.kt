@@ -1,5 +1,7 @@
 package co.touchlab.dogify.presentation.screens.order.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -9,11 +11,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.touchlab.dogify.domain.model.ItemWithCount
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OrderItemCard(
     itemWithCount: ItemWithCount,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -26,6 +30,10 @@ fun OrderItemCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .combinedClickable(
+                    onClick = onIncrement,
+                    onLongClick = onLongClick
+                )
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
