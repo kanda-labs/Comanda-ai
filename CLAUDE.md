@@ -67,7 +67,7 @@ kandalabs.commander/
 └── designsystem/   # UI components, theming
 ```
 
-**Key Screens:** TablesScreen, TableDetailsScreen, ItemsScreen
+**Key Screens:** TablesScreen, TableDetailsScreen, ItemsScreen, OrderScreen
 
 ## 🛠️ Development Guidelines
 
@@ -113,3 +113,41 @@ SQLite with tables: Users, Tables, Items, Orders, Bills (see `SQLTableObjects.kt
 - **Database:** `DatabaseConfig.kt`, `SQLTableObjects.kt`
 - **Mobile DI:** Check DI modules for base URL configuration
 - **Platform Code:** `androidMain/`, `iosMain/`, `commonMain/`
+- **API Documentation:** `API_ENDPOINTS.md`
+
+## 🍽️ Table Status Management
+
+### Table Status Flow
+The app implements a complete table status management system:
+
+```
+FREE (Livre) → [Abrir conta] → OCCUPIED (Ocupada) → [Fechar conta] → ON_PAYMENT (Em pagamento)
+```
+
+### Status Mapping (Frontend ↔ Backend)
+| Frontend Status | Backend Status | Description |
+|-----------------|----------------|-------------|
+| `FREE` | `CLOSED` | Mesa livre, sem conta ativa |
+| `OCCUPIED` | `OPEN` | Mesa ocupada, conta ativa |
+| `ON_PAYMENT` | `ON_PAYMENT` | Mesa em processo de pagamento |
+
+### UI Behavior by Status
+
+| Status | Badge Color | Primary Button | Secondary Button |
+|---------|-------------|----------------|------------------|
+| **FREE** | 🟢 Verde "Livre" | "Abrir conta" | "Voltar" |
+| **OCCUPIED** | 🟡 Amarelo "Ocupada" | "Fazer pedido" | "Fechar conta" |
+| **ON_PAYMENT** | 🟠 Laranja "Em pagamento" | - | "Voltar" |
+
+### Key Implementation Points
+- **Opening account**: Creates a bill via `POST /bills` and auto-updates table status
+- **Closing account**: Updates table status via `PUT /tables/{id}` to `ON_PAYMENT`
+- **Making orders**: Navigates to OrderScreen with `billId` from active table
+- **Auto-refresh**: UI automatically updates after status changes by fetching fresh data
+- **Repository methods**: `openTable()`, `closeTable()`, `getTableById()` for status management
+
+### Important Files for Table Status
+- **TablesDetailsViewModel.kt**: Status update logic with auto-refresh
+- **TableDetailsScreenState.kt**: UI state based on table status
+- **TablesRepository.kt**: Interface with status management methods
+- **TablesRepositoryImp.kt**: API integration for status updates
