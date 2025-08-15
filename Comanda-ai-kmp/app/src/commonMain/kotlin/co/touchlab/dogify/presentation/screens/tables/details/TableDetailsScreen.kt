@@ -39,6 +39,7 @@ import kandalabs.commander.domain.model.Table
 import kandalabs.commander.domain.model.TableStatus
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import co.touchlab.dogify.presentation.screens.tables.details.component.TableDetailsOrders
+import co.touchlab.dogify.presentation.screens.tables.details.component.OrderDetailsModal
 import co.touchlab.dogify.presentation.designSystem.components.CommandaBadge
 import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.OrderStatus
@@ -71,6 +72,7 @@ public data class TableDetailsScreen(val table: Table) : Screen {
                     }
                 }
                 TableDetailsAction.BACK -> navigator.pop()
+                TableDetailsAction.SHOW_ORDER_DETAILS -> { /* Handled by onOrderClick */ }
             }
 
         }
@@ -80,7 +82,9 @@ public data class TableDetailsScreen(val table: Table) : Screen {
 
         TableDetailsScreenContent(
             state = state,
-            action = { action -> actions(action) }
+            action = { action -> actions(action) },
+            onOrderClick = { order -> viewModel.showOrderDetails(order) },
+            onDismissOrderDetails = { viewModel.hideOrderDetails() }
         )
     }
 }
@@ -88,7 +92,9 @@ public data class TableDetailsScreen(val table: Table) : Screen {
 @Composable
 private fun TableDetailsScreenContent(
     state: TableDetailsScreenState,
-    action: (TableDetailsAction) -> Unit
+    action: (TableDetailsAction) -> Unit,
+    onOrderClick: (Order) -> Unit,
+    onDismissOrderDetails: () -> Unit
 ) {
     MaterialTheme {
         Surface(
@@ -156,7 +162,7 @@ private fun TableDetailsScreenContent(
 
                     TableDetailsOrders(
                         orders = state.orders.ordersPresentation,
-                        onOrderClick = { /* ação ao clicar no pedido, se necessário */ },
+                        onOrderClick = onOrderClick,
                         modifier = Modifier
                             .weight(1f)
                     )
@@ -164,6 +170,15 @@ private fun TableDetailsScreenContent(
                     TableDetailsButtons(state, action)
                 }
             }
+        }
+
+        // Order Details Modal
+        state.selectedOrderForDetails?.let { order ->
+            OrderDetailsModal(
+                isVisible = true,
+                order = order,
+                onDismiss = onDismissOrderDetails
+            )
         }
     }
 }
@@ -217,7 +232,9 @@ private fun TableDetailsScreenPreview() {
                 isLoading = false,
                 error = null
             ),
-            action = {}
+            action = {},
+            onOrderClick = {},
+            onDismissOrderDetails = {}
         )
     }
 }

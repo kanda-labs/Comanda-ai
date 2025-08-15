@@ -31,7 +31,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 internal fun TableDetailsOrders(
     orders: List<OrdersDetailsItemState>,
-    onOrderClick: (OrdersDetailsItemState) -> Unit,
+    onOrderClick: (Order) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (orders.isEmpty()) {
@@ -67,7 +67,7 @@ internal fun TableDetailsOrders(
                 OrderListItem(
                     order = order,
                     isLastItem = order == orders.last(),
-                    onClick = { onOrderClick(order) }
+                    onClick = { onOrderClick(order.order) }
                 )
             }
         }

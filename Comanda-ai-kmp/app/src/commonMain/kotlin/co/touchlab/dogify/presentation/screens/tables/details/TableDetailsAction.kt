@@ -5,4 +5,5 @@ enum class TableDetailsAction {
     CLOSE_TABLE,
     MAKE_ORDER,
     BACK,
+    SHOW_ORDER_DETAILS,
 }

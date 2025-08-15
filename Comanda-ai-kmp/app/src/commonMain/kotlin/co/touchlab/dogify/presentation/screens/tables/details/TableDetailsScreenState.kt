@@ -11,7 +11,8 @@ import kotlinx.datetime.LocalDateTime
 internal data class TableDetailsScreenState(
     private val table: Table? = null,
     val isLoading: Boolean = true,
-    val error: ComandaAiException? = null
+    val error: ComandaAiException? = null,
+    val selectedOrderForDetails: Order? = null
 ) {
     val appBarTitle = "Detalhes da mesa"
     private val presentationNumber = buildString {

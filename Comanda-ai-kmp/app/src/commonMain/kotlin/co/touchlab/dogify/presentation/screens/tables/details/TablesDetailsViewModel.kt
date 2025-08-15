@@ -90,4 +90,20 @@ internal class TablesDetailsViewModel(
             )
         }
     }
+
+    fun showOrderDetails(order: Order) {
+        screenModelScope.launch {
+            mutableState.emit(
+                state.value.copy(selectedOrderForDetails = order)
+            )
+        }
+    }
+
+    fun hideOrderDetails() {
+        screenModelScope.launch {
+            mutableState.emit(
+                state.value.copy(selectedOrderForDetails = null)
+            )
+        }
+    }
 }
