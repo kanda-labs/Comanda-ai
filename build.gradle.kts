@@ -75,7 +75,7 @@ tasks.register("buildInstallStartApp") {
             commandLine("./gradlew", ":app:installDebug")
         }
         exec {
-            commandLine("adb", "shell", "am", "start", "-n", "co.touchlab.dogify/co.touchlab.dogify.MainActivity")
+            commandLine("adb", "shell", "am", "start", "-n", "co.kandalabs.comandaai/co.kandalabs.comandaai.MainActivity")
         }
     }
 }

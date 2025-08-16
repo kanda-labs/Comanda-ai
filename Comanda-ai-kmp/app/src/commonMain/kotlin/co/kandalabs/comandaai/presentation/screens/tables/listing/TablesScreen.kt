@@ -1,0 +1,174 @@
+package co.kandalabs.comandaai.presentation.screens.tables.listing
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.kodein.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import co.kandalabs.comandaai.components.ComandaAiTopAppBar
+import co.kandalabs.comandaai.theme.ComandaAiTypography
+import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
+import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
+import co.kandalabs.comandaai.presentation.screens.tables.details.TableDetailsScreen
+import co.kandalabs.comandaai.tokens.ComandaAiSpacing
+import kandalabs.commander.domain.model.Table
+import kandalabs.commander.domain.model.TableStatus
+import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
+public object TablesScreen : Screen {
+
+    @Composable
+    override fun Content() {
+        val viewModel = rememberScreenModel<TablesViewModel>()
+        val state = viewModel.state.collectAsState().value
+        val navigator = LocalNavigator.current
+        LaunchedEffect(Unit) {
+            viewModel.retrieveTables()
+        }
+
+        TablesScreenContent(
+            state = state,
+            retry = { viewModel.retrieveTables() },
+            onClick = { table: Table ->
+                navigator?.push(TableDetailsScreen(table = table))
+            }
+        )
+    }
+}
+
+@Composable
+private fun TablesScreenContent(
+    state: TablesScreenState,
+    retry: () -> Unit,
+    onClick: (Table) -> Unit
+) {
+    MaterialTheme {
+        if (state.isLoading) {
+            LoadingView()
+        } else if (state.error != null) {
+            ErrorView(
+                error = state.error,
+                retry = retry
+            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+
+
+            ) {
+
+                ComandaAiTopAppBar(state.title)
+
+                TablesGrid(
+                    tablesPresentations = state.tablesPresentation,
+                    onClick = onClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TablesGrid(
+    tablesPresentations: List<TablePresentation>,
+    onClick: (Table) -> Unit
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(ComandaAiSpacing.Large.value)
+
+    ) {
+        items(tablesPresentations) { tablePresentation ->
+            TableItem(tablePresentation = tablePresentation, onClick = onClick)
+        }
+    }
+}
+
+@Composable
+private fun TableItem(
+    tablePresentation: TablePresentation,
+    onClick: (Table) -> Unit
+) {
+
+    Card(
+        modifier = Modifier
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(8.dp)),
+        colors = CardDefaults.cardColors(
+            containerColor = tablePresentation.backGroundColor.value
+        )
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+                .clickable(onClick = { onClick(tablePresentation.table) })
+        ) {
+            Text(
+                text = tablePresentation.number,
+                color = tablePresentation.textColor,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                style = ComandaAiTypography.displayLarge
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TablesScreenPreview() {
+    MaterialTheme {
+        TablesScreenContent(
+            state = TablesScreenState(
+                tables = persistentListOf(
+                    Table(
+                        number = 1,
+                        status = TableStatus.OCCUPIED
+                    ),
+                    Table(
+                        number = 2,
+                        status = TableStatus.FREE
+                    ),
+                    Table(
+                        number = 3,
+                        status = TableStatus.ON_PAYMENT
+                    )
+                ),
+                isLoading = false,
+                error = null
+            ),
+            retry = {},
+            onClick = {}
+        )
+    }
+}
+

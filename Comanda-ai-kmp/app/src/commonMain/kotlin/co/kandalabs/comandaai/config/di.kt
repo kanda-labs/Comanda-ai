@@ -1,0 +1,126 @@
+package co.kandalabs.comandaai.config
+
+import co.kandalabs.comandaai.config.sqldelight.createDatabase
+import co.kandalabs.comandaai.core.logger.ComandaAiLogger
+import co.kandalabs.comandaai.core.logger.ComandaAiLoggerImpl
+import co.kandalabs.comandaai.data.api.CommanderApi
+import co.kandalabs.comandaai.data.repository.ItemsRepositoryImp
+import co.kandalabs.comandaai.data.repository.OrderRepositoryImpl
+import co.kandalabs.comandaai.data.repository.TablesRepositoryImp
+import co.kandalabs.comandaai.domain.repository.ItemsRepository
+import co.kandalabs.comandaai.domain.repository.OrderRepository
+import co.kandalabs.comandaai.domain.repository.TablesRepository
+import co.kandalabs.comandaai.presentation.screens.itemsSelection.BreedsListingViewModel
+import co.kandalabs.comandaai.presentation.screens.order.OrderScreenModel
+import co.kandalabs.comandaai.presentation.screens.tables.details.TablesDetailsViewModel
+import co.kandalabs.comandaai.presentation.screens.tables.listing.TablesViewModel
+import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
+import de.jensklingenberg.ktorfit.Ktorfit
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.serialization.json.Json
+import org.kodein.di.DI
+import org.kodein.di.bindProvider
+import org.kodein.di.bindSingleton
+import org.kodein.di.instance
+
+private val commonModule = DI.Module("commonModule") {
+
+    bindSingleton<ComandaAiDatabase> {
+        createDatabase(instance())
+    }
+
+    bindSingleton<CommanderApi> {
+        val httpClient = HttpClient {
+            defaultRequest {
+                header("Accept-Encoding", "identity")
+                header("Content-Type", "application/json")
+                header("Accept", "application/json")
+            }
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        println("HTTP: $message")
+                    }
+                }
+                level = LogLevel.ALL
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                    encodeDefaults = true
+                })
+            }
+        }
+        Ktorfit.Builder()
+            .baseUrl(CommanderApi.baseUrl)
+            .httpClient(httpClient)
+            .build()
+            .create<CommanderApi>()
+    }
+
+    bindSingleton<ComandaAiLogger> {
+        ComandaAiLoggerImpl()
+    }
+
+    bindSingleton<ItemsRepository> {
+        ItemsRepositoryImp(
+            api = instance(),
+            logger = instance(),
+            dispatcher = Dispatchers.IO,
+        )
+    }
+
+    bindSingleton<TablesRepository> {
+        TablesRepositoryImp(
+            commanderApi = instance()
+        )
+    }
+
+    bindSingleton<OrderRepository> {
+        OrderRepositoryImpl(
+            commanderApi = instance()
+        )
+    }
+
+    bindProvider {
+        TablesViewModel(repository = instance())
+    }
+
+    bindProvider {
+        TablesDetailsViewModel(repository = instance())
+    }
+
+    bindProvider {
+        BreedsListingViewModel(repository = instance())
+    }
+
+    bindProvider {
+        OrderScreenModel(
+            itemsRepository = instance(),
+            orderRepository = instance()
+        )
+    }
+
+
+}
+
+object AppModule {
+    fun DI.MainBuilder.initializeKodein() {
+        import(commonModule)
+    }
+}
+
+
+
+
+

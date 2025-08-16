@@ -1,4 +1,4 @@
--- src/commonMain/sqldelight/DogifyDatabase/Breed.sq
+-- src/commonMain/sqldelight/ComandaAiDatabase/Breed.sq
 
 CREATE TABLE Breed (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

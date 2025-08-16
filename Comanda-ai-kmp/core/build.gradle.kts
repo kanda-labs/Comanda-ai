@@ -30,7 +30,7 @@ kotlin {
 }
 
 android {
-    namespace = "co.touchlab.dogify.core"
+    namespace = "co.kandalabs.comandaai.core"
     compileSdk = 35
     defaultConfig {
         minSdk = 25

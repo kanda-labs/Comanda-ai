@@ -20,8 +20,8 @@ plugins {
 
 sqldelight {
     databases {
-        create("DogifyDatabase") {
-            packageName.set("co.touchlab.dogify.sqldelight.db")
+        create("ComandaAiDatabase") {
+            packageName.set("co.kandalabs.comandaai.sqldelight.db")
         }
     }
 }
@@ -109,11 +109,11 @@ kotlin {
 
 
 android {
-    namespace = "co.touchlab.dogify"
+    namespace = "co.kandalabs.comandaai"
     compileSdk = 35
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        applicationId = "co.touchlab.dogify"
+        applicationId = "co.kandalabs.comandaai"
         minSdk = 25
         targetSdk = 35
         versionCode = 1
