@@ -58,6 +58,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            implementation(projects.auth)
             implementation(projects.designsystem)
             implementation(projects.core)
             implementation(compose.runtime)

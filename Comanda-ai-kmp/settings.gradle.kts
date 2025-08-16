@@ -19,5 +19,6 @@ dependencyResolutionManagement {
 }
 
 include(":app")
+include(":auth")
 include(":designsystem")
 include(":core")

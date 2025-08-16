@@ -25,6 +25,7 @@ docker-compose up -d             # Start with Docker
 cd Comanda-ai-kmp
 ./gradlew build                  # Build all targets
 ./gradlew :app:assembleDebug     # Build Android APK
+./gradlew :auth:build            # Build auth module
 ./gradlew test                   # Run tests
 ```
 
@@ -63,11 +64,12 @@ kandalabs.commander/
 **Module Structure:**
 ```
 ├── app/            # Main app (MVVM implementation)
+├── auth/           # Authentication module (Login, Registration)
 ├── core/           # Utilities, error handling
 └── designsystem/   # UI components, theming
 ```
 
-**Key Screens:** TablesScreen, TableDetailsScreen, ItemsScreen, OrderScreen
+**Key Screens:** LoginScreen, TablesScreen, TableDetailsScreen, ItemsScreen, OrderScreen
 
 ## 🛠️ Development Guidelines
 
@@ -151,3 +153,115 @@ FREE (Livre) → [Abrir conta] → OCCUPIED (Ocupada) → [Fechar conta] → ON_
 - **TableDetailsScreenState.kt**: UI state based on table status
 - **TablesRepository.kt**: Interface with status management methods
 - **TablesRepositoryImp.kt**: API integration for status updates
+
+## 🔐 Authentication Module
+
+The app uses a modularized authentication system with the `auth` module providing login functionality.
+
+### Auth Module Structure
+```
+auth/
+├── build.gradle.kts
+└── src/
+    ├── commonMain/kotlin/co/kandalabs/comandaai/auth/
+    │   ├── AuthModule.kt                    # Public API
+    │   └── presentation/login/
+    │       ├── LoginScreen.kt              # Login UI (Compose)
+    │       ├── LoginViewModel.kt           # MVVM ViewModel
+    │       └── LoginScreenState.kt         # UI State
+    └── androidMain/
+        └── AndroidManifest.xml
+```
+
+### Using Auth Module
+```kotlin
+// Import auth functionality
+import co.kandalabs.comandaai.auth.AuthModule
+
+// Get login screen
+val loginScreen = AuthModule.getLoginScreen()
+
+// Example integration in ComandaAiApp
+@Composable
+fun ComandaAiApp() {
+    ComandaAiTheme {
+        Navigator(AuthModule.getLoginScreen()) { navigator ->
+            SlideTransition(navigator)
+        }
+    }
+}
+```
+
+### Login Screen Features
+- ✅ **Form Validation**: Username (min 3 chars) and password (min 4 chars)
+- ✅ **Real-time Validation**: Immediate feedback on input errors
+- ✅ **Loading States**: Button disabled during authentication
+- ✅ **Error Handling**: Display authentication errors with styling
+- ✅ **Keyboard Navigation**: Tab between fields, submit on Done
+- ✅ **Design System**: Uses ComandaAi colors, spacing, and components
+- ✅ **Multiplatform**: Works on Android and iOS
+
+### Auth Module Dependencies
+```kotlin
+auth {
+    - core (error handling, utilities)
+    - designsystem (UI components, theming)
+    - voyager (navigation framework)
+    - kodein (dependency injection)
+    - compose (UI framework)
+}
+```
+
+### Future Auth Features (Planned)
+- 📝 User registration screen
+- 🔐 Password recovery flow
+- 👥 Social login (Google, Apple)
+- 🔒 2FA authentication
+- 💾 Token persistence
+- 🔄 Automatic token refresh
+
+### Key Auth Files
+- **auth/AuthModule.kt**: Public API for auth integration
+- **auth/presentation/login/LoginScreen.kt**: Main login interface
+- **auth/presentation/login/LoginViewModel.kt**: Login business logic
+- **auth/presentation/login/LoginScreenState.kt**: UI state management
+
+## 📱 Order Details Modal
+
+The table details screen includes an interactive order details modal for viewing order items and their status.
+
+### Modal Features
+- ✅ **Click to Open**: Click any order in the table details to view details
+- ✅ **90% Height**: Modal occupies 90% of screen height
+- ✅ **Bottom Alignment**: Slides up from bottom of screen
+- ✅ **Drag to Dismiss**: Drag downward to close (150px threshold)
+- ✅ **Order Number**: Title shows "Pedido Nº X"
+- ✅ **Item List**: Shows all order items with individual status
+- ✅ **Status Colors**: Visual indicators (Atendido/Pendente/Cancelado)
+- ✅ **Quantity Display**: Shows item count and observations
+- ✅ **Bottom Button**: "Voltar" button fixed at bottom
+
+### Implementation Files
+- **OrderDetailsModal.kt**: Modal component with drag-to-dismiss
+- **TableDetailsAction.kt**: SHOW_ORDER_DETAILS action
+- **TableDetailsScreenState.kt**: selectedOrderForDetails state
+- **TablesDetailsViewModel.kt**: showOrderDetails() / hideOrderDetails() methods
+- **TableDetailsOrders.kt**: Order click handling
+
+### Usage
+```kotlin
+// Orders list with click handler
+TableDetailsOrders(
+    orders = state.orders.ordersPresentation,
+    onOrderClick = { order -> viewModel.showOrderDetails(order) }
+)
+
+// Modal integration
+state.selectedOrderForDetails?.let { order ->
+    OrderDetailsModal(
+        isVisible = true,
+        order = order,
+        onDismiss = { viewModel.hideOrderDetails() }
+    )
+}
+```
