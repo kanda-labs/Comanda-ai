@@ -15,7 +15,7 @@ comanda-ai/
 ### Backend Development
 ```bash
 cd CommanderAPI
-./gradlew run                    # Start server (localhost:8080)
+./gradlew run                    # Start server (localhost:8081)
 ./gradlew test                   # Run tests
 docker-compose up -d             # Start with Docker
 ```
@@ -92,12 +92,77 @@ kandalabs.commander/
 - **Backend:** JUnit 5 + MockK, separate test config
 - **Mobile:** Kotlin Test + AssertK + Turbine, Compose testing
 
+## 🔑 Demo Credentials
+
+For testing and development, use these demo user credentials:
+
+| Username | Password | Role | Description |
+|----------|----------|------|-------------|
+| `leonardo-paixao` | `123456` | MANAGER | Manager access |
+| `lueny-paixao` | `142824` | USER | Regular user |
+| `admin` | `122825` | ADMIN | Administrator |
+| `test` | `1234` | USER | Test user |
+| `rennan-viana` | `123456` | USER | Regular user |
+
+**Note:** These are demo credentials for development only. In production, proper password hashing and secure authentication should be implemented.
+
+## 🍽️ Menu Items
+
+The system comes with these pre-configured menu items:
+
+### Espetinhos (SKEWER)
+- **Espetinho de Alcatra** - R$ 8,00 (ID: 1)
+- **Filé com Alho** - R$ 9,00 (ID: 2)
+- **Medalhão de Frango** - R$ 10,00 (ID: 3)
+- **Batata Frita** - R$ 15,00 (ID: 7)
+
+### Chopp (CHOPP)
+- **Chopp** - R$ 10,00 (ID: 4)
+
+### Bebidas sem Álcool (NON_ALCOHOLIC_DRINKS)
+- **Água** - R$ 3,00 (ID: 5)
+- **Refrigerante** - R$ 5,00 (ID: 6)
+
+### Item Categories
+- `SKEWER`: Food items and appetizers
+- `CHOPP`: Draft beer
+- `NON_ALCOHOLIC_DRINKS`: Soft drinks and water
+- `DRINK`: Alcoholic beverages (other than chopp)
+
+## 📋 API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/login` - User authentication
+
+### Items Management
+- `GET /api/v1/items` - List all items
+- `GET /api/v1/items/{id}` - Get item by ID
+- `POST /api/v1/items` - Create new item
+- `PUT /api/v1/items/{id}` - Update item
+- `DELETE /api/v1/items/{id}` - Delete item
+
+### Tables Management
+- `GET /api/v1/tables` - List all tables
+- `GET /api/v1/tables/{id}` - Get table details
+- `PUT /api/v1/tables/{id}` - Update table status
+
+### Orders & Bills
+- `POST /api/v1/bills` - Create bill (opens table)
+- `GET /api/v1/bills/{tableId}` - Get bill for table
+- `POST /api/v1/orders` - Create order
+- `GET /api/v1/orders` - List orders
+
+### Server-Sent Events
+- `GET /api/v1/orders/sse` - Real-time order updates
+
+**API Documentation:** Available at `/swagger-ui` when server is running
+
 ## ⚙️ Configuration
 
 ### Environment Variables (Backend)
 | Variable | Default | Description |
 |----------|---------|-------------|
-| PORT | 8080 | Server port |
+| PORT | 8081 | Server port |
 | HOST | 0.0.0.0 | Server host |
 | DATABASE_URL | jdbc:sqlite:data.db | Database connection |
 | LOG_LEVEL | INFO | Logging level |
