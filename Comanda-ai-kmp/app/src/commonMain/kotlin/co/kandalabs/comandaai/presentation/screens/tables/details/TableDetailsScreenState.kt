@@ -14,6 +14,7 @@ internal data class TableDetailsScreenState(
     val error: ComandaAiException? = null,
     val selectedOrderForDetails: Order? = null
 ) {
+    val currentTable: Table? get() = table
     val appBarTitle = "Detalhes da mesa"
     private val presentationNumber = buildString {
         if ((table?.number ?: 0) < 10) append("0")

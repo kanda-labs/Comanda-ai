@@ -19,10 +19,13 @@ internal class TablesDetailsViewModel(
             mutableState.emit(TableDetailsScreenState(isLoading = true))
 
             safeRunCatching {
-                val tableOrders =
-                    table.id?.let { repository.getTableOrders(it).getOrElse { emptyList() } } ?: emptyList<Order>()
-                val tableWithOrders = table.copy(orders = tableOrders.toPersistentList())
-                TableDetailsScreenState(table = tableWithOrders, isLoading = false)
+                val updatedTable = table.id?.let { tableId ->
+                    repository.getTableById(tableId).fold(
+                        onSuccess = { it },
+                        onFailure = { table }
+                    )
+                } ?: table
+                TableDetailsScreenState(table = updatedTable, isLoading = false)
             }.fold(
                 onSuccess = { tableDetailsScreenState ->
                     mutableState.emit(tableDetailsScreenState)
@@ -104,6 +107,13 @@ internal class TablesDetailsViewModel(
             mutableState.emit(
                 state.value.copy(selectedOrderForDetails = null)
             )
+        }
+    }
+
+    fun refreshData() {
+        val currentTable = state.value.currentTable
+        if (currentTable != null) {
+            setupDetails(currentTable)
         }
     }
 }

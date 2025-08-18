@@ -241,6 +241,14 @@ private fun OrderItemRow(
                     modifier = Modifier.size(20.dp)
                 )
             }
+            ItemStatus.DELIVERED -> {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = "Entregue",
+                    tint = ComandaAiColors.Green600.value,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
             ItemStatus.OPEN -> {
                 IconButton(
                     onClick = onMarkComplete,

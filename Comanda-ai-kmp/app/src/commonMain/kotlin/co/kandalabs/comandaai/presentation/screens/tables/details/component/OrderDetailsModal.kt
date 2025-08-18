@@ -240,6 +240,10 @@ private fun OrderDetailsItem(
             ComandaAiColors.Green500.value,
             ComandaAiColors.OnSurface.value
         )
+        ItemStatus.DELIVERED -> Pair(
+            ComandaAiColors.Green500.value,
+            ComandaAiColors.OnSurface.value
+        )
         ItemStatus.OPEN -> Pair(
             ComandaAiColors.Blue500.value,
             ComandaAiColors.OnSurface.value
@@ -252,6 +256,7 @@ private fun OrderDetailsItem(
 
     val statusText = when (item.status) {
         ItemStatus.GRANTED -> "Atendido"
+        ItemStatus.DELIVERED -> "Entregue"
         ItemStatus.OPEN -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
     }

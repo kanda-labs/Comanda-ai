@@ -172,16 +172,16 @@ private fun KitchenScreenContent(
                 1 -> OrderOverviewTab(state = state)
             }
         }
-
-        // User Profile Modal
-        UserProfileModal(
-            isVisible = showUserModal,
-            userName = userSession?.userName,
-            userRole = userSession?.role?.name,
-            onDismiss = onDismissUserModal,
-            onLogout = onLogout
-        )
     }
+
+    // User Profile Modal - Moved outside of Scaffold to fix z-index issue
+    UserProfileModal(
+        isVisible = showUserModal,
+        userName = userSession?.userName,
+        userRole = userSession?.role?.name,
+        onDismiss = onDismissUserModal,
+        onLogout = onLogout
+    )
 }
 
 @Composable

@@ -31,7 +31,7 @@ internal class TablesRepositoryImp(
         return safeRunCatching {
             commanderApi.getTable(id).orders
         }.onFailure { error ->
-            println(error)
+            println("Error fetching table orders: $error")
         }
     }
 

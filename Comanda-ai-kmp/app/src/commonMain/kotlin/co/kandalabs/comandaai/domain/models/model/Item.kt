@@ -21,6 +21,11 @@ data class ItemOrder(
     val status: ItemStatus
 )
 
-enum class ItemStatus { GRANTED, OPEN, CANCELED }
+enum class ItemStatus { 
+    GRANTED, 
+    OPEN, 
+    DELIVERED, 
+    CANCELED 
+}
 
 enum class ItemCategory { SKEWER, DRINK, NON_ALCOHOLIC_DRINKS, CHOPP }
