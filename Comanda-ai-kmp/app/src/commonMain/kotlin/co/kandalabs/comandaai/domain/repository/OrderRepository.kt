@@ -9,6 +9,10 @@ interface OrderRepository {
         billId: Int,
         items: List<CreateOrderItemRequest>
     ): ComandaAiResult<Order>
+    
+    suspend fun getAllOrders(): ComandaAiResult<List<Order>>
+    
+    suspend fun updateOrder(orderId: Int, order: Order): ComandaAiResult<Order>
 }
 
 data class CreateOrderItemRequest(

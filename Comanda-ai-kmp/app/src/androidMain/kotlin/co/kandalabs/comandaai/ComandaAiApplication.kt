@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import co.kandalabs.comandaai.config.AppModule.initializeKodein
 import co.kandalabs.comandaai.config.sqldelight.DriverFactory
+import co.kandalabs.comandaai.core.session.SessionManager
+import co.kandalabs.comandaai.core.session.SessionManagerImpl
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.bindSingleton
@@ -18,6 +20,10 @@ class ComandaAiApplication : Application(), DIAware {
 
         bindSingleton<DriverFactory> {
             DriverFactory(instance())
+        }
+        
+        bindSingleton<SessionManager> {
+            SessionManagerImpl(instance<Context>())
         }
     }
 }

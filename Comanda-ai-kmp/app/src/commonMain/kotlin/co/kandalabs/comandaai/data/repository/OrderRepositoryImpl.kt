@@ -34,6 +34,20 @@ internal class OrderRepositoryImpl(
         }.onFailure { error ->
             println("Error creating order: $error")
         }
+    
+    override suspend fun getAllOrders(): ComandaAiResult<List<Order>> =
+        safeRunCatching {
+            commanderApi.getAllOrders()
+        }.onFailure { error ->
+            println("Error getting all orders: $error")
+        }
+    
+    override suspend fun updateOrder(orderId: Int, order: Order): ComandaAiResult<Order> =
+        safeRunCatching {
+            commanderApi.updateOrder(orderId, order)
+        }.onFailure { error ->
+            println("Error updating order: $error")
+        }
 }
 
 @Serializable

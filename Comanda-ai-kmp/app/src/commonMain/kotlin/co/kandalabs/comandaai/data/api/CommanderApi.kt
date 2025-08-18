@@ -34,4 +34,10 @@ internal interface CommanderApi {
 
     @PUT("api/v1/tables/{id}")
     suspend fun updateTable(@Path("id") id: Int, @Body request: UpdateTableRequest): Table
+    
+    @GET("api/v1/orders")
+    suspend fun getAllOrders(): List<Order>
+    
+    @PUT("api/v1/orders/{id}")
+    suspend fun updateOrder(@Path("id") id: Int, @Body order: Order): Order
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,7 +35,12 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import kotlinx.coroutines.launch
+import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
+import co.kandalabs.comandaai.components.UserAvatar
+import co.kandalabs.comandaai.core.session.UserSession
+import co.kandalabs.comandaai.presentation.screens.tables.listing.components.UserProfileModal
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
@@ -47,15 +58,34 @@ public object TablesScreen : Screen {
         val viewModel = rememberScreenModel<TablesViewModel>()
         val state = viewModel.state.collectAsState().value
         val navigator = LocalNavigator.current
+        val scope = rememberCoroutineScope()
+        
+        var showUserModal by remember { mutableStateOf(false) }
+        var userSession by remember { mutableStateOf<UserSession?>(null) }
+        
         LaunchedEffect(Unit) {
             viewModel.retrieveTables()
+            userSession = viewModel.getUserSession()
         }
 
         TablesScreenContent(
             state = state,
+            userSession = userSession,
+            showUserModal = showUserModal,
             retry = { viewModel.retrieveTables() },
             onClick = { table: Table ->
                 navigator?.push(TableDetailsScreen(table = table))
+            },
+            onUserAvatarClick = {
+                scope.launch {
+                    userSession = viewModel.getUserSession()
+                    showUserModal = true
+                }
+            },
+            onDismissUserModal = { showUserModal = false },
+            onLogout = {
+                viewModel.logout()
+                navigator?.replaceAll(AuthModule.getLoginScreen())
             }
         )
     }
@@ -64,8 +94,13 @@ public object TablesScreen : Screen {
 @Composable
 private fun TablesScreenContent(
     state: TablesScreenState,
+    userSession: UserSession?,
+    showUserModal: Boolean,
     retry: () -> Unit,
-    onClick: (Table) -> Unit
+    onClick: (Table) -> Unit,
+    onUserAvatarClick: () -> Unit,
+    onDismissUserModal: () -> Unit,
+    onLogout: () -> Unit
 ) {
     MaterialTheme {
         if (state.isLoading) {
@@ -84,7 +119,37 @@ private fun TablesScreenContent(
 
             ) {
 
-                ComandaAiTopAppBar(state.title)
+                ComandaAiTopAppBar(
+                    title = state.title,
+                    actions = {
+                        UserAvatar(
+                            userName = userSession?.userName,
+                            onClick = onUserAvatarClick
+                        )
+                    }
+                )
+
+                // Welcome message
+                if (userSession?.userName != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = ComandaAiSpacing.Large.value,
+                                top = ComandaAiSpacing.Medium.value,
+                                end = ComandaAiSpacing.Large.value,
+                                bottom = ComandaAiSpacing.Small.value
+                            ),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Text(
+                            text = "Bem-vindo, ${userSession.userName}!",
+                            style = ComandaAiTypography.titleMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
 
                 TablesGrid(
                     tablesPresentations = state.tablesPresentation,
@@ -92,6 +157,14 @@ private fun TablesScreenContent(
                 )
             }
         }
+        
+        // User Profile Modal
+        UserProfileModal(
+            isVisible = showUserModal,
+            userSession = userSession,
+            onDismiss = onDismissUserModal,
+            onLogout = onLogout
+        )
     }
 }
 
@@ -166,8 +239,13 @@ private fun TablesScreenPreview() {
                 isLoading = false,
                 error = null
             ),
+            userSession = null,
+            showUserModal = false,
             retry = {},
-            onClick = {}
+            onClick = {},
+            onUserAvatarClick = {},
+            onDismissUserModal = {},
+            onLogout = {}
         )
     }
 }

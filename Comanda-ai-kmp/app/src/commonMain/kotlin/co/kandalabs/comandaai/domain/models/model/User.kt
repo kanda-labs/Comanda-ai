@@ -1,5 +1,6 @@
 package kandalabs.commander.domain.model
 
+import co.kandalabs.comandaai.core.enums.UserRole
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
@@ -11,12 +12,15 @@ import kotlinx.serialization.Serializable
 data class User(
     val id: Int? = null,
     val name: String,
+    val userName: String,
     val email: String? = null,
     val active: Boolean = true,
+    val role: UserRole = UserRole.WAITER,
     val createdAt: LocalDateTime,
 ){
 
 }
+
 
 /**
  * Data Transfer Object for paginated responses

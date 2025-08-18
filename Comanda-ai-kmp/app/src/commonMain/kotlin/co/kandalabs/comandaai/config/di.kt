@@ -1,9 +1,13 @@
 package co.kandalabs.comandaai.config
 
+import co.kandalabs.comandaai.auth.AuthModule
+import co.kandalabs.comandaai.kitchen.KitchenModule
 import co.kandalabs.comandaai.config.sqldelight.createDatabase
 import co.kandalabs.comandaai.core.logger.ComandaAiLogger
 import co.kandalabs.comandaai.core.logger.ComandaAiLoggerImpl
+import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.data.api.CommanderApi
+import co.kandalabs.comandaai.data.api.OrderSSEClient
 import co.kandalabs.comandaai.data.repository.ItemsRepositoryImp
 import co.kandalabs.comandaai.data.repository.OrderRepositoryImpl
 import co.kandalabs.comandaai.data.repository.TablesRepositoryImp
@@ -12,6 +16,8 @@ import co.kandalabs.comandaai.domain.repository.OrderRepository
 import co.kandalabs.comandaai.domain.repository.TablesRepository
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.BreedsListingViewModel
 import co.kandalabs.comandaai.presentation.screens.order.OrderScreenModel
+import co.kandalabs.comandaai.presentation.screens.ordersline.OrdersLineViewModel
+import co.kandalabs.comandaai.presentation.screens.splash.SplashViewModel
 import co.kandalabs.comandaai.presentation.screens.tables.details.TablesDetailsViewModel
 import co.kandalabs.comandaai.presentation.screens.tables.listing.TablesViewModel
 import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
@@ -22,6 +28,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
@@ -37,9 +44,17 @@ private val commonModule = DI.Module("commonModule") {
     bindSingleton<ComandaAiDatabase> {
         createDatabase(instance())
     }
+    
+    bindSingleton<Json> {
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            encodeDefaults = true
+        }
+    }
 
-    bindSingleton<CommanderApi> {
-        val httpClient = HttpClient {
+    bindSingleton<HttpClient> {
+        HttpClient {
             defaultRequest {
                 header("Accept-Encoding", "identity")
                 header("Content-Type", "application/json")
@@ -54,18 +69,27 @@ private val commonModule = DI.Module("commonModule") {
                 level = LogLevel.ALL
             }
             install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                    encodeDefaults = true
-                })
+                json(instance<Json>())
             }
+            install(SSE)
         }
+    }
+
+    bindSingleton<CommanderApi> {
         Ktorfit.Builder()
             .baseUrl(CommanderApi.baseUrl)
-            .httpClient(httpClient)
+            .httpClient(instance<HttpClient>())
             .build()
             .create<CommanderApi>()
+    }
+    
+    bindSingleton<OrderSSEClient> {
+        OrderSSEClient(
+            httpClient = instance(),
+            json = instance(),
+            baseUrl = CommanderApi.baseUrl,
+            logger = instance()
+        )
     }
 
     bindSingleton<ComandaAiLogger> {
@@ -93,7 +117,10 @@ private val commonModule = DI.Module("commonModule") {
     }
 
     bindProvider {
-        TablesViewModel(repository = instance())
+        TablesViewModel(
+            repository = instance(),
+            sessionManager = instance()
+        )
     }
 
     bindProvider {
@@ -111,12 +138,26 @@ private val commonModule = DI.Module("commonModule") {
         )
     }
 
+    bindProvider {
+        SplashViewModel(sessionManager = instance())
+    }
+    
+    bindProvider {
+        OrdersLineViewModel(
+            orderRepository = instance(),
+            orderSSEClient = instance(),
+            sessionManager = instance()
+        )
+    }
+
 
 }
 
 object AppModule {
     fun DI.MainBuilder.initializeKodein() {
         import(commonModule)
+        import(AuthModule.authModule)
+        import(KitchenModule.kitchenDI)
     }
 }
 

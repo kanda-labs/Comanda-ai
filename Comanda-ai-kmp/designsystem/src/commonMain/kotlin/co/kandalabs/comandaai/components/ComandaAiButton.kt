@@ -8,6 +8,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
@@ -15,7 +16,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 enum class ComandaAiButtonVariant {
     Primary,
-    Secondary
+    Secondary,
+    Destructive
 }
 
 
@@ -42,11 +44,19 @@ fun ComandaAiButton(
                 disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            
+            ComandaAiButtonVariant.Destructive -> ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
     val textColor = when (variant) {
         ComandaAiButtonVariant.Primary -> MaterialTheme.colorScheme.onPrimary
         ComandaAiButtonVariant.Secondary -> MaterialTheme.colorScheme.onSecondary
+        ComandaAiButtonVariant.Destructive -> MaterialTheme.colorScheme.onError
     }
 
     Button(
@@ -58,6 +68,27 @@ fun ComandaAiButton(
         enabled = isEnabled,
         content = {
             Text(text, color = textColor, modifier = Modifier.padding(ComandaAiSpacing.xXSmall.value))
+        }
+    )
+}
+
+@Composable
+fun ComandaAiTextButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true
+) {
+    TextButton(
+        modifier = modifier.fillMaxWidth(),
+        onClick = onClick,
+        enabled = isEnabled,
+        content = {
+            Text(
+                text = text,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.padding(ComandaAiSpacing.xXSmall.value)
+            )
         }
     )
 }

@@ -27,12 +27,13 @@ fun ComandaAiTopAppBar(
     title: String,
     onBackOrClose: () -> Unit = {},
     icon: ImageVector? = null,
+    actions: @Composable () -> Unit = {}
 ) {
     TopAppBar(
         title = {
             Text(
                 modifier = Modifier.fillMaxWidth()
-                    .padding(end = ButtonSizeOffset),
+                    .padding(end = if (icon != null) ButtonSizeOffset else 0.dp),
                 text = title,
                 style = MaterialTheme.typography.displayMedium,
                 textAlign = TextAlign.Center
@@ -48,6 +49,9 @@ fun ComandaAiTopAppBar(
                     )
                 }
             }
+        },
+        actions = {
+            actions()
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
