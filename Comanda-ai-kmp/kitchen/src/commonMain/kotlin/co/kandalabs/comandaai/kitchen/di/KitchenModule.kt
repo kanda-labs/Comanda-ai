@@ -34,6 +34,6 @@ val kitchenModule = DI.Module("kitchenModule") {
     }
     
     bindProvider {
-        KitchenViewModel(instance())
+        KitchenViewModel(instance(), instance())
     }
 }

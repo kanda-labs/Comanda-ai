@@ -69,6 +69,7 @@ kotlin {
             // Project modules
             implementation(projects.core)
             implementation(projects.designsystem)
+            implementation(projects.auth)
         }
 
         androidMain.dependencies {

@@ -80,7 +80,7 @@ fun ItemRow(
             
             StatusBadge(
                 status = item.overallStatus,
-                count = item.totalCount,
+                count = item.unitStatuses.count { it.status != ItemStatus.DELIVERED },
                 isMultipleItems = item.totalCount > 1,
                 onClick = {
                     if (item.totalCount > 1) {
@@ -103,38 +103,7 @@ fun ItemRow(
         
         
         // Enhanced conditional logic with better UX
-        if (item.totalCount == 1) {
-            // Single item - direct action button with icon
-            if (hasUndeliveredItems) {
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                FilledTonalButton(
-                    onClick = { onMarkItemAsDelivered(item.itemId) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(
-                            text = "Marcar como Entregue",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-            }
-        } else {
+        if (item.totalCount > 1) {
             // Multiple items - expandable accordion triggered by badge click only
             
             // Enhanced accordion with smooth animations
@@ -157,31 +126,6 @@ fun ItemRow(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Controle Individual",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Surface(
-                                shape = MaterialTheme.shapes.small,
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                            ) {
-                                Text(
-                                    text = "${item.unitStatuses.count { it.status != ItemStatus.DELIVERED }} pendentes",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
-                            }
-                        }
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
                         
                         // Improved grid layout
                         LazyVerticalGrid(
