@@ -49,8 +49,8 @@ class UserServiceTest {
     fun `getAllUsers should return list of users from repository`() = runBlocking {
         // Arrange
         val mockUserRespons = listOf(
-            User(id = 1, name = "John Doe", email = "john@example.com", createdAt = testDateTime()),
-            User(id = 2, name = "Jane Smith", email = "jane@example.com", createdAt = testDateTime())
+            User(id = 1, name = "John Doe", userName = "john_doe", email = "john@example.com", createdAt = testDateTime()),
+            User(id = 2, name = "Jane Smith", userName = "jane_smith", email = "jane@example.com", createdAt = testDateTime())
         )
         coEvery { mockRepository.findAll() } returns mockUserRespons
         
@@ -68,7 +68,7 @@ class UserServiceTest {
     fun `getUserById should return user when found`() = runBlocking {
         // Arrange
         val userId = 1
-        val mockUser = User(id = userId, name = "John Doe", email = "john@example.com", createdAt = testDateTime())
+        val mockUser = User(id = userId, name = "John Doe", userName = "john_doe", email = "john@example.com", createdAt = testDateTime())
         coEvery { mockRepository.findById(userId) } returns mockUser
         
         // Act
@@ -100,8 +100,8 @@ class UserServiceTest {
         // Arrange
         val searchName = "John"
         val mockUserRespons = listOf(
-            User(id = 1, name = "John Doe", email = "john@example.com", createdAt = testDateTime()),
-            User(id = 2, name = "Johnny Smith", email = "johnny@example.com", createdAt = testDateTime())
+            User(id = 1, name = "John Doe", userName = "john_doe", email = "john@example.com", createdAt = testDateTime()),
+            User(id = 2, name = "Johnny Smith", userName = "johnny_smith", email = "johnny@example.com", createdAt = testDateTime())
         )
         coEvery { mockRepository.findByName(searchName) } returns mockUserRespons
         
@@ -123,6 +123,7 @@ class UserServiceTest {
         // Arrange
         val newUser = User(
             name = "John Doe",
+            userName = "john_doe",
             email = "john@example.com",
             active = true,
             createdAt = testDateTime()
@@ -149,6 +150,7 @@ class UserServiceTest {
         // Arrange
         val invalidUser = User(
             name = "", // Invalid blank name
+            userName = "testuser",
             email = "john@example.com",
             createdAt = testDateTime()
         )
@@ -170,6 +172,7 @@ class UserServiceTest {
         // Arrange
         val invalidUser = User(
             name = "John Doe",
+            userName = "john_doe",
             email = "invalid-email", // Invalid email format
             createdAt = testDateTime()
         )
@@ -191,6 +194,7 @@ class UserServiceTest {
         // Arrange
         val validUser = User(
             name = "John Doe",
+            userName = "john_doe",
             email = "john@example.com",
             createdAt = testDateTime()
         )
@@ -219,6 +223,7 @@ class UserServiceTest {
         val updateUser = User(
             id = userId,
             name = "John Updated",
+            userName = "john_updated",
             email = "john.updated@example.com",
             createdAt = testDateTime()
         )
@@ -244,6 +249,7 @@ class UserServiceTest {
         val updateUser = User(
             id = userId,
             name = "John Doe",
+            userName = "john_doe",
             email = "john@example.com",
             createdAt = testDateTime()
         )
@@ -268,6 +274,7 @@ class UserServiceTest {
         val invalidUser = User(
             id = userId,
             name = "", // Invalid blank name
+            userName = "testuser",
             email = "john@example.com",
             createdAt = testDateTime()
         )
@@ -333,8 +340,8 @@ class UserServiceTest {
         val page = 2
         val size = 10
         val userRespons = listOf(
-            User(id = 11, name = "User 11", createdAt = testDateTime()),
-            User(id = 12, name = "User 12", createdAt = testDateTime())
+            User(id = 11, name = "User 11", userName = "user11", createdAt = testDateTime()),
+            User(id = 12, name = "User 12", userName = "user12", createdAt = testDateTime())
         )
         val totalCount = 25L
         
@@ -401,6 +408,7 @@ class UserServiceTest {
         // Arrange
         val userWithNullEmail = User(
             name = "John Doe",
+            userName = "john_doe",
             email = null,
             active = true,
             createdAt = testDateTime()
@@ -448,7 +456,7 @@ class UserServiceTest {
         
         // Test valid emails (should not fail validation)
         validEmails.forEach { email ->
-            val user = User(id = userId, name = "Test User", email = email, createdAt = testDateTime())
+            val user = User(id = userId, name = "Test User", userName = "testuser", email = email, createdAt = testDateTime())
             coEvery { mockRepository.update(userId, user) } returns user
             
             val result = userService.updateUser(userId, user)
@@ -457,7 +465,7 @@ class UserServiceTest {
         
         // Test invalid emails (should fail validation)
         invalidEmails.forEach { email ->
-            val user = User(id = userId, name = "Test User", email = email, createdAt = testDateTime())
+            val user = User(id = userId, name = "Test User", userName = "testuser", email = email, createdAt = testDateTime())
             
             val result = userService.updateUser(userId, user)
             assertTrue(result.isFailure, "Email '$email' should be invalid")

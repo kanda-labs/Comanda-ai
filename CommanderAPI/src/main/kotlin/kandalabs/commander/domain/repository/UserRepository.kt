@@ -10,6 +10,7 @@ interface UserRepository {
     suspend fun findAll(): List<User>
     suspend fun findById(id: Int): User?
     suspend fun findByName(name: String): List<User>
+    suspend fun findByUserName(userName: String): User?
     suspend fun create(user: User): User
     suspend fun update(id: Int, user: User): User?
     suspend fun delete(id: Int): Boolean

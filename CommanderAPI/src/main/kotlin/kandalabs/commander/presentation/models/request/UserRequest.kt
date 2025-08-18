@@ -1,5 +1,6 @@
 package kandalabs.commander.presentation.models.request
 
+import kandalabs.commander.domain.enums.UserRole
 import kotlinx.serialization.Serializable
 
 /**
@@ -8,8 +9,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateUserRequest(
     val name: String,
+    val userName: String,
     val email: String? = null,
-    val active: Boolean = true
+    val active: Boolean = true,
+    val role: UserRole = UserRole.WAITER
 )
 
 /**
@@ -18,8 +21,10 @@ data class CreateUserRequest(
 @Serializable
 data class UpdateUserRequest(
     val name: String,
+    val userName: String,
     val email: String? = null,
-    val active: Boolean? = null
+    val active: Boolean? = null,
+    val role: UserRole? = null
 )
 
 /**

@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import kandalabs.commander.domain.model.User
 import kandalabs.commander.domain.repository.UserRepository
 import kandalabs.commander.data.model.sqlModels.UserTable
+import kandalabs.commander.domain.enums.UserRole
 import mu.KLogger
 import org.jetbrains.exposed.sql.selectAll
 import toEpochMilliseconds
@@ -49,14 +50,25 @@ class UserRepositoryImpl(
         }
     }
     
+    override suspend fun findByUserName(userName: String): User? {
+        logger.debug { "Finding user by userName: $userName" }
+        return transaction {
+            userTable.selectAll().where { userTable.userName eq userName }
+                .map { it.toUser() }
+                .singleOrNull()
+        }
+    }
+    
     override suspend fun create(user: User): User {
         logger.debug { "Creating new user: $user" }
         return transaction {
             val insertStatement = userTable.insert {
                 it[name] = user.name
+                it[userName] = user.userName
                 it[email] = user.email
                 it[active] = user.active
                 it[createdAt] = user.createdAt.toEpochMilliseconds()
+                it[role] = user.role.name
             }
             
             val generatedId = insertStatement[userTable.id]
@@ -69,8 +81,10 @@ class UserRepositoryImpl(
         return transaction {
             val rowsUpdated = userTable.update({ userTable.id eq id }) {
                 it[name] = user.name
+                it[userName] = user.userName
                 it[email] = user.email
                 it[active] = user.active
+                it[role] = user.role.name
                 // Don't update createdAt as it should be immutable
             }
             
@@ -115,9 +129,11 @@ class UserRepositoryImpl(
         return User(
             id = this[userTable.id],
             name = this[userTable.name],
+            userName = this[userTable.userName],
             email = this[userTable.email],
             active = this[userTable.active],
-            createdAt = this[userTable.createdAt].toLocalDateTime()
+            createdAt = this[userTable.createdAt].toLocalDateTime(),
+            role = UserRole.valueOf(this[userTable.role])
         )
     }
 }

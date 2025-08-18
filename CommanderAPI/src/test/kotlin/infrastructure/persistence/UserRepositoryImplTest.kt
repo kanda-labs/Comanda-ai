@@ -42,6 +42,7 @@ class UserRepositoryImplTest {
         // Arrange
         val user = User(
             name = "Test User",
+            userName = "testuser",
             email = "test@example.com",
             active = true,
             createdAt = testDateTime()
@@ -62,6 +63,7 @@ class UserRepositoryImplTest {
         // Arrange
         val user = User(
             name = "Test User",
+            userName = "testuser",
             email = "test@example.com",
             createdAt = testDateTime()
         )
@@ -88,8 +90,8 @@ class UserRepositoryImplTest {
     @Test
     fun `findAll returns all users`() = runBlocking {
         // Arrange
-        repository.create(User(name = "User 1", email = "user1@example.com", createdAt = testDateTime()))
-        repository.create(User(name = "User 2", email = "user2@example.com", createdAt = testDateTime()))
+        repository.create(User(name = "User 1", userName = "user1", email = "user1@example.com", createdAt = testDateTime()))
+        repository.create(User(name = "User 2", userName = "user2", email = "user2@example.com", createdAt = testDateTime()))
         
         // Act
         val users = repository.findAll()
@@ -101,9 +103,9 @@ class UserRepositoryImplTest {
     @Test
     fun `findByName returns users with matching name`() = runBlocking {
         // Arrange
-        repository.create(User(name = "John Doe", email = "john@example.com", createdAt = testDateTime()))
-        repository.create(User(name = "Johnny Smith", email = "johnny@example.com", createdAt = testDateTime()))
-        repository.create(User(name = "Jane Smith", email = "jane@example.com", createdAt = testDateTime()))
+        repository.create(User(name = "John Doe", userName = "johndoe", email = "john@example.com", createdAt = testDateTime()))
+        repository.create(User(name = "Johnny Smith", userName = "johnnysmith", email = "johnny@example.com", createdAt = testDateTime()))
+        repository.create(User(name = "Jane Smith", userName = "janesmith", email = "jane@example.com", createdAt = testDateTime()))
         
         // Act
         val usersWithJohn = repository.findByName("John")
@@ -116,11 +118,12 @@ class UserRepositoryImplTest {
     @Test
     fun `update modifies existing user`() = runBlocking {
         // Arrange
-        val user = User(name = "Original Name", email = "original@example.com", createdAt = testDateTime())
+        val user = User(name = "Original Name", userName = "originaluser", email = "original@example.com", createdAt = testDateTime())
         val createdUser = repository.create(user)
         val updatedUser = User(
             id = createdUser.id,
             name = "Updated Name",
+            userName = "updateduser",
             email = "updated@example.com",
             active = false,
             createdAt = createdUser.createdAt
@@ -143,6 +146,7 @@ class UserRepositoryImplTest {
         val nonExistentUser = User(
             id = 999,
             name = "Non-existent User",
+            userName = "nonexistentuser",
             email = "nonexistent@example.com",
             createdAt = testDateTime()
         )
@@ -157,7 +161,7 @@ class UserRepositoryImplTest {
     @Test
     fun `delete removes user and returns true when successful`() = runBlocking {
         // Arrange
-        val user = User(name = "Test User", email = "test@example.com", createdAt = testDateTime())
+        val user = User(name = "Test User", userName = "testuser", email = "test@example.com", createdAt = testDateTime())
         val createdUser = repository.create(user)
         
         // Act
@@ -181,7 +185,7 @@ class UserRepositoryImplTest {
     fun `findAllPaginated returns correct page of results`() = runBlocking {
         // Arrange - Create 15 users
         repeat(15) { i ->
-            repository.create(User(name = "User $i", email = "user$i@example.com", createdAt = testDateTime()))
+            repository.create(User(name = "User $i", userName = "user$i", email = "user$i@example.com", createdAt = testDateTime()))
         }
         
         // Act - Get first page (10 items)
@@ -198,7 +202,7 @@ class UserRepositoryImplTest {
     fun `count returns total number of users`() = runBlocking {
         // Arrange - Create 5 users
         repeat(5) { i ->
-            repository.create(User(name = "User $i", email = "user$i@example.com", createdAt = testDateTime()))
+            repository.create(User(name = "User $i", userName = "user$i", email = "user$i@example.com", createdAt = testDateTime()))
         }
         
         // Act

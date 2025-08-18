@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "2.0.0"
-    id("io.ktor.plugin") version "2.3.8"
+    id("io.ktor.plugin") version "3.0.2"
     kotlin("plugin.serialization") version "2.0.0"
     java // Explicitly apply the Java plugin
 }
@@ -15,7 +15,7 @@ repositories {
 }
 
 // Define versions
-val ktorVersion = "2.3.8"
+val ktorVersion = "3.0.2"
 val koinVersion = "3.5.3"
 val logbackVersion = "1.4.14"
 val exposedVersion = "0.46.0"
@@ -49,6 +49,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
+    implementation("io.ktor:ktor-server-sse:$ktorVersion")
     
     // OpenAPI/Swagger Support
     implementation("io.ktor:ktor-server-swagger:$ktorVersion")

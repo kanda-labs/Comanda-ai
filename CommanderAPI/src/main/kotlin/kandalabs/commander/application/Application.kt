@@ -15,6 +15,7 @@ import kandalabs.commander.application.config.DatabaseConfig
 import kandalabs.commander.data.model.sqlModels.BillTable
 import kandalabs.commander.data.model.sqlModels.ItemTable
 import kandalabs.commander.data.model.sqlModels.OrderItemTable
+import kandalabs.commander.data.model.sqlModels.OrderItemStatusTable
 import kandalabs.commander.data.model.sqlModels.OrderTable
 import kandalabs.commander.data.model.sqlModels.TableTable
 import kandalabs.commander.data.model.sqlModels.UserTable
@@ -28,6 +29,8 @@ import kandalabs.commander.domain.service.TableService
 import kandalabs.commander.domain.service.BillService
 import kandalabs.commander.domain.service.ItemService
 import kandalabs.commander.domain.service.OrderService
+import kandalabs.commander.domain.service.KitchenService
+import kandalabs.commander.domain.service.KitchenServiceImpl
 import kandalabs.commander.infrastructure.framework.ktor.configurePlugins
 import kandalabs.commander.infrastructure.framework.ktor.configureSecurity
 import kandalabs.commander.data.repository.UserRepositoryImpl
@@ -40,6 +43,10 @@ import kandalabs.commander.presentation.routes.tableRoutes
 import kandalabs.commander.presentation.routes.billRoutes
 import kandalabs.commander.presentation.routes.itemRoutes
 import kandalabs.commander.presentation.routes.orderRoutes
+import kandalabs.commander.presentation.routes.orderSSERoutes
+import kandalabs.commander.presentation.routes.authRoutes
+import kandalabs.commander.presentation.routes.kitchenRoutes
+import kotlinx.serialization.json.Json
 import mu.KLogger
 
 private val logger = KotlinLogging.logger {}
@@ -98,6 +105,7 @@ fun Application.configureRouting() {
     val billService by inject<BillService>()
     val itemService by inject<ItemService>()
     val orderService by inject<OrderService>()
+    val kitchenService by inject<KitchenService>()
 
     routing {
         // Health check endpoint
@@ -112,11 +120,14 @@ fun Application.configureRouting() {
 
         // Application routes
         route("/api/v1") {
+            authRoutes(userService)
             userRoutes(userService)
             tableRoutes(tableService, orderService)
             billRoutes(billService, tableService)
             itemRoutes(itemService)
             orderRoutes(orderService)
+            orderSSERoutes(orderService)
+            kitchenRoutes(kitchenService)
         }
     }
 }
@@ -130,8 +141,10 @@ private val appModule = module {
     single<TableTable> { TableTable }
     single<OrderTable> { OrderTable }
     single<OrderItemTable> { OrderItemTable }
+    single<OrderItemStatusTable> { OrderItemStatusTable }
     single<ItemTable> { ItemTable }
     single<KLogger> { KotlinLogging.logger {} }
+    single<Json> { Json { prettyPrint = true; ignoreUnknownKeys = true } }
 
 
     single<UserRepository> { UserRepositoryImpl(userTable = get(), logger = get()) }
@@ -143,7 +156,7 @@ private val appModule = module {
     single<ItemRepository> { ItemRepositoryImpl(itemTable = get(), logger = get()) }
     single<OrderRepository> { OrderRepositoryImpl(
         orderTable = get(), logger = get(),
-        orderItemTable = get()
+        orderItemTable = get(), orderItemStatusTable = get()
     ) }
 
     single { UserService(get()) }
@@ -151,4 +164,5 @@ private val appModule = module {
     single { BillService(get()) }
     single { ItemService(get()) }
     single { OrderService(get()) }
+    single<KitchenService> { KitchenServiceImpl(get()) }
 }

@@ -22,9 +22,12 @@ private val logger = KotlinLogging.logger {}
 /**
  * Validates user request data
  */
-private fun validateUserRequest(name: String, email: String?) {
+private fun validateUserRequest(name: String, userName: String, email: String?) {
     if (name.isBlank()) {
         throw IllegalArgumentException("Name cannot be empty")
+    }
+    if (userName.isBlank()) {
+        throw IllegalArgumentException("UserName cannot be empty")
     }
     if (email != null && email.isBlank()) {
         throw IllegalArgumentException("Email cannot be empty")
@@ -124,15 +127,17 @@ fun Route.userRoutes(userService: UserService) {
                 try {
                     val request = call.receive<CreateUserRequest>()
 
-                    validateUserRequest(request.name, request.email)
+                    validateUserRequest(request.name, request.userName, request.email)
 
                     logger.info { "Creating user with name: ${request.name}" }
 
                     val user = User(
                         id = null,
                         name = request.name,
+                        userName = request.userName,
                         email = request.email,
                         active = request.active,
+                        role = request.role,
                         createdAt = System.currentTimeMillis().toLocalDateTime(),
                     )
 
@@ -183,7 +188,7 @@ fun Route.userRoutes(userService: UserService) {
                     val request = call.receive<UpdateUserRequest>()
 
                     // Validate request
-                    validateUserRequest(request.name, request.email)
+                    validateUserRequest(request.name, request.userName, request.email)
 
                     logger.info { "Updating user with id: $id" }
 
@@ -195,8 +200,10 @@ fun Route.userRoutes(userService: UserService) {
                     val user = User(
                         id = id,
                         name = request.name,
+                        userName = request.userName,
                         email = request.email,
                         active = request.active ?: existingUser.active,
+                        role = request.role ?: existingUser.role,
                         createdAt = existingUser.createdAt
                     )
 

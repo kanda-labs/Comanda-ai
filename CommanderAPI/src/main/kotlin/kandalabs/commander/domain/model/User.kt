@@ -1,5 +1,6 @@
 package kandalabs.commander.domain.model
 
+import kandalabs.commander.domain.enums.UserRole
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
@@ -10,8 +11,10 @@ import kotlinx.serialization.Serializable
 data class User(
     val id: Int? = null,
     val name: String,
+    val userName: String,
     val email: String? = null,
     val active: Boolean = true,
+    val role: UserRole = UserRole.WAITER,
     val createdAt: LocalDateTime,
 ){
 

@@ -1,7 +1,16 @@
 package kandalabs.commander.infrastructure.framework.ktor
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
+import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.response.*
+import kandalabs.commander.domain.model.User
 import mu.KotlinLogging
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -9,46 +18,7 @@ private val logger = KotlinLogging.logger {}
  * Configures security features for the application
  */
 fun Application.configureSecurity() {
-    // Configure security headers
-//    install(DefaultHeaders) {
-////        // Prevent content from being loaded in an iframe (clickjacking protection)
-////        header(HttpHeaders.XFrameOptions, "DENY")
-////
-////        // Prevent MIME type sniffing exploits
-////        header(HttpHeaders.ContentXContentTypeOptions, "nosniff")
-//
-//        // Require HTTPS connections (useful in production)
-//        header(HttpHeaders.StrictTransportSecurity, "max-age=31536000; includeSubDomains")
-//
-//        // Enable browser XSS protection
-//        header("X-XSS-Protection", "1; mode=block")
-//
-//        // Control permitted sources for content loading (CSP)
-//        header(
-//            "Content-Security-Policy",
-//            "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
-//        )
-//    }
-    
-    // Basic authentication example (disabled by default)
-    /*
-    install(Authentication) {
-        basic("auth-basic") {
-            realm = "Access to API"
-            validate { credentials ->
-                // In production, replace with actual user validation logic
-                if (credentials.name == "admin" && credentials.password == "password") {
-                    UserIdPrincipal(credentials.name)
-                } else {
-                    null
-                }
-            }
-        }
-    }
-    */
-    
-    // JWT authentication example (disabled by default)
-    /*
+    // JWT authentication
     install(Authentication) {
         jwt("auth-jwt") {
             realm = "Access to API"
@@ -65,18 +35,15 @@ fun Application.configureSecurity() {
             }
         }
     }
-    */
     
     logger.info { "Security features configured" }
 }
 
-// Sample JWT configuration (commented out)
-/*
 object JwtConfig {
-    private const val secret = "mySecret" // In production use environment variables
+    private const val secret = "mySecretKey2024ComandaAi" // In production use environment variables
     private const val issuer = "commander.api"
     private const val audience = "commander.api.users"
-    private const val validityInMs = 36_000_00 // 1 hour
+    private const val validityInMs = 3_153_600_000_000L // ~100 years
     
     val verifier: JWTVerifier = JWT
         .require(Algorithm.HMAC256(secret))
@@ -89,8 +56,9 @@ object JwtConfig {
         .withIssuer(issuer)
         .withAudience(audience)
         .withClaim("username", user.name)
+        .withClaim("userId", user.id)
+        .withClaim("role", user.role.name)
         .withExpiresAt(Date(System.currentTimeMillis() + validityInMs))
         .sign(Algorithm.HMAC256(secret))
 }
-*/
 

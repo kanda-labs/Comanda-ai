@@ -50,8 +50,8 @@ class UserRoutesTest {
     fun `GET users returns 200 with paginated list`() = testApplication {
         // Arrange
         val mockUserRespons = listOf(
-            User(id = 1, name = "John Doe", email = "john@example.com", createdAt = testDateTime()),
-            User(id = 2, name = "Jane Smith", email = "jane@example.com", createdAt = testDateTime())
+            User(id = 1, name = "John Doe", userName = "johndoe", email = "john@example.com", createdAt = testDateTime()),
+            User(id = 2, name = "Jane Smith", userName = "janesmith", email = "jane@example.com", createdAt = testDateTime())
         )
         coEvery { mockUserService.getPaginatedUsers(1, 10) } returns Result.success(Pair(mockUserRespons, 2L))
         
@@ -97,7 +97,7 @@ class UserRoutesTest {
     fun `GET user by id returns 200 with user when found`() = testApplication {
         // Arrange
         val userId = 1
-        val mockUser = User(id = userId, name = "John Doe", email = "john@example.com", createdAt = testDateTime())
+        val mockUser = User(id = userId, name = "John Doe", userName = "johndoe", email = "john@example.com", createdAt = testDateTime())
         coEvery { mockUserService.getUserById(userId) } returns mockUser
         
         application {
@@ -144,6 +144,7 @@ class UserRoutesTest {
         // Arrange
         val createRequest = CreateUserRequest(
             name = "John Doe",
+            userName = "johndoe",
             email = "john@example.com",
             active = true
         )
@@ -151,6 +152,7 @@ class UserRoutesTest {
         val createdUser = User(
             id = 1,
             name = createRequest.name,
+            userName = createRequest.userName,
             email = createRequest.email,
             active = createRequest.active,
             createdAt = testDateTime()
@@ -184,6 +186,7 @@ class UserRoutesTest {
         // Arrange
         val invalidRequest = CreateUserRequest(
             name = "",  // Invalid: empty name
+            userName = "",  // Invalid: empty userName
             email = "invalid-email"  // Invalid: incorrect email format
         )
         
@@ -214,6 +217,7 @@ class UserRoutesTest {
         val userId = 1
         val updateRequest = UpdateUserRequest(
             name = "John Updated",
+            userName = "johnupdated",
             email = "john.updated@example.com",
             active = true
         )
@@ -221,6 +225,7 @@ class UserRoutesTest {
         val existingUser = User(
             id = userId,
             name = "John Doe",
+            userName = "johndoe",
             email = "john@example.com",
             active = true,
             createdAt = testDateTime()
@@ -228,6 +233,7 @@ class UserRoutesTest {
         
         val updatedUser = existingUser.copy(
             name = updateRequest.name,
+            userName = updateRequest.userName!!,
             email = updateRequest.email
         )
         
@@ -261,6 +267,7 @@ class UserRoutesTest {
         val userId = 999
         val updateRequest = UpdateUserRequest(
             name = "John Updated",
+            userName = "johnupdated",
             email = "john.updated@example.com"
         )
         

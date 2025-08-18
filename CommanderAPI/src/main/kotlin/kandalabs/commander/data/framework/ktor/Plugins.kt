@@ -3,7 +3,7 @@ package kandalabs.commander.infrastructure.framework.ktor
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
@@ -12,6 +12,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.httpMethod
 import io.ktor.server.request.path
 import io.ktor.server.response.*
+import io.ktor.server.sse.*
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.slf4j.event.Level
@@ -31,6 +32,9 @@ fun Application.configurePlugins() {
             ignoreUnknownKeys = true
         })
     }
+    
+    // Configure Server-Sent Events
+    install(SSE)
     
     // Configure CORS
     install(CORS) {
