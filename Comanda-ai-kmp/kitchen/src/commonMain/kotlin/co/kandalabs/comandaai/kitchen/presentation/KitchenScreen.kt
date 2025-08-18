@@ -36,22 +36,22 @@ import kotlinx.coroutines.launch
 import org.kodein.di.instance
 
 class KitchenScreen : Screen {
-    
+
     @Composable
     override fun Content() {
         val viewModel = rememberScreenModel<KitchenViewModel>()
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.current
         val scope = rememberCoroutineScope()
-        
+
         var showUserModal by remember { mutableStateOf(false) }
         var userSession by remember { mutableStateOf<UserSession?>(null) }
         var selectedTab by remember { mutableStateOf(0) }
-        
+
         LaunchedEffect(Unit) {
             userSession = viewModel.getUserSession()
         }
-        
+
         KitchenScreenContent(
             state = state,
             userSession = userSession,
@@ -101,51 +101,28 @@ private fun KitchenScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text("Pedidos ativos", style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            "${state.orders.size} pedidos ativos",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                    Row {
+                        UserAvatar(
+                            userName = userSession?.userName,
+                            onClick = onUserAvatarClick
                         )
+                        Column(modifier = Modifier.padding(start = 16.dp)) {
+                            Text("Pedidos ativos", style = MaterialTheme.typography.titleLarge)
+                            Text(
+                                "${state.orders.size} pedidos ativos",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
-                },
-                navigationIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Restaurant,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
                 },
                 actions = {
-                    if (state.isConnected) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Conectado",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .size(20.dp)
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Desconectado",
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    }
-
                     IconButton(onClick = onRefresh) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Atualizar pedidos"
                         )
                     }
-                    
-                    UserAvatar(
-                        userName = userSession?.userName,
-                        onClick = onUserAvatarClick
-                    )
                 }
             )
         },
@@ -172,23 +149,7 @@ private fun KitchenScreenContent(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
-            // Welcome message
-            if (userSession?.userName != null) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = "Bem-vindo, ${userSession.userName}!",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-            
+
             // Erro
             state.error?.let { error ->
                 Snackbar(
@@ -207,10 +168,11 @@ private fun KitchenScreenContent(
                     onMarkAsDelivered = onMarkAsDelivered,
                     onMarkItemAsDelivered = onMarkItemAsDelivered
                 )
+
                 1 -> OrderOverviewTab(state = state)
             }
         }
-        
+
         // User Profile Modal
         UserProfileModal(
             isVisible = showUserModal,
@@ -277,7 +239,9 @@ private fun EmptyState() {
             )
         }
     }
-}@Composable
+}
+
+@Composable
 private fun OrderControlTab(
     state: KitchenScreenState,
     listState: LazyListState,
@@ -317,52 +281,64 @@ private fun OrderControlTab(
 
 @Composable
 private fun OrderOverviewTab(state: KitchenScreenState) {
-    val skewersNames = setOf("Espetinho de Alcatra", "Filé com Alho", "Medalhão de Frango", "Batata Frita")
-    var selectedItemNames by remember { mutableStateOf(skewersNames) }
-    
-    val itemSummary = remember(state.orders, selectedItemNames) {
+    var selectedCategories by remember { mutableStateOf(setOf("SKEWER")) }
+
+    val itemSummary = remember(state.orders, selectedCategories) {
         state.orders.flatMap { order ->
             order.items.filter { item ->
-                selectedItemNames.isEmpty() || selectedItemNames.contains(item.name)
+                // Filtrar por categoria usando o nome do item para inferir categoria
+                val itemCategory = when {
+                    item.name.contains("Espetinho") || item.name.contains("Filé") || item.name.contains(
+                        "Medalhão"
+                    ) || item.name.contains("Batata") -> "SKEWER"
+
+                    item.name.contains("Chopp") -> "CHOPP"
+                    item.name.contains("Água") || item.name.contains("Refrigerante") -> "NON_ALCOHOLIC_DRINKS"
+                    else -> "DRINK"
+                }
+                selectedCategories.contains(itemCategory)
             }
         }.groupBy { it.itemId }
-        .mapValues { (_, items) ->
-            items.sumOf { it.totalCount }
-        }
-        .mapKeys { (itemId, _) ->
-            state.orders.flatMap { it.items }
-                .first { it.itemId == itemId }
-        }
+            .mapValues { (_, items) ->
+                // Contar apenas itens que não foram entregues (excluir DELIVERED)
+                items.sumOf { item ->
+                    item.unitStatuses.count { unitStatus ->
+                        unitStatus.status != ItemStatus.DELIVERED
+                    }
+                }
+            }
+            .mapKeys { (itemId, _) ->
+                state.orders.flatMap { it.items }
+                    .first { it.itemId == itemId }
+            }
+            .filter { (_, count) -> count > 0 } // Remover itens com contagem zero
     }
-    
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Item Filter - Horizontal Badges
-        val availableItems = listOf(
-            "Espetinho de Alcatra",
-            "Filé com Alho",
-            "Medalhão de Frango",
-            "Batata Frita",
-            "Chopp",
-            "Água",
-            "Refrigerante"
+        // Category Filter - Horizontal Badges
+        val availableCategories = listOf(
+            "SKEWER" to "Espetinhos",
+            "CHOPP" to "Chopp",
+            "NON_ALCOHOLIC_DRINKS" to "Bebidas",
+            "DRINK" to "Bebidas Alcoólicas"
         )
-        
+
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(availableItems) { itemName ->
-                val isSelected = selectedItemNames.contains(itemName)
+            items(availableCategories) { (categoryId, categoryName) ->
+                val isSelected = selectedCategories.contains(categoryId)
                 Surface(
                     modifier = Modifier.clickable {
-                        selectedItemNames = if (isSelected) {
-                            selectedItemNames - itemName
+                        selectedCategories = if (isSelected) {
+                            selectedCategories - categoryId
                         } else {
-                            selectedItemNames + itemName
+                            selectedCategories + categoryId
                         }
                     },
                     shape = MaterialTheme.shapes.small,
@@ -371,10 +347,13 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
                     } else {
                         MaterialTheme.colorScheme.surfaceVariant
                     },
-                    border = if (isSelected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                    border = if (isSelected) null else BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline
+                    )
                 ) {
                     Text(
-                        text = itemName,
+                        text = categoryName,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.labelMedium,
                         color = if (isSelected) {
@@ -387,7 +366,7 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
                 }
             }
         }
-        
+
         // Items Summary
         if (itemSummary.isEmpty()) {
             Box(
@@ -411,7 +390,7 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = "Selecione outros itens para ver o resumo",
+                        text = "Selecione outras categorias para ver o resumo",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         textAlign = TextAlign.Center
@@ -442,20 +421,18 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Medium
                                 )
-                                Text(
-                                    text = "Item ID: ${item.itemId}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                                )
                             }
-                            
+
                             Surface(
                                 color = MaterialTheme.colorScheme.primaryContainer,
                                 shape = MaterialTheme.shapes.medium
                             ) {
                                 Text(
                                     text = totalQuantity.toString(),
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    modifier = Modifier.padding(
+                                        horizontal = 12.dp,
+                                        vertical = 6.dp
+                                    ),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     fontWeight = FontWeight.Bold

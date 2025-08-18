@@ -81,7 +81,7 @@ fun OrderCard(
                     onClick = { onMarkAsDelivered(order.id) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
+                        .height(32.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
@@ -97,8 +97,8 @@ fun OrderCard(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Marcar Todo Pedido como Entregue",
-                            style = MaterialTheme.typography.labelLarge,
+                            text = "Entregar pedido",
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold
                         )
                     }
