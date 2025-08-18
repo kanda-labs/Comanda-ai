@@ -8,7 +8,8 @@ internal data class LoginScreenState(
     val usernameError: String? = null,
     val passwordError: String? = null,
     val isLoading: Boolean = false,
-    val error: ComandaAiException? = null
+    val error: ComandaAiException? = null,
+    val isPasswordVisible: Boolean = false
 ) {
     val isFormValid: Boolean = username.isNotBlank() && password.isNotBlank() && usernameError == null && passwordError == null
     
@@ -19,5 +20,6 @@ internal enum class LoginAction {
     USERNAME_CHANGED,
     PASSWORD_CHANGED,
     LOGIN,
-    CLEAR_ERROR
+    CLEAR_ERROR,
+    TOGGLE_PASSWORD_VISIBILITY
 }

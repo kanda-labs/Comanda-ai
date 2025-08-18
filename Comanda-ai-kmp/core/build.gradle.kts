@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -18,6 +19,11 @@ kotlin {
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.io.core)
             implementation(libs.ktor.client.core)
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+        }
+        
+        androidMain.dependencies {
+            implementation("androidx.security:security-crypto:1.1.0-alpha06")
         }
 
         commonTest.dependencies {

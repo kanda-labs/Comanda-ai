@@ -51,6 +51,10 @@ kotlin {
             // Coroutines
             implementation(libs.kotlinx.coroutines)
 
+            // Ktor Client
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
 
             // Kodein DI
             implementation(libs.kodein.di)

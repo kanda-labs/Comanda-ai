@@ -21,10 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.tokens.ComandaAiColors
@@ -43,7 +46,8 @@ object LoginScreen : Screen {
             onUsernameChanged = viewModel::onUsernameChanged,
             onPasswordChanged = viewModel::onPasswordChanged,
             onLogin = viewModel::onLogin,
-            onClearError = viewModel::clearError
+            onClearError = viewModel::clearError,
+            onTogglePasswordVisibility = viewModel::togglePasswordVisibility
         )
     }
 }
@@ -54,7 +58,8 @@ private fun LoginScreenContent(
     onUsernameChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onLogin: () -> Unit,
-    onClearError: () -> Unit
+    onClearError: () -> Unit,
+    onTogglePasswordVisibility: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -153,7 +158,19 @@ private fun LoginScreenContent(
                     )
                 }
             },
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (state.isPasswordVisible) 
+                VisualTransformation.None 
+            else 
+                PasswordVisualTransformation(),
+            trailingIcon = {
+                TextButton(onClick = onTogglePasswordVisibility) {
+                    Text(
+                        text = if (state.isPasswordVisible) "Ocultar" else "Mostrar",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = ComandaAiColors.Primary.value
+                    )
+                }
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
@@ -240,7 +257,8 @@ private fun LoginScreenPreview() {
             onUsernameChanged = {},
             onPasswordChanged = {},
             onLogin = {},
-            onClearError = {}
+            onClearError = {},
+            onTogglePasswordVisibility = {}
         )
     }
 }
