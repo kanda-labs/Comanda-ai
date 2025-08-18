@@ -24,7 +24,7 @@ class OrderSSEClient(
                 urlString = "${baseUrl}api/v1/orders/events",
                 request = {
                     method = HttpMethod.Get
-                    parameter("clientId", "kitchen-${System.currentTimeMillis()}")
+                    parameter("clientId", "kitchen-${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}")
                 }
             ) {
                 incoming.collect { event ->

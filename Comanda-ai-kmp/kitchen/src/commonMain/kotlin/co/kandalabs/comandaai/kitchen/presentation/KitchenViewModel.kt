@@ -56,8 +56,31 @@ class KitchenViewModel(
         screenModelScope.launch {
             repository.updateItemUnitStatus(orderId, itemId, unitIndex, newStatus)
                 .onSuccess {
-                    // Recarregar pedidos para refletir mudanças
-                    loadActiveOrders()
+                    // Atualizar estado local em vez de recarregar tudo
+                    _state.update { currentState ->
+                        val updatedOrders = currentState.orders.map { order ->
+                            if (order.id == orderId) {
+                                val updatedItems = order.items.map { item ->
+                                    if (item.itemId == itemId) {
+                                        val updatedUnitStatuses = item.unitStatuses.mapIndexed { index, unitStatus ->
+                                            if (index == unitIndex) {
+                                                unitStatus.copy(status = newStatus)
+                                            } else {
+                                                unitStatus
+                                            }
+                                        }
+                                        item.copy(unitStatuses = updatedUnitStatuses)
+                                    } else {
+                                        item
+                                    }
+                                }
+                                order.copy(items = updatedItems)
+                            } else {
+                                order
+                            }
+                        }
+                        currentState.copy(orders = updatedOrders)
+                    }
                 }
                 .onFailure { error ->
                     _state.update { it.copy(error = error.message) }
@@ -69,8 +92,11 @@ class KitchenViewModel(
         screenModelScope.launch {
             repository.markOrderAsDelivered(orderId)
                 .onSuccess {
-                    // Recarregar pedidos para refletir mudanças
-                    loadActiveOrders()
+                    // Remover pedido do estado local em vez de recarregar tudo
+                    _state.update { currentState ->
+                        val updatedOrders = currentState.orders.filter { it.id != orderId }
+                        currentState.copy(orders = updatedOrders)
+                    }
                 }
                 .onFailure { error ->
                     _state.update { it.copy(error = error.message) }
@@ -82,8 +108,38 @@ class KitchenViewModel(
         screenModelScope.launch {
             repository.markItemAsDelivered(orderId, itemId)
                 .onSuccess {
-                    // Recarregar pedidos para refletir mudanças
-                    loadActiveOrders()
+                    // Atualizar estado local em vez de recarregar tudo
+                    _state.update { currentState ->
+                        val updatedOrders = currentState.orders.map { order ->
+                            if (order.id == orderId) {
+                                val updatedItems = order.items.map { item ->
+                                    if (item.itemId == itemId) {
+                                        val updatedUnitStatuses = item.unitStatuses.map { unitStatus ->
+                                            unitStatus.copy(status = ItemStatus.DELIVERED)
+                                        }
+                                        item.copy(unitStatuses = updatedUnitStatuses)
+                                    } else {
+                                        item
+                                    }
+                                }
+                                
+                                // Se todos os itens estão entregues, remover o pedido
+                                val allDelivered = updatedItems.all { item ->
+                                    item.unitStatuses.all { it.status == ItemStatus.DELIVERED }
+                                }
+                                
+                                if (allDelivered) {
+                                    null // Será filtrado depois
+                                } else {
+                                    order.copy(items = updatedItems)
+                                }
+                            } else {
+                                order
+                            }
+                        }.filterNotNull()
+                        
+                        currentState.copy(orders = updatedOrders)
+                    }
                 }
                 .onFailure { error ->
                     _state.update { it.copy(error = error.message) }

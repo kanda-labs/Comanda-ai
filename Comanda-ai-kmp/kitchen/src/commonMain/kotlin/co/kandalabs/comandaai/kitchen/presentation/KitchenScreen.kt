@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Restaurant
@@ -40,6 +42,7 @@ class KitchenScreen : Screen {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun KitchenScreenContent(
     state: KitchenScreenState,
@@ -49,161 +52,97 @@ private fun KitchenScreenContent(
     onMarkItemAsDelivered: (Int, Int) -> Unit,
     onErrorDismiss: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Enhanced Header with Surface
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 4.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+    // Preservar estado do scroll
+    val listState = rememberLazyListState()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Column {
+                        Text("Cozinha", style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            "${state.orders.size} pedidos ativos",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                },
+                navigationIcon = {
                     Icon(
                         imageVector = Icons.Default.Restaurant,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
+                        tint = MaterialTheme.colorScheme.primary
                     )
-                    Column {
-                        Text(
-                            text = "Cozinha",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "${state.orders.size} pedidos ativos",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    }
-                }
-                
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Connection status indicator
+                },
+                actions = {
                     if (state.isConnected) {
-                        Surface(
-                            shape = MaterialTheme.shapes.small,
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(6.dp)
-                                        .background(
-                                            MaterialTheme.colorScheme.primary,
-                                            shape = MaterialTheme.shapes.extraSmall
-                                        )
-                                )
-                                Text(
-                                    text = "Conectado",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    }
-                    
-                    IconButton(
-                        onClick = onRefresh,
-                        modifier = Modifier.size(40.dp)
-                    ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Atualizar pedidos",
-                            tint = MaterialTheme.colorScheme.primary
+                            contentDescription = "Conectado",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(20.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Desconectado",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+
+                    IconButton(onClick = onRefresh) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Atualizar pedidos"
                         )
                     }
                 }
-            }
+            )
         }
-        
-        // Content area with improved spacing
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
-            // Error handling with better design
+            // Erro
             state.error?.let { error ->
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
-                    )
+                Snackbar(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    action = {
+                        TextButton(onClick = onErrorDismiss) { Text("OK") }
+                    }
+                ) { Text(error) }
+            }
+
+            when {
+                state.isLoading -> LoadingState()
+                state.orders.isEmpty() -> EmptyState()
+                else -> LazyColumn(
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Text(
-                            text = error,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        TextButton(onClick = onErrorDismiss) {
-                            Text(
-                                "Dispensar",
-                                color = MaterialTheme.colorScheme.onErrorContainer
+                    items(
+                        items = state.orders,
+                        key = { order -> order.id } // Chave estável para preservar estado
+                    ) { order ->
+                        ElevatedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.large
+                        ) {
+                            OrderCard(
+                                order = order,
+                                onItemStatusChange = { itemId, unitIndex, status ->
+                                    onItemStatusChange(order.id, itemId, unitIndex, status)
+                                },
+                                onMarkAsDelivered = onMarkAsDelivered,
+                                onMarkItemAsDelivered = onMarkItemAsDelivered
                             )
                         }
-                    }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Loading state with better design
-            if (state.isLoading) {
-                LoadingState()
-            } else if (state.orders.isEmpty()) {
-                EmptyState()
-            } else {
-                // Orders list with improved spacing
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp)
-                ) {
-                    items(state.orders) { order ->
-                        OrderCard(
-                            order = order,
-                            onItemStatusChange = { itemId, unitIndex, status ->
-                                onItemStatusChange(order.id, itemId, unitIndex, status)
-                            },
-                            onMarkAsDelivered = onMarkAsDelivered,
-                            onMarkItemAsDelivered = onMarkItemAsDelivered
-                        )
                     }
                 }
             }

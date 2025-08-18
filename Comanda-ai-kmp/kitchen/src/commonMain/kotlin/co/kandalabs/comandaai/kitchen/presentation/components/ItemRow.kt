@@ -204,7 +204,10 @@ fun ItemRow(
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                             modifier = Modifier.height(((item.unitStatuses.size / 3 + 1) * 70).dp)
                         ) {
-                            itemsIndexed(item.unitStatuses) { index, unitStatus ->
+                            itemsIndexed(
+                                items = item.unitStatuses,
+                                key = { index, _ -> "${item.itemId}_$index" } // Chave estável única
+                            ) { index, unitStatus ->
                                 ItemUnitControl(
                                     unitIndex = index + 1,
                                     currentStatus = unitStatus.status,
