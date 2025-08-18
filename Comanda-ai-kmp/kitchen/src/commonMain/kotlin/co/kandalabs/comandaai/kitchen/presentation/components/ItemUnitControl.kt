@@ -1,10 +1,8 @@
 package co.kandalabs.comandaai.kitchen.presentation.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -16,53 +14,30 @@ fun ItemUnitControl(
     currentStatus: ItemStatus,
     onStatusChange: (ItemStatus) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    
-    Box {
-        OutlinedButton(
-            onClick = { expanded = true },
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = getStatusColor(currentStatus).copy(alpha = 0.1f),
-                contentColor = getStatusColor(currentStatus)
+    OutlinedButton(
+        onClick = {
+            // Toggle between OPEN and DELIVERED
+            val newStatus = if (currentStatus == ItemStatus.DELIVERED) {
+                ItemStatus.OPEN
+            } else {
+                ItemStatus.DELIVERED
+            }
+            onStatusChange(newStatus)
+        },
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = getStatusColor(currentStatus).copy(alpha = 0.1f),
+            contentColor = getStatusColor(currentStatus)
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            StatusIndicator(status = currentStatus)
+            Text(
+                text = "#$unitIndex",
+                style = MaterialTheme.typography.labelSmall
             )
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = "#$unitIndex",
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-        
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            ItemStatus.values().forEach { status ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            StatusIndicator(status = status)
-                            Text(getStatusText(status))
-                        }
-                    },
-                    onClick = {
-                        onStatusChange(status)
-                        expanded = false
-                    }
-                )
-            }
         }
     }
 }

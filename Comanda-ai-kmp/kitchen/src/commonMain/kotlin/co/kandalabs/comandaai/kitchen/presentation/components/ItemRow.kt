@@ -6,6 +6,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -76,11 +80,27 @@ fun ItemRow(
             
             StatusBadge(
                 status = item.overallStatus,
-                count = item.totalCount
+                count = item.totalCount,
+                isMultipleItems = item.totalCount > 1,
+                onClick = {
+                    if (item.totalCount > 1) {
+                        // Toggle accordion for multiple items
+                        isExpanded = !isExpanded
+                    } else {
+                        // Toggle status between OPEN and DELIVERED for single item
+                        val newStatus = if (item.overallStatus == ItemStatus.DELIVERED) {
+                            ItemStatus.OPEN
+                        } else {
+                            ItemStatus.DELIVERED
+                        }
+                        onStatusChange(0, newStatus)
+                    }
+                }
             )
         }
         
         Spacer(modifier = Modifier.height(8.dp))
+        
         
         // Enhanced conditional logic with better UX
         if (item.totalCount == 1) {
@@ -115,40 +135,7 @@ fun ItemRow(
                 }
             }
         } else {
-            // Multiple items - expandable accordion with enhanced design
-            if (hasUndeliveredItems) {
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                OutlinedButton(
-                    onClick = { isExpanded = !isExpanded },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                    ),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (isExpanded) "Ocultar Controles" else "Controlar Itens (${item.totalCount})",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Icon(
-                            imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            }
+            // Multiple items - expandable accordion triggered by badge click only
             
             // Enhanced accordion with smooth animations
             AnimatedVisibility(

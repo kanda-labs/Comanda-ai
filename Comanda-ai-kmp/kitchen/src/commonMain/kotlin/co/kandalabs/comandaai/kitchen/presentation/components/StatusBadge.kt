@@ -1,5 +1,6 @@
 package co.kandalabs.comandaai.kitchen.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,7 +22,9 @@ import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
 @Composable
 fun StatusBadge(
     status: ItemStatus,
-    count: Int
+    count: Int,
+    isMultipleItems: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     val (backgroundColor, textColor, icon) = when (status) {
         ItemStatus.OPEN -> Triple(
@@ -53,7 +57,8 @@ fun StatusBadge(
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = backgroundColor,
-        shadowElevation = 1.dp
+        shadowElevation = 1.dp,
+        modifier = Modifier.clickable { onClick() }
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
@@ -80,6 +85,16 @@ fun StatusBadge(
                 fontWeight = FontWeight.Medium,
                 color = textColor
             )
+            
+            // Show dropdown arrow for multiple items
+            if (isMultipleItems) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Expandir",
+                    modifier = Modifier.size(16.dp),
+                    tint = textColor
+                )
+            }
         }
     }
 }
