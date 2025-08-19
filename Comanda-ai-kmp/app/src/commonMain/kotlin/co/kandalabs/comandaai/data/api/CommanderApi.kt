@@ -3,6 +3,7 @@ package co.kandalabs.comandaai.data.api
 import co.kandalabs.comandaai.data.repository.CreateOrderRequest
 import co.kandalabs.comandaai.data.repository.CreateBillRequest
 import co.kandalabs.comandaai.data.repository.UpdateTableRequest
+import co.kandalabs.comandaai.data.repository.UpdateOrderWithStatusesRequest
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
@@ -10,6 +11,7 @@ import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Path
 import kandalabs.commander.domain.model.Item
 import kandalabs.commander.domain.model.Order
+import kandalabs.commander.domain.model.OrderWithStatuses
 import kandalabs.commander.domain.model.Table
 
 internal interface CommanderApi {
@@ -38,6 +40,15 @@ internal interface CommanderApi {
     @GET("api/v1/orders")
     suspend fun getAllOrders(): List<Order>
     
+    @GET("api/v1/orders/{id}")
+    suspend fun getOrderById(@Path("id") id: Int): Order
+
+    @GET("api/v1/orders/{id}/with-statuses")
+    suspend fun getOrderByIdWithStatuses(@Path("id") id: Int): OrderWithStatuses
+    
     @PUT("api/v1/orders/{id}")
     suspend fun updateOrder(@Path("id") id: Int, @Body order: Order): Order
+    
+    @PUT("api/v1/orders/{id}/with-statuses")
+    suspend fun updateOrderWithIndividualStatuses(@Path("id") id: Int, @Body request: UpdateOrderWithStatusesRequest): Order
 }

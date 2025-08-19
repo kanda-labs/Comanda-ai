@@ -4,13 +4,21 @@ import kandalabs.commander.domain.model.ItemStatus
 import kandalabs.commander.domain.model.ItemUnitStatus
 import kandalabs.commander.domain.model.KitchenOrder
 import kandalabs.commander.domain.model.OrderResponse
+import kandalabs.commander.domain.model.OrderWithStatusesResponse
 import kandalabs.commander.presentation.models.request.CreateOrderRequest
 
 interface OrderRepository {
     suspend fun getAllOrders(): List<OrderResponse>
     suspend fun getOrderById(id: Int): OrderResponse?
+    suspend fun getOrderByIdWithStatuses(id: Int): OrderWithStatusesResponse?
     suspend fun createOrder(createOrderRequest: CreateOrderRequest): OrderResponse
     suspend fun updateOrder(id: Int, orderResponse: OrderResponse): OrderResponse?
+    suspend fun updateOrderWithIndividualStatuses(
+        id: Int, 
+        orderResponse: OrderResponse,
+        individualStatuses: Map<String, ItemStatus>,
+        updatedBy: String
+    ): OrderResponse?
     suspend fun deleteOrder(id: Int): Boolean
     suspend fun getOrdersByBillId(billId: Int): List<OrderResponse>
     

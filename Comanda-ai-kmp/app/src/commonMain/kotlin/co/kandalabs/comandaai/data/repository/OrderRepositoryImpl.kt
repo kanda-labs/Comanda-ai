@@ -6,6 +6,8 @@ import co.kandalabs.comandaai.data.api.CommanderApi
 import co.kandalabs.comandaai.domain.repository.CreateOrderItemRequest
 import co.kandalabs.comandaai.domain.repository.OrderRepository
 import kandalabs.commander.domain.model.Order
+import kandalabs.commander.domain.model.OrderWithStatuses
+import kandalabs.commander.domain.model.ItemStatus
 import kotlinx.serialization.Serializable
 
 internal class OrderRepositoryImpl(
@@ -42,11 +44,44 @@ internal class OrderRepositoryImpl(
             println("Error getting all orders: $error")
         }
     
+    override suspend fun getOrderById(orderId: Int): ComandaAiResult<Order> =
+        safeRunCatching {
+            commanderApi.getOrderById(orderId)
+        }.onFailure { error ->
+            println("Error getting order by id: $error")
+        }
+    
+    override suspend fun getOrderByIdWithStatuses(orderId: Int): ComandaAiResult<OrderWithStatuses> =
+        safeRunCatching {
+            commanderApi.getOrderByIdWithStatuses(orderId)
+        }.onFailure { error ->
+            println("Error getting order by id with statuses: $error")
+        }
+    
     override suspend fun updateOrder(orderId: Int, order: Order): ComandaAiResult<Order> =
         safeRunCatching {
             commanderApi.updateOrder(orderId, order)
         }.onFailure { error ->
             println("Error updating order: $error")
+        }
+    
+    override suspend fun updateOrderWithIndividualStatuses(
+        orderId: Int,
+        order: Order,
+        individualStatuses: Map<String, ItemStatus>,
+        updatedBy: String
+    ): ComandaAiResult<Order> =
+        safeRunCatching {
+            commanderApi.updateOrderWithIndividualStatuses(
+                orderId,
+                UpdateOrderWithStatusesRequest(
+                    order = order,
+                    individualStatuses = individualStatuses,
+                    updatedBy = updatedBy
+                )
+            )
+        }.onFailure { error ->
+            println("Error updating order with individual statuses: $error")
         }
 }
 
@@ -69,6 +104,13 @@ data class CreateOrderItemDto(
 data class CreateBillRequest(
     val tableId: Int?,
     val tableNumber: Int?
+)
+
+@Serializable
+data class UpdateOrderWithStatusesRequest(
+    val order: Order,
+    val individualStatuses: Map<String, ItemStatus>,
+    val updatedBy: String
 )
 
 @Serializable

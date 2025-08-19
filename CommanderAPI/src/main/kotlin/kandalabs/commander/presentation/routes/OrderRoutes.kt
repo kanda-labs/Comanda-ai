@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 import kandalabs.commander.domain.model.OrderResponse
 import kandalabs.commander.domain.service.OrderService
 import kandalabs.commander.presentation.models.request.CreateOrderRequest
+import kandalabs.commander.presentation.models.request.UpdateOrderWithStatusesRequest
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -29,6 +30,16 @@ fun Route.orderRoutes(orderService: OrderService) {
             }
         }
 
+        get("/{id}/with-statuses") {
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val order = orderService.getOrderByIdWithStatuses(id)
+            if (order != null) {
+                call.respond(order)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
         post {
             val orderRequest = call.receive<CreateOrderRequest>()
 
@@ -39,6 +50,22 @@ fun Route.orderRoutes(orderService: OrderService) {
             val id = call.parameters["id"]?.toIntOrNull() ?: return@put call.respond(HttpStatusCode.BadRequest)
             val orderResponse = call.receive<OrderResponse>()
             val updatedOrder = orderService.updateOrder(id, orderResponse)
+            if (updatedOrder != null) {
+                call.respond(updatedOrder)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
+        put("/{id}/with-statuses") {
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@put call.respond(HttpStatusCode.BadRequest)
+            val request = call.receive<UpdateOrderWithStatusesRequest>()
+            val updatedOrder = orderService.updateOrderWithIndividualStatuses(
+                id, 
+                request.order,
+                request.individualStatuses,
+                request.updatedBy
+            )
             if (updatedOrder != null) {
                 call.respond(updatedOrder)
             } else {

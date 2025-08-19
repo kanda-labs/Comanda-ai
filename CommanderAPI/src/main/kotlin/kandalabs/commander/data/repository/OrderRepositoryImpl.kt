@@ -35,6 +35,53 @@ class OrderRepositoryImpl(
         }
     }
 
+    override suspend fun getOrderByIdWithStatuses(id: Int): OrderWithStatusesResponse? {
+        logger.debug { "Fetching order by id with statuses: $id" }
+        return transaction {
+            val orderRow = orderTable.selectAll().where { orderTable.id eq id }.singleOrNull()
+                ?: return@transaction null
+
+            val order = orderRow.toOrder()
+            
+            // Build individual statuses map
+            val individualStatuses = mutableMapOf<String, ItemStatus>()
+            
+            order.items.forEach { item ->
+                val itemId = item.itemId
+                val totalCount = item.count
+                
+                // Get unit statuses for each unit of this item
+                (0 until totalCount).forEach { unitIndex ->
+                    val statusRow = orderItemStatusTable.selectAll()
+                        .where { 
+                            (orderItemStatusTable.orderId eq id) and 
+                            (orderItemStatusTable.itemId eq itemId) and 
+                            (orderItemStatusTable.unitIndex eq unitIndex)
+                        }
+                        .singleOrNull()
+                    
+                    val status = if (statusRow != null) {
+                        ItemStatus.valueOf(statusRow[orderItemStatusTable.status])
+                    } else {
+                        ItemStatus.OPEN // Default status
+                    }
+                    
+                    individualStatuses["${itemId}_${unitIndex}"] = status
+                }
+            }
+            
+            OrderWithStatusesResponse(
+                id = order.id,
+                billId = order.billId,
+                tableNumber = order.tableNumber,
+                items = order.items,
+                status = order.status,
+                createdAt = order.createdAt,
+                individualStatuses = individualStatuses
+            )
+        }
+    }
+
     override suspend fun getOrdersByBillId(billId: Int): List<OrderResponse> {
         logger.debug { "Fetching orders by billId: $billId" }
         return transaction {
@@ -99,6 +146,84 @@ class OrderRepositoryImpl(
             } else {
                 null
             }
+        }
+    }
+
+    override suspend fun updateOrderWithIndividualStatuses(
+        id: Int,
+        orderResponse: OrderResponse,
+        individualStatuses: Map<String, ItemStatus>,
+        updatedBy: String
+    ): OrderResponse? {
+        logger.debug { "Updating order with individual statuses: $id, statuses: $individualStatuses" }
+        return try {
+            transaction {
+                // Update order status
+                val rowsUpdated = orderTable.update({ orderTable.id eq id }) {
+                    it[status] = orderResponse.status.name
+                }
+                
+                if (rowsUpdated == 0) {
+                    return@transaction null
+                }
+                
+                // Update individual item statuses in OrderItemStatusTable
+                individualStatuses.forEach { (key, status) ->
+                    val parts = key.split("_")
+                    if (parts.size == 2) {
+                        val itemId = parts[0].toIntOrNull()
+                        val unitIndex = parts[1].toIntOrNull()
+                        
+                        if (itemId != null && unitIndex != null) {
+                            // Check if status record exists
+                            val existingStatus = orderItemStatusTable.selectAll()
+                                .where { 
+                                    (orderItemStatusTable.orderId eq id) and 
+                                    (orderItemStatusTable.itemId eq itemId) and 
+                                    (orderItemStatusTable.unitIndex eq unitIndex)
+                                }
+                                .singleOrNull()
+                            
+                            if (existingStatus != null) {
+                                // Update existing record
+                                orderItemStatusTable.update(
+                                    { 
+                                        (orderItemStatusTable.orderId eq id) and 
+                                        (orderItemStatusTable.itemId eq itemId) and 
+                                        (orderItemStatusTable.unitIndex eq unitIndex)
+                                    }
+                                ) {
+                                    it[orderItemStatusTable.status] = status.name
+                                    it[orderItemStatusTable.updatedAt] = localDateTimeAsLong()
+                                    it[orderItemStatusTable.updatedBy] = updatedBy
+                                }
+                            } else {
+                                // Insert new record
+                                orderItemStatusTable.insert {
+                                    it[orderItemStatusTable.orderId] = id
+                                    it[orderItemStatusTable.itemId] = itemId
+                                    it[orderItemStatusTable.unitIndex] = unitIndex
+                                    it[orderItemStatusTable.status] = status.name
+                                    it[orderItemStatusTable.updatedAt] = localDateTimeAsLong()
+                                    it[orderItemStatusTable.updatedBy] = updatedBy
+                                    it[orderItemStatusTable.orderItemId] = id * 1000 + itemId
+                                }
+                            }
+                            
+                            // Update overall item status based on individual statuses
+                            updateOverallItemStatus(id, itemId)
+                        }
+                    }
+                }
+                
+                // Return updated order
+                orderTable.selectAll().where { orderTable.id eq id }
+                    .map { it.toOrder() }
+                    .singleOrNull()
+            }
+        } catch (e: Exception) {
+            logger.error(e) { "Error updating order with individual statuses" }
+            null
         }
     }
 

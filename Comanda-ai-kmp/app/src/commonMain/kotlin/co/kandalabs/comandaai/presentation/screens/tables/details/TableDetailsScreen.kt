@@ -93,7 +93,9 @@ public data class TableDetailsScreen(val table: Table) : Screen {
             state = state,
             action = { action -> actions(action) },
             onOrderClick = { order -> 
-                navigator.push(OrderControlScreen(order))
+                order.id?.let { orderId ->
+                    navigator.push(OrderControlScreen(orderId))
+                }
             }
         )
     }

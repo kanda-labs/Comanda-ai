@@ -56,6 +56,53 @@ class OrderControlViewModel(
         }
     }
     
+    fun setupOrderById(orderId: Int) {
+        screenModelScope.launch {
+            _state.value = _state.value.copy(
+                isLoading = true,
+                error = null
+            )
+            
+            try {
+                val currentUserSession = sessionManager.getSession()
+                
+                when (val result = orderRepository.getOrderByIdWithStatuses(orderId)) {
+                    is ComandaAiResult.Success -> {
+                        val orderWithStatuses = result.data
+                        
+                        // Converter para Order regular para compatibilidade
+                        val order = Order(
+                            id = orderWithStatuses.id,
+                            billId = orderWithStatuses.billId,
+                            tableNumber = orderWithStatuses.tableNumber,
+                            items = orderWithStatuses.items,
+                            status = orderWithStatuses.status,
+                            createdAt = orderWithStatuses.createdAt
+                        )
+                        
+                        _state.value = _state.value.copy(
+                            order = order,
+                            userRole = currentUserSession?.role?.name,
+                            individualItemStatuses = orderWithStatuses.individualStatuses,
+                            isLoading = false
+                        )
+                    }
+                    is ComandaAiResult.Failure -> {
+                        _state.value = _state.value.copy(
+                            error = result.exception,
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    error = ComandaAiException.UnknownException(e.message ?: "Erro ao carregar pedido"),
+                    isLoading = false
+                )
+            }
+        }
+    }
+    
     fun updateItemStatus(item: ItemOrder, newStatus: ItemStatus) {
         screenModelScope.launch {
             try {
@@ -131,6 +178,14 @@ class OrderControlViewModel(
                 val key = "${item.itemId}_$individualIndex"
                 currentStatuses[key] = newStatus
                 
+                // Garantir que todos os outros itens individuais deste tipo mantêm seus status no mapa
+                for (index in 0 until item.count) {
+                    val otherKey = "${item.itemId}_$index"
+                    if (!currentStatuses.containsKey(otherKey)) {
+                        currentStatuses[otherKey] = item.status
+                    }
+                }
+                
                 // Verificar se todos os itens individuais deste tipo estão entregues para atualizar o status geral
                 val currentOrder = _state.value.order
                 if (currentOrder != null) {
@@ -144,8 +199,9 @@ class OrderControlViewModel(
                             val generalStatus = when {
                                 allIndividualStatuses.all { it == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
                                 allIndividualStatuses.all { it == ItemStatus.CANCELED } -> ItemStatus.CANCELED
+                                allIndividualStatuses.all { it == ItemStatus.OPEN } -> ItemStatus.OPEN
                                 allIndividualStatuses.any { it == ItemStatus.DELIVERED } -> ItemStatus.GRANTED
-                                else -> allIndividualStatuses.first()
+                                else -> ItemStatus.OPEN
                             }
                             
                             orderItem.copy(status = generalStatus)
@@ -155,15 +211,54 @@ class OrderControlViewModel(
                     }
                     val updatedOrder = currentOrder.copy(items = updatedItems)
                     
-                    _state.value = _state.value.copy(
-                        order = updatedOrder,
-                        individualItemStatuses = currentStatuses,
-                        isLoading = false,
-                        showStatusModal = false,
-                        selectedIndividualItem = null
-                    )
+                    // Persistir as mudanças no backend
+                    try {
+                        val currentUserSession = sessionManager.getSession()
+                        val updatedBy = currentUserSession?.userName ?: "system"
+                        
+                        val result = orderRepository.updateOrderWithIndividualStatuses(
+                            updatedOrder.id!!,
+                            updatedOrder,
+                            currentStatuses,
+                            updatedBy
+                        )
+                        
+                        when (result) {
+                            is ComandaAiResult.Success -> {
+                                // Atualizar com o resultado do backend
+                                _state.value = _state.value.copy(
+                                    order = result.data,
+                                    individualItemStatuses = currentStatuses,
+                                    isLoading = false,
+                                    showStatusModal = false,
+                                    selectedIndividualItem = null
+                                )
+                            }
+                            is ComandaAiResult.Failure -> {
+                                println("Erro ao persistir status individual no backend: ${result.exception.message}")
+                                // Manter atualização local mesmo com erro no backend
+                                _state.value = _state.value.copy(
+                                    order = updatedOrder,
+                                    individualItemStatuses = currentStatuses,
+                                    isLoading = false,
+                                    showStatusModal = false,
+                                    selectedIndividualItem = null
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        println("Erro ao chamar API para persistir status individual: ${e.message}")
+                        // Manter atualização local mesmo com erro na API
+                        _state.value = _state.value.copy(
+                            order = updatedOrder,
+                            individualItemStatuses = currentStatuses,
+                            isLoading = false,
+                            showStatusModal = false,
+                            selectedIndividualItem = null
+                        )
+                    }
                     
-                    // Verificar se o pedido todo está entregue
+                    // Verificar se o pedido todo está entregue apenas se não houver erro
                     checkAndUpdateOrderStatusFromIndividuals(updatedOrder, currentStatuses)
                 }
             } catch (e: Exception) {
@@ -198,15 +293,55 @@ class OrderControlViewModel(
                     }
                     val updatedOrder = currentOrder.copy(items = updatedItems)
                     
-                    // Recolher o acordeon após entregar todos os itens
-                    val newExpandedItems = _state.value.expandedItems - "${item.itemId}"
-                    
-                    _state.value = _state.value.copy(
-                        order = updatedOrder,
-                        individualItemStatuses = currentStatuses,
-                        expandedItems = newExpandedItems,
-                        isLoading = false
-                    )
+                    // Persistir as mudanças no backend
+                    try {
+                        val currentUserSession = sessionManager.getSession()
+                        val updatedBy = currentUserSession?.userName ?: "system"
+                        
+                        val result = orderRepository.updateOrderWithIndividualStatuses(
+                            updatedOrder.id!!,
+                            updatedOrder,
+                            currentStatuses,
+                            updatedBy
+                        )
+                        
+                        when (result) {
+                            is ComandaAiResult.Success -> {
+                                // Recolher o acordeon após entregar todos os itens
+                                val newExpandedItems = _state.value.expandedItems - "${item.itemId}"
+                                
+                                _state.value = _state.value.copy(
+                                    order = result.data,
+                                    individualItemStatuses = currentStatuses,
+                                    expandedItems = newExpandedItems,
+                                    isLoading = false
+                                )
+                            }
+                            is ComandaAiResult.Failure -> {
+                                println("Erro ao persistir entrega de todos os itens no backend: ${result.exception.message}")
+                                // Recolher o acordeon mesmo com erro no backend
+                                val newExpandedItems = _state.value.expandedItems - "${item.itemId}"
+                                
+                                _state.value = _state.value.copy(
+                                    order = updatedOrder,
+                                    individualItemStatuses = currentStatuses,
+                                    expandedItems = newExpandedItems,
+                                    isLoading = false
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        println("Erro ao chamar API para persistir entrega de todos os itens: ${e.message}")
+                        // Recolher o acordeon mesmo com erro na API
+                        val newExpandedItems = _state.value.expandedItems - "${item.itemId}"
+                        
+                        _state.value = _state.value.copy(
+                            order = updatedOrder,
+                            individualItemStatuses = currentStatuses,
+                            expandedItems = newExpandedItems,
+                            isLoading = false
+                        )
+                    }
                     
                     // Verificar se o pedido todo está entregue
                     checkAndUpdateOrderStatusFromIndividuals(updatedOrder, currentStatuses)
@@ -232,7 +367,15 @@ class OrderControlViewModel(
                     
                     // Fazer chamada para o backend para persistir a mudança
                     try {
-                        val result = orderRepository.updateOrder(orderToUpdate.id!!, orderToUpdate)
+                        val currentUserSession = sessionManager.getSession()
+                        val updatedBy = currentUserSession?.userName ?: "system"
+                        
+                        val result = orderRepository.updateOrderWithIndividualStatuses(
+                            orderToUpdate.id!!,
+                            orderToUpdate,
+                            _state.value.individualItemStatuses,
+                            updatedBy
+                        )
                         when (result) {
                             is ComandaAiResult.Success -> {
                                 result.data
@@ -284,7 +427,15 @@ class OrderControlViewModel(
                     
                     // Fazer chamada para o backend para persistir a mudança
                     try {
-                        val result = orderRepository.updateOrder(orderToUpdate.id!!, orderToUpdate)
+                        val currentUserSession = sessionManager.getSession()
+                        val updatedBy = currentUserSession?.userName ?: "system"
+                        
+                        val result = orderRepository.updateOrderWithIndividualStatuses(
+                            orderToUpdate.id!!,
+                            orderToUpdate,
+                            individualStatuses,
+                            updatedBy
+                        )
                         when (result) {
                             is ComandaAiResult.Success -> {
                                 result.data

@@ -35,7 +35,7 @@ import kandalabs.commander.domain.model.ItemOrder
 import kandalabs.commander.domain.model.ItemStatus
 import kandalabs.commander.domain.model.OrderStatus
 
-public data class OrderControlScreen(val order: Order) : Screen {
+public data class OrderControlScreen(val orderId: Int) : Screen {
 
     @Composable
     override fun Content() {
@@ -43,8 +43,8 @@ public data class OrderControlScreen(val order: Order) : Screen {
         val state = viewModel.state.collectAsState().value
         val navigator = LocalNavigator.currentOrThrow
 
-        LaunchedEffect(Unit) {
-            viewModel.setupOrder(order)
+        LaunchedEffect(orderId) {
+            viewModel.setupOrderById(orderId)
         }
 
         OrderControlScreenContent(
@@ -400,7 +400,7 @@ private fun OrderControlItemAccordion(
                             IndividualItemRow(
                                 item = item,
                                 index = index + 1,
-                                individualStatus = individualItemStatuses["${item.itemId}_$index"] ?: item.status,
+                                individualStatus = individualItemStatuses["${item.itemId}_$index"] ?: ItemStatus.GRANTED,
                                 onItemClick = { onIndividualItemClick(item, index) }
                             )
 
