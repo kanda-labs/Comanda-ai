@@ -29,6 +29,7 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.kandalabs.comandaai.presentation.screens.order.OrderScreen
+import co.kandalabs.comandaai.presentation.screens.ordercontrol.OrderControlScreen
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
@@ -41,7 +42,6 @@ import kandalabs.commander.domain.model.Table
 import kandalabs.commander.domain.model.TableStatus
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import co.kandalabs.comandaai.presentation.screens.tables.details.component.TableDetailsOrders
-import co.kandalabs.comandaai.presentation.screens.tables.details.component.OrderDetailsModal
 import co.kandalabs.comandaai.presentation.designSystem.components.CommandaBadge
 import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.OrderStatus
@@ -59,18 +59,19 @@ public data class TableDetailsScreen(val table: Table) : Screen {
                 TableDetailsAction.OPEN_TABLE -> viewModel.openTable(table)
                 TableDetailsAction.CLOSE_TABLE -> viewModel.closeTable(table)
                 TableDetailsAction.MAKE_ORDER -> {
-                    val billId = table.billId
+                    val currentTable = state.currentTable
+                    val billId = currentTable?.billId
                     if (billId != null) {
                         navigator.push(
                             OrderScreen(
-                                tableId = table.id ?: 0,
-                                tableNumber = table.number.toString(),
+                                tableId = currentTable.id ?: 0,
+                                tableNumber = currentTable.number.toString(),
                                 billId = billId
                             )
                         )
                     } else {
                         // TODO: Mostrar erro - mesa sem bill ativa
-                        println("Erro: Mesa ${table.number} não possui bill ativa")
+                        println("Erro: Mesa ${currentTable?.number ?: table.number} não possui bill ativa")
                     }
                 }
                 TableDetailsAction.BACK -> navigator.pop()
@@ -91,8 +92,9 @@ public data class TableDetailsScreen(val table: Table) : Screen {
         TableDetailsScreenContent(
             state = state,
             action = { action -> actions(action) },
-            onOrderClick = { order -> viewModel.showOrderDetails(order) },
-            onDismissOrderDetails = { viewModel.hideOrderDetails() }
+            onOrderClick = { order -> 
+                navigator.push(OrderControlScreen(order))
+            }
         )
     }
 }
@@ -101,8 +103,7 @@ public data class TableDetailsScreen(val table: Table) : Screen {
 private fun TableDetailsScreenContent(
     state: TableDetailsScreenState,
     action: (TableDetailsAction) -> Unit,
-    onOrderClick: (Order) -> Unit,
-    onDismissOrderDetails: () -> Unit
+    onOrderClick: (Order) -> Unit
 ) {
     MaterialTheme {
         Surface(
@@ -179,15 +180,6 @@ private fun TableDetailsScreenContent(
                 }
             }
         }
-
-        // Order Details Modal
-        state.selectedOrderForDetails?.let { order ->
-            OrderDetailsModal(
-                isVisible = true,
-                order = order,
-                onDismiss = onDismissOrderDetails
-            )
-        }
     }
 }
 
@@ -241,8 +233,7 @@ private fun TableDetailsScreenPreview() {
                 error = null
             ),
             action = {},
-            onOrderClick = {},
-            onDismissOrderDetails = {}
+            onOrderClick = {}
         )
     }
 }

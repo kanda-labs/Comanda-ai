@@ -57,11 +57,15 @@ fun Route.authRoutes(userService: UserService) {
                 
                 // Demo password validation - in production use proper password hashing
                 val validPassword = when (user?.userName) {
-                    "admin" -> request.password == "122825"
+                    "admin" -> request.password == "12345678"
                     "test" -> request.password == "1234"
                     "lueny-paixao" -> request.password == "142824"
                     "leonardo-paixao" -> request.password == "123456"
                     "rennan-viana" -> request.password == "123456"
+                    "maykon-douglas" -> request.password == "12345678"
+                    "cacau" -> request.password == "123456"
+                    "vivi" -> request.password == "123456"
+                    "jessica" -> request.password == "123456"
                     else -> false
                 }
                 

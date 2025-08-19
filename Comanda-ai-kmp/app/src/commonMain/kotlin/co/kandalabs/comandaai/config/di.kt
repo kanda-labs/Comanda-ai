@@ -16,6 +16,7 @@ import co.kandalabs.comandaai.domain.repository.OrderRepository
 import co.kandalabs.comandaai.domain.repository.TablesRepository
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.BreedsListingViewModel
 import co.kandalabs.comandaai.presentation.screens.order.OrderScreenModel
+import co.kandalabs.comandaai.presentation.screens.ordercontrol.OrderControlViewModel
 import co.kandalabs.comandaai.presentation.screens.ordersline.OrdersLineViewModel
 import co.kandalabs.comandaai.presentation.screens.splash.SplashViewModel
 import co.kandalabs.comandaai.presentation.screens.tables.details.TablesDetailsViewModel
@@ -147,6 +148,13 @@ private val commonModule = DI.Module("commonModule") {
             orderRepository = instance(),
             orderSSEClient = instance(),
             sessionManager = instance()
+        )
+    }
+    
+    bindProvider {
+        OrderControlViewModel(
+            sessionManager = instance(),
+            orderRepository = instance()
         )
     }
 
