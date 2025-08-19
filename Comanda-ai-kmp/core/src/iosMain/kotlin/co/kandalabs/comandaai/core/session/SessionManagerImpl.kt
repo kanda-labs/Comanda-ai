@@ -1,5 +1,6 @@
 package co.kandalabs.comandaai.core.session
 
+import co.kandalabs.comandaai.core.cache.CacheManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -10,7 +11,9 @@ import platform.Foundation.NSUserDefaults
 /**
  * iOS implementation of SessionManager using NSUserDefaults
  */
-class SessionManagerImpl : SessionManager {
+class SessionManagerImpl(
+    private val cacheManager: CacheManager? = null
+) : SessionManager {
     
     private val userDefaults = NSUserDefaults.standardUserDefaults
     private val json = Json { ignoreUnknownKeys = true }
@@ -41,6 +44,14 @@ class SessionManagerImpl : SessionManager {
     override suspend fun clearSession(): Unit = withContext(Dispatchers.Main) {
         userDefaults.removeObjectForKey(SESSION_KEY)
         userDefaults.synchronize()
+    }
+    
+    override suspend fun logout(): Unit = withContext(Dispatchers.Main) {
+        // Clear session data
+        clearSession()
+        
+        // Clear all cached data
+        cacheManager?.clearAllCache()
     }
     
     override suspend fun hasActiveSession(): Boolean = withContext(Dispatchers.Main) {

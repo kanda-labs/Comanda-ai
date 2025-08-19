@@ -20,6 +20,11 @@ interface SessionManager {
     suspend fun clearSession()
     
     /**
+     * Clear current session and all cached data
+     */
+    suspend fun logout()
+    
+    /**
      * Check if there's an active session
      */
     suspend fun hasActiveSession(): Boolean

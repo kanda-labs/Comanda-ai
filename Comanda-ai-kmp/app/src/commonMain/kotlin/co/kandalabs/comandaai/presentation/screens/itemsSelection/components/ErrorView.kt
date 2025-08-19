@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import co.kandalabs.comandaai.core.error.ComandaAiException
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
-import comanda_ai_kmp.app.generated.resources.Res
-import comanda_ai_kmp.app.generated.resources.golden_connection_error
-import comanda_ai_kmp.app.generated.resources.golden_generic_error
+import comandaai.app.generated.resources.Res
+import comandaai.app.generated.resources.golden_connection_error
+import comandaai.app.generated.resources.golden_generic_error
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

@@ -134,7 +134,11 @@ private fun LoginScreenContent(
                 errorBorderColor = ComandaAiColors.Error.value,
                 focusedLabelColor = ComandaAiColors.Primary.value,
                 unfocusedLabelColor = ComandaAiColors.Gray600.value,
-                errorLabelColor = ComandaAiColors.Error.value
+                errorLabelColor = ComandaAiColors.Error.value,
+                focusedTextColor = ComandaAiColors.OnBackground.value,
+                unfocusedTextColor = ComandaAiColors.OnBackground.value,
+                focusedPlaceholderColor = ComandaAiColors.Gray500.value,
+                unfocusedPlaceholderColor = ComandaAiColors.Gray500.value
             )
         )
 
@@ -190,7 +194,11 @@ private fun LoginScreenContent(
                 errorBorderColor = ComandaAiColors.Error.value,
                 focusedLabelColor = ComandaAiColors.Primary.value,
                 unfocusedLabelColor = ComandaAiColors.Gray600.value,
-                errorLabelColor = ComandaAiColors.Error.value
+                errorLabelColor = ComandaAiColors.Error.value,
+                focusedTextColor = ComandaAiColors.OnBackground.value,
+                unfocusedTextColor = ComandaAiColors.OnBackground.value,
+                focusedPlaceholderColor = ComandaAiColors.Gray500.value,
+                unfocusedPlaceholderColor = ComandaAiColors.Gray500.value
             )
         )
 

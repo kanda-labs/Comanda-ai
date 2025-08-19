@@ -3,6 +3,8 @@ package co.kandalabs.comandaai.config
 import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.kitchen.KitchenModule
 import co.kandalabs.comandaai.config.sqldelight.createDatabase
+import co.kandalabs.comandaai.core.cache.CacheManager
+import co.kandalabs.comandaai.core.cache.CacheManagerImpl
 import co.kandalabs.comandaai.core.logger.ComandaAiLogger
 import co.kandalabs.comandaai.core.logger.ComandaAiLoggerImpl
 import co.kandalabs.comandaai.core.session.SessionManager
@@ -97,6 +99,12 @@ private val commonModule = DI.Module("commonModule") {
         ComandaAiLoggerImpl()
     }
 
+    bindSingleton<CacheManager> {
+        CacheManagerImpl(
+            httpClient = instance()
+        )
+    }
+
     bindSingleton<ItemsRepository> {
         ItemsRepositoryImp(
             api = instance(),
@@ -167,6 +175,15 @@ object AppModule {
         import(AuthModule.authModule)
         import(KitchenModule.kitchenDI)
     }
+}
+
+expect val platformDI: DI.Module
+
+val di = DI.lazy {
+    import(commonModule)
+    import(AuthModule.authModule)
+    import(KitchenModule.kitchenDI)
+    import(platformDI)
 }
 
 

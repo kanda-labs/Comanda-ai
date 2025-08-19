@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import co.kandalabs.comandaai.core.cache.CacheManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -13,7 +14,10 @@ import kotlinx.serialization.decodeFromString
 /**
  * Android implementation of SessionManager using EncryptedSharedPreferences
  */
-class SessionManagerImpl(private val context: Context) : SessionManager {
+class SessionManagerImpl(
+    private val context: Context,
+    private val cacheManager: CacheManager? = null
+) : SessionManager {
     
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -60,6 +64,14 @@ class SessionManagerImpl(private val context: Context) : SessionManager {
     
     override suspend fun clearSession() = withContext(Dispatchers.IO) {
         sharedPreferences.edit().remove(SESSION_KEY).apply()
+    }
+    
+    override suspend fun logout(): Unit = withContext(Dispatchers.IO) {
+        // Clear session data
+        clearSession()
+        
+        // Clear all cached data
+        cacheManager?.clearAllCache()
     }
     
     override suspend fun hasActiveSession(): Boolean = withContext(Dispatchers.IO) {

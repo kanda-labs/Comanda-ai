@@ -16,7 +16,7 @@ import kandalabs.commander.domain.model.Table
 
 internal interface CommanderApi {
     companion object {
-        const val baseUrl = "http://10.0.2.2:8081/"
+        const val baseUrl = "http://192.168.1.34:8081/"
     }
 
     @GET("api/v1/items")

@@ -155,7 +155,7 @@ class KitchenViewModel(
     
     fun logout() {
         screenModelScope.launch {
-            sessionManager.clearSession()
+            sessionManager.logout()
         }
     }
     

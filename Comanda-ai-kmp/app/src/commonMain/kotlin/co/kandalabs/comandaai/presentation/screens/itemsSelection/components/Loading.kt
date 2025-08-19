@@ -16,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
-import comanda_ai_kmp.app.generated.resources.Res
-import comanda_ai_kmp.app.generated.resources.golden_loading
+import comandaai.app.generated.resources.Res
+import comandaai.app.generated.resources.golden_loading
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

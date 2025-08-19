@@ -128,7 +128,7 @@ internal class OrdersLineViewModel(
     
     fun logout() {
         screenModelScope.launch {
-            sessionManager.clearSession()
+            sessionManager.logout()
         }
     }
     

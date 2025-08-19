@@ -1,5 +1,6 @@
 import org.gradle.api.internal.FeaturePreviews
 
+rootProject.name = "ComandaAi"
 enableFeaturePreview(FeaturePreviews.Feature.TYPESAFE_PROJECT_ACCESSORS.toString())
 
 pluginManagement {

@@ -39,7 +39,7 @@ internal class TablesViewModel(
     
     fun logout() {
         screenModelScope.launch {
-            sessionManager.clearSession()
+            sessionManager.logout()
         }
     }
     
