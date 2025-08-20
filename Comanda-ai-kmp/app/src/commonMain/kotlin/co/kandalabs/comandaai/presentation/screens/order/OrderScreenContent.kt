@@ -1,6 +1,9 @@
 package co.kandalabs.comandaai.presentation.screens.order
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -63,6 +66,7 @@ fun OrderScreenContent(
     
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
+            modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
             topBar = {
                 ComandaAiTopAppBar(
                     title = "Mesa $tableNumber",

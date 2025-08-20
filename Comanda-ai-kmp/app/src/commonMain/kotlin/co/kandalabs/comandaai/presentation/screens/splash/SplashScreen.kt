@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,7 +23,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.kitchen.KitchenModule
 import co.kandalabs.comandaai.presentation.screens.tables.listing.TablesScreen
-import co.kandalabs.comandaai.presentation.screens.ordersline.OrdersLineScreen
 import co.kandalabs.comandaai.core.enums.UserRole
 
 object SplashScreen : Screen {
@@ -62,7 +64,9 @@ object SplashScreen : Screen {
 @Composable
 private fun SplashContent() {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing),
         contentAlignment = Alignment.Center
     ) {
         Column(

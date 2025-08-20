@@ -15,6 +15,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for the Kitchen screen that manages kitchen orders and item statuses.
+ * 
+ * Features:
+ * - Real-time order updates via SSE
+ * - Optimistic updates for better UX
+ * - Individual item unit status management
+ * - Automatic order removal when all items are delivered
+ */
 class KitchenViewModel(
     private val repository: KitchenRepository,
     private val sessionManager: SessionManager
@@ -26,22 +35,16 @@ class KitchenViewModel(
     init {
         loadActiveOrders()
         startRealTimeUpdates()
-        
-        // Test connection
-        screenModelScope.launch {
-            try {
-                val sseClient = repository as? co.kandalabs.comandaai.kitchen.data.repository.KitchenRepositoryImpl
-                if (sseClient != null) {
-                    // Basic connectivity test would go here
-                } else {
-                    println("KitchenViewModel: Repository type issue: ${repository::class}")
-                }
-            } catch (e: Exception) {
-                println("KitchenViewModel: Connection test failed: ${e.message}")
-            }
-        }
     }
     
+    // =================================
+    // Public API Methods
+    // =================================
+    
+    /**
+     * Load active orders from the repository.
+     * Called manually to refresh the orders list.
+     */
     fun loadActiveOrders() {
         _state.update { it.copy(isLoading = true, error = null) }
         
@@ -66,6 +69,10 @@ class KitchenViewModel(
         }
     }
     
+    /**
+     * Update the status of a specific unit of an item in an order.
+     * Uses optimistic updates for better UX.
+     */
     fun updateItemStatus(
         orderId: Int,
         itemId: Int,
@@ -95,6 +102,10 @@ class KitchenViewModel(
         }
     }
     
+    /**
+     * Mark an entire order as delivered.
+     * Removes the order from the active orders list.
+     */
     fun markOrderAsDelivered(orderId: Int) {
         screenModelScope.launch {
             repository.markOrderAsDelivered(orderId)
@@ -111,6 +122,10 @@ class KitchenViewModel(
         }
     }
     
+    /**
+     * Mark all units of a specific item as delivered.
+     * Uses optimistic updates for better UX.
+     */
     fun markItemAsDelivered(orderId: Int, itemId: Int) {
         // Store current state for rollback
         val currentState = _state.value
@@ -135,6 +150,10 @@ class KitchenViewModel(
         }
     }
     
+    /**
+     * Refresh orders with a loading indicator.
+     * Used for pull-to-refresh functionality.
+     */
     fun refreshOrders() {
         _state.update { it.copy(isRefreshing = true) }
         
@@ -159,20 +178,37 @@ class KitchenViewModel(
         }
     }
     
+    /**
+     * Clear any error messages from the state.
+     */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
     
+    /**
+     * Get the current user session for authentication checks.
+     */
     suspend fun getUserSession(): UserSession? {
         return sessionManager.getSession()
     }
     
+    /**
+     * Log out the current user and clear session data.
+     */
     fun logout() {
         screenModelScope.launch {
             sessionManager.logout()
         }
     }
     
+    // =================================
+    // Private Implementation Methods
+    // =================================
+    
+    /**
+     * Start listening to real-time updates via SSE.
+     * Automatically handles connection, reconnection, and error states.
+     */
     private fun startRealTimeUpdates() {
         screenModelScope.launch {
             try {
@@ -190,9 +226,10 @@ class KitchenViewModel(
                                 )
                             }
                         }
-                        is KitchenEvent.Heartbeat -> {}
+                        is KitchenEvent.Heartbeat -> {
+                            // Keep connection alive
+                        }
                         is KitchenEvent.Error -> {
-                            println("KitchenViewModel: Error event received: ${event.message}")
                             _state.update { 
                                 it.copy(
                                     error = event.message,
@@ -203,7 +240,6 @@ class KitchenViewModel(
                     }
                 }
             } catch (e: Exception) {
-                println("KitchenViewModel: Exception in real-time updates: ${e.message}")
                 _state.update { 
                     it.copy(
                         error = "Real-time connection failed: ${e.message}",
@@ -214,7 +250,10 @@ class KitchenViewModel(
         }
     }
     
-    // Helper functions for optimistic updates
+    /**
+     * Apply optimistic updates to order items for immediate UI feedback.
+     * Automatically removes orders when all items are delivered.
+     */
     private fun updateOrdersOptimistically(
         orders: List<KitchenOrder>,
         orderId: Int,
@@ -263,6 +302,10 @@ class KitchenViewModel(
         }
     }
     
+    /**
+     * Mark all units of an item as delivered optimistically.
+     * Automatically removes orders when all items are delivered.
+     */
     private fun markItemAsDeliveredOptimistically(
         orders: List<KitchenOrder>,
         orderId: Int,
@@ -300,6 +343,10 @@ class KitchenViewModel(
         }
     }
     
+    /**
+     * Calculate the overall status of an item based on its unit statuses.
+     * Returns DELIVERED if all units are delivered, otherwise OPEN.
+     */
     private fun calculateOverallStatus(unitStatuses: List<ItemUnitStatus>): ItemStatus {
         return when {
             unitStatuses.all { it.status == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
