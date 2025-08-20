@@ -171,7 +171,6 @@ private fun TableDetailsScreenContent(
                                 contentColor = it.textColor.value,
                                 modifier = Modifier
                                     .padding(start = ComandaAiSpacing.Small.value)
-                                    .weight(1f)
                             )
                         }
                     }

@@ -52,10 +52,7 @@ object SplashScreen : Screen {
                     UserRole.ADMIN -> {
                         navigator.replace(AdminScreen)
                     }
-                    null -> {
-                        println("SplashScreen - Role is null, navigating to TablesScreen")
-                        navigator.replace(TablesScreen) // Default fallback
-                    }
+                    else -> { }
                 }
             } else {
                 navigator.replace(AuthModule.getLoginScreen())
@@ -83,9 +80,11 @@ private fun SplashContent() {
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary
             )
-            
+
             CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(48.dp),
+                strokeWidth = 4.dp
             )
         }
     }
