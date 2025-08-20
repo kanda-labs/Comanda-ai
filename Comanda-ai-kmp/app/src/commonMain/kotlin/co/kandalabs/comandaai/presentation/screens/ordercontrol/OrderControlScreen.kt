@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,6 +54,8 @@ public data class OrderControlScreen(val orderId: Int) : Screen {
             onItemClick = { itemOrder ->
                 if (itemOrder.count > 1) {
                     viewModel.toggleItemExpansion("${itemOrder.itemId}")
+                } else if (state.userRole == "MANAGER") {
+                    viewModel.showStatusModal(itemOrder)
                 } else {
                     viewModel.updateItemStatus(itemOrder, getNextStatus(itemOrder.status))
                 }
@@ -293,7 +296,7 @@ private fun OrderControlItemAccordion(
     }
 
     val statusText = when (item.status) {
-        ItemStatus.GRANTED -> "Pendente"
+        ItemStatus.GRANTED -> "Atendido"
         ItemStatus.DELIVERED -> "Entregue"
         ItemStatus.OPEN -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
@@ -464,7 +467,7 @@ private fun IndividualItemRow(
     }
 
     val statusText = when (individualStatus) {
-        ItemStatus.GRANTED -> "Pendente"
+        ItemStatus.GRANTED -> "Atendido"
         ItemStatus.DELIVERED -> "Entregue"
         ItemStatus.OPEN -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
@@ -533,7 +536,7 @@ private fun OrderControlItem(
     }
 
     val statusText = when (item.status) {
-        ItemStatus.GRANTED -> "Pendente"
+        ItemStatus.GRANTED -> "Atendido"
         ItemStatus.DELIVERED -> "Entregue"
         ItemStatus.OPEN -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
@@ -595,20 +598,36 @@ private fun StatusSelectionModal(
     onDismiss: () -> Unit,
     onStatusSelected: (ItemStatus) -> Unit
 ) {
-    // Filtra os status disponíveis excluindo o status atual
-    val availableStatuses = ItemStatus.values().filter { it != item.status }
+    // Filtra os status disponíveis excluindo o status atual e GRANTED
+    val availableStatuses = ItemStatus.values().filter { it != item.status && it != ItemStatus.GRANTED }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "Alterar Status",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable { onDismiss() },
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(ComandaAiSpacing.Medium.value)
+                .clickable { },
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
             )
-        },
-        text = {
-            Column {
+        ) {
+            Column(
+                modifier = Modifier.padding(ComandaAiSpacing.Medium.value)
+            ) {
+                Text(
+                    text = "Alterar Status",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = ComandaAiSpacing.Medium.value)
+                )
+                
                 Text(
                     text = "Item: ${item.name}",
                     style = MaterialTheme.typography.bodyMedium,
@@ -616,7 +635,7 @@ private fun StatusSelectionModal(
                 )
 
                 val currentStatusText = when (item.status) {
-                    ItemStatus.GRANTED -> "Pendente"
+                    ItemStatus.GRANTED -> "Atendido"
                     ItemStatus.DELIVERED -> "Entregue"
                     ItemStatus.OPEN -> "Pendente"
                     ItemStatus.CANCELED -> "Cancelado"
@@ -641,31 +660,30 @@ private fun StatusSelectionModal(
 
                 availableStatuses.forEach { status ->
                     val statusText = when (status) {
-                        ItemStatus.GRANTED -> "Atendido"
                         ItemStatus.DELIVERED -> "Entregue"
                         ItemStatus.OPEN -> "Pendente"
                         ItemStatus.CANCELED -> "Cancelado"
+                        else -> ""
                     }
 
                     val (bgColor, textColor) = when (status) {
-                        ItemStatus.GRANTED -> Pair(
-                            ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Yellow500.value
-                        )
-
                         ItemStatus.DELIVERED -> Pair(
                             ComandaAiColors.Green500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Green500.value
+                            ComandaAiColors.OnSurface.value
                         )
 
                         ItemStatus.OPEN -> Pair(
                             ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Yellow500.value
+                            ComandaAiColors.OnSurface.value
                         )
 
                         ItemStatus.CANCELED -> Pair(
                             ComandaAiColors.Error.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Error.value
+                            ComandaAiColors.OnSurface.value
+                        )
+                        else -> Pair(
+                            ComandaAiColors.Gray200.value,
+                            ComandaAiColors.OnSurface.value
                         )
                     }
 
@@ -686,19 +704,27 @@ private fun StatusSelectionModal(
                                 .fillMaxWidth()
                                 .padding(12.dp),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = textColor,
+                            color = ComandaAiColors.OnSurface.value,
                             fontWeight = FontWeight.Medium
                         )
                     }
                 }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                
+                Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
+                
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ComandaAiColors.Gray200.value,
+                        contentColor = ComandaAiColors.OnSurface.value
+                    )
+                ) {
+                    Text("Cancelar")
+                }
             }
         }
-    )
+    }
 }
 
 @Composable
@@ -709,20 +735,36 @@ private fun IndividualItemStatusModal(
     onDismiss: () -> Unit,
     onStatusSelected: (ItemStatus) -> Unit
 ) {
-    // Filtra os status disponíveis excluindo o status atual individual
-    val availableStatuses = ItemStatus.values().filter { it != currentIndividualStatus }
+    // Filtra os status disponíveis excluindo o status atual individual e GRANTED
+    val availableStatuses = ItemStatus.values().filter { it != currentIndividualStatus && it != ItemStatus.GRANTED }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "Alterar Status Individual",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable { onDismiss() },
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(ComandaAiSpacing.Medium.value)
+                .clickable { },
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
             )
-        },
-        text = {
-            Column {
+        ) {
+            Column(
+                modifier = Modifier.padding(ComandaAiSpacing.Medium.value)
+            ) {
+                Text(
+                    text = "Alterar Status Individual",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = ComandaAiSpacing.Medium.value)
+                )
+                
                 Text(
                     text = "Item: ${item.name} #${individualIndex + 1}",
                     style = MaterialTheme.typography.bodyMedium,
@@ -730,7 +772,7 @@ private fun IndividualItemStatusModal(
                 )
 
                 val currentStatusText = when (currentIndividualStatus) {
-                    ItemStatus.GRANTED -> "Pendente"
+                    ItemStatus.GRANTED -> "Atendido"
                     ItemStatus.DELIVERED -> "Entregue"
                     ItemStatus.OPEN -> "Pendente"
                     ItemStatus.CANCELED -> "Cancelado"
@@ -755,31 +797,30 @@ private fun IndividualItemStatusModal(
 
                 availableStatuses.forEach { status ->
                     val statusText = when (status) {
-                        ItemStatus.GRANTED -> "Atendido"
                         ItemStatus.DELIVERED -> "Entregue"
                         ItemStatus.OPEN -> "Pendente"
                         ItemStatus.CANCELED -> "Cancelado"
+                        else -> ""
                     }
 
                     val (bgColor, textColor) = when (status) {
-                        ItemStatus.GRANTED -> Pair(
-                            ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Yellow500.value
-                        )
-
                         ItemStatus.DELIVERED -> Pair(
                             ComandaAiColors.Green500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Green500.value
+                            ComandaAiColors.OnSurface.value
                         )
 
                         ItemStatus.OPEN -> Pair(
                             ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Yellow500.value
+                            ComandaAiColors.OnSurface.value
                         )
 
                         ItemStatus.CANCELED -> Pair(
                             ComandaAiColors.Error.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Error.value
+                            ComandaAiColors.OnSurface.value
+                        )
+                        else -> Pair(
+                            ComandaAiColors.Gray200.value,
+                            ComandaAiColors.OnSurface.value
                         )
                     }
 
@@ -800,19 +841,27 @@ private fun IndividualItemStatusModal(
                                 .fillMaxWidth()
                                 .padding(12.dp),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = textColor,
+                            color = ComandaAiColors.OnSurface.value,
                             fontWeight = FontWeight.Medium
                         )
                     }
                 }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                
+                Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
+                
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ComandaAiColors.Gray200.value,
+                        contentColor = ComandaAiColors.OnSurface.value
+                    )
+                ) {
+                    Text("Cancelar")
+                }
             }
         }
-    )
+    }
 }
 
 private fun getNextStatus(currentStatus: ItemStatus): ItemStatus {

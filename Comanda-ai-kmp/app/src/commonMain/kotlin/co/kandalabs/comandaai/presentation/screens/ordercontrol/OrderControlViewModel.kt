@@ -108,8 +108,6 @@ class OrderControlViewModel(
             try {
                 _state.value = _state.value.copy(isLoading = true)
                 
-                // TODO: Implementar chamada para API para atualizar status do item
-                // Por enquanto, apenas atualizar localmente
                 val currentOrder = _state.value.order
                 if (currentOrder != null) {
                     val updatedItems = currentOrder.items.map { orderItem ->
@@ -121,8 +119,61 @@ class OrderControlViewModel(
                     }
                     val updatedOrder = currentOrder.copy(items = updatedItems)
                     
+                    // Atualizar os status individuais também
+                    val currentStatuses = _state.value.individualItemStatuses.toMutableMap()
+                    for (index in 0 until item.count) {
+                        val key = "${item.itemId}_$index"
+                        currentStatuses[key] = newStatus
+                    }
+                    
+                    // Persistir as mudanças no backend
+                    try {
+                        val currentUserSession = sessionManager.getSession()
+                        val updatedBy = currentUserSession?.userName ?: "system"
+                        
+                        val result = orderRepository.updateOrderWithIndividualStatuses(
+                            updatedOrder.id!!,
+                            updatedOrder,
+                            currentStatuses,
+                            updatedBy
+                        )
+                        
+                        when (result) {
+                            is ComandaAiResult.Success -> {
+                                _state.value = _state.value.copy(
+                                    order = result.data,
+                                    individualItemStatuses = currentStatuses,
+                                    isLoading = false,
+                                    showStatusModal = false,
+                                    selectedItem = null
+                                )
+                            }
+                            is ComandaAiResult.Failure -> {
+                                println("Erro ao persistir status no backend: ${result.exception.message}")
+                                // Manter atualização local mesmo com erro no backend
+                                _state.value = _state.value.copy(
+                                    order = updatedOrder,
+                                    individualItemStatuses = currentStatuses,
+                                    isLoading = false,
+                                    showStatusModal = false,
+                                    selectedItem = null
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        println("Erro ao chamar API para persistir status: ${e.message}")
+                        // Manter atualização local mesmo com erro na API
+                        _state.value = _state.value.copy(
+                            order = updatedOrder,
+                            individualItemStatuses = currentStatuses,
+                            isLoading = false,
+                            showStatusModal = false,
+                            selectedItem = null
+                        )
+                    }
+                    
                     // Verificar se o pedido todo está entregue
-                    checkAndUpdateOrderStatus(updatedOrder)
+                    checkAndUpdateOrderStatusFromIndividuals(updatedOrder, currentStatuses)
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
