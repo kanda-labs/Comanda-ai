@@ -29,6 +29,7 @@ fun OrderScreenContent(
     screenModel: OrderScreenModel,
     onBackClick: () -> Unit,
     onSubmitOrder: () -> Unit,
+    onOrderSuccess: () -> Unit,
     onShowFeedback: (isSuccess: Boolean, message: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -51,8 +52,8 @@ fun OrderScreenContent(
     // Handle order submission success
     LaunchedEffect(orderSubmitted) {
         if (orderSubmitted) {
-            onShowFeedback(true, "Pedido enviado com sucesso!")
             screenModel.resetOrderSubmitted()
+            onOrderSuccess()
         }
     }
     

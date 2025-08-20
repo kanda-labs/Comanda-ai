@@ -24,6 +24,10 @@ class OrderScreen(
             onSubmitOrder = { 
                 screenModel.submitOrder(tableId, billId)
             },
+            onOrderSuccess = {
+                // Navigate back to table details (pop twice: OrderScreen + any FeedbackScreen)
+                navigator.popUntil { screen -> screen is co.kandalabs.comandaai.presentation.screens.tables.details.TableDetailsScreen }
+            },
             onShowFeedback = { isSuccess, message ->
                 navigator.push(FeedbackScreen(isSuccess, message))
             }

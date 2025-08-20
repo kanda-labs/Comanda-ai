@@ -38,8 +38,8 @@ internal fun OrderListItem(
     ComandaAiListItem(
         modifier = Modifier
             .fillMaxWidth()
-            .background(ComandaAiColors.Surface.value)
             .clickable(onClick = onClick),
+        backgroundColor = MaterialTheme.colorScheme.surface,
         showDivider = isLastItem.not(),
         contentSlot = {
             Row(
@@ -54,12 +54,12 @@ internal fun OrderListItem(
                     Text(
                         text = order.id,
                         style = MaterialTheme.typography.titleMedium,
-                        color = ComandaAiColors.OnSurface.value
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = order.time,
                         style = MaterialTheme.typography.bodySmall,
-                        color = ComandaAiColors.OnSurface.value
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 

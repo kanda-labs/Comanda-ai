@@ -45,7 +45,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ComandaAiListItem(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = ComandaAiColors.Surface.value,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     onClick: (() -> Unit)? = null,
     showDivider: Boolean = true,
     startSlot: @Composable (RowScope.() -> Unit)? = null,
