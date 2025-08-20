@@ -5,17 +5,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.core.getOrThrow
 import co.kandalabs.comandaai.domain.repository.TablesRepository
-import co.kandalabs.comandaai.domain.repository.ItemsRepository
-import kandalabs.commander.domain.model.Item
-import kandalabs.commander.domain.model.ItemStatus
-import kandalabs.commander.domain.model.OrderStatus
-import io.ktor.util.reflect.instanceOf
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 internal class PaymentSummaryViewModel(
-    private val repository: TablesRepository,
-    private val itemsRepository: ItemsRepository
+    private val repository: TablesRepository
 ) : StateScreenModel<PaymentSummaryScreenState>(PaymentSummaryScreenState()) {
 
     fun setupPaymentSummaryById(tableId: Int, tableNumber: Int) {
@@ -23,50 +16,16 @@ internal class PaymentSummaryViewModel(
             updateState { it.copy(isLoading = true, error = null) }
             println("Setting up payment summary for table $tableId")
             
-            safeRunCatching {
-                val bill = repository.getBillByTableId(tableId)
-                
-                var totalAmount = 0
-                var itemsList = emptyList<Item>()
-                
-                itemsRepository.getItems(null).fold(
-                    onSuccess = { items ->
-                        itemsList = items
-                        totalAmount = bill.orders
-                            .filter { order -> order.status != OrderStatus.CANCELED } // Excluir pedidos cancelados
-                            .sumOf { order ->
-                                order.items
-                                    .filter { orderItem -> orderItem.status != ItemStatus.CANCELED } // Excluir itens cancelados
-                                    .sumOf { orderItem -> 
-                                        val foundItem = items.firstOrNull { it.id == orderItem.itemId }
-                                        val itemValueInCentavos = foundItem?.value ?: 0
-                                        orderItem.count * itemValueInCentavos
-                                    }
-                            }
-                    },
-                    onFailure = {
-                        // Se falhar ao buscar itens, usa cálculo simples
-                        totalAmount = bill.orders
-                            .filter { order -> order.status != OrderStatus.CANCELED } // Excluir pedidos cancelados
-                            .sumOf { order ->
-                                order.items
-                                    .filter { item -> item.status != ItemStatus.CANCELED } // Excluir itens cancelados
-                                    .sumOf { item -> item.count * 100 } // Fallback para 1 real em centavos
-                            }
-                    }
-                )
-                
-                PaymentSummaryScreenState(
-                    isLoading = false,
-                    tableNumber = tableNumber.toString().padStart(2, '0'),
-                    orders = bill.orders,
-                    totalAmount = totalAmount.toLong(),
-                    items = itemsList
-                )
-            }.fold(
-                onSuccess = { newState -> 
+            repository.getPaymentSummary(tableId).fold(
+                onSuccess = { paymentSummary -> 
                     println("Payment summary loaded successfully")
-                    updateState { newState }
+                    updateState { 
+                        PaymentSummaryScreenState(
+                            isLoading = false,
+                            tableNumber = paymentSummary.tableNumber,
+                            paymentSummary = paymentSummary
+                        )
+                    }
                 },
                 onFailure = { error ->
                     println("Error loading payment summary: ${error.message}")
@@ -83,19 +42,18 @@ internal class PaymentSummaryViewModel(
 
     fun finishPaymentById(tableId: Int, onFinish: () -> Unit) {
         screenModelScope.launch {
-            val currentState = state.value
             updateState { it.copy(isProcessingPayment = true) }
-            safeRunCatching {
-                val bill = repository.getBillByTableId(tableId)
-                val billId = bill.id.getOrThrow()
-                repository.finishTablePayment(tableId, billId, currentState.totalAmount)
-                    .getOrThrow()
-            }.fold(
-                onSuccess = { updateState {
-                    onFinish()
-                    it.copy(isProcessingPayment = false)
-                } },
+            
+            repository.processTablePayment(tableId).fold(
+                onSuccess = { 
+                    println("Payment processed successfully for table $tableId")
+                    updateState {
+                        onFinish()
+                        it.copy(isProcessingPayment = false)
+                    }
+                },
                 onFailure = { error ->
+                    println("Error processing payment: ${error.message}")
                     updateState {
                         it.copy(
                             isProcessingPayment = false,

@@ -239,8 +239,9 @@ class OrderRepositoryImpl(
         logger.debug { "Fetching orders with incomplete items for kitchen" }
         return try {
             val orders = transaction {
-                // Get all orders that have items not fully completed
+                // Get all orders except those with GRANTED status
                 orderTable.selectAll()
+                    .where { orderTable.status neq OrderStatus.GRANTED.name }
                     .map { orderRow ->
                         val orderId = orderRow[OrderTable.id]
                         val items = OrderItemTable.selectAll()

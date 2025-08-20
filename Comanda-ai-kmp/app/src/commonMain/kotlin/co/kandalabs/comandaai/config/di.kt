@@ -142,8 +142,7 @@ private val commonModule = DI.Module("commonModule") {
 
     bindProvider {
         PaymentSummaryViewModel(
-            repository = instance(),
-            itemsRepository = instance()
+            repository = instance()
         )
     }
 

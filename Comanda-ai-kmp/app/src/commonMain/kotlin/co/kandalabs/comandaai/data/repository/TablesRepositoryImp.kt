@@ -6,6 +6,7 @@ import co.kandalabs.comandaai.data.api.CommanderApi
 import co.kandalabs.comandaai.data.repository.CreateBillRequest
 import co.kandalabs.comandaai.data.repository.UpdateTableRequest
 import co.kandalabs.comandaai.domain.repository.TablesRepository
+import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
 import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.BillStatus
 import kandalabs.commander.domain.model.Order
@@ -97,6 +98,22 @@ internal class TablesRepositoryImp(
             Unit
         }.onFailure { error ->
             println("Error finishing table payment: $error")
+        }
+    }
+
+    override suspend fun getPaymentSummary(tableId: Int): ComandaAiResult<PaymentSummaryResponse> {
+        return safeRunCatching {
+            commanderApi.getPaymentSummary(tableId)
+        }.onFailure { error ->
+            println("Error getting payment summary: $error")
+        }
+    }
+
+    override suspend fun processTablePayment(tableId: Int): ComandaAiResult<Unit> {
+        return safeRunCatching {
+            commanderApi.processTablePayment(tableId)
+        }.onFailure { error ->
+            println("Error processing table payment: $error")
         }
     }
 }

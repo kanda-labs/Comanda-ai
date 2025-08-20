@@ -150,8 +150,13 @@ private val appModule = module {
     single<UserRepository> { UserRepositoryImpl(userTable = get(), logger = get()) }
     single<TableRepository> { TableRepositoryImpl(tableTable = get(), logger = get()) }
     single<BillRepository> { BillRepositoryImpl(
-        billTable = get(), logger = get(),
-        orderTable = get()
+        billTable = get(), 
+        orderTable = get(),
+        orderItemTable = get(),
+        orderItemStatusTable = get(),
+        itemTable = get(),
+        tableTable = get(),
+        logger = get()
     ) }
     single<ItemRepository> { ItemRepositoryImpl(itemTable = get(), logger = get()) }
     single<OrderRepository> { OrderRepositoryImpl(

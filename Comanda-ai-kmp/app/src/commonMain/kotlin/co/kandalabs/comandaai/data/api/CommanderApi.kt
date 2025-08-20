@@ -14,6 +14,7 @@ import kandalabs.commander.domain.model.Item
 import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.OrderWithStatuses
 import kandalabs.commander.domain.model.Table
+import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
 
 internal interface CommanderApi {
     companion object {
@@ -55,7 +56,13 @@ internal interface CommanderApi {
     
     @GET("api/v1/bills/table/{tableId}")
     suspend fun getBillByTableId(@Path("tableId") tableId: Int): Bill
+
+    @GET("api/v1/bills/table/{tableId}/payment-summary")
+    suspend fun getPaymentSummary(@Path("tableId") tableId: Int): PaymentSummaryResponse
     
     @PUT("api/v1/bills/{id}")
     suspend fun updateBill(@Path("id") id: Int, @Body bill: Bill): Bill
+
+    @POST("api/v1/bills/table/{tableId}/payment")
+    suspend fun processTablePayment(@Path("tableId") tableId: Int)
 }

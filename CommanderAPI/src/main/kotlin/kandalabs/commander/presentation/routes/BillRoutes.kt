@@ -39,6 +39,16 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
             }
         }
 
+        get("/table/{tableId}/payment-summary") {
+            val tableId = call.parameters["tableId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val paymentSummary = billService.getBillPaymentSummary(tableId.toInt())
+            if (paymentSummary != null) {
+                call.respond(paymentSummary)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
         post {
             runCatching {
                 val request = call.receive<CreateBillRequest>()
@@ -76,6 +86,16 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
                 call.respond(updatedBill)
             } else {
                 call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
+        post("/table/{tableId}/payment") {
+            val tableId = call.parameters["tableId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+            val success = billService.processTablePayment(tableId.toInt())
+            if (success) {
+                call.respond(HttpStatusCode.OK, mapOf("message" to "Payment processed successfully"))
+            } else {
+                call.respond(HttpStatusCode.NotFound, mapOf("error" to "Table or bill not found"))
             }
         }
 
