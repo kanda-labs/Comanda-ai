@@ -25,20 +25,23 @@ internal class PaymentSummaryViewModel(
                 val bill = repository.getBillByTableId(tableId)
                 
                 var totalAmount = 0
+                var itemsList = emptyList<Item>()
+                
                 itemsRepository.getItems(null).fold(
                     onSuccess = { items ->
+                        itemsList = items
                         totalAmount = bill.orders.sumOf { order ->
                             order.items.sumOf { orderItem -> 
                                 val foundItem = items.firstOrNull { it.id == orderItem.itemId }
-                                val itemValueInReais = foundItem?.value ?: 0
-                                orderItem.count * itemValueInReais
+                                val itemValueInCentavos = foundItem?.value ?: 0
+                                orderItem.count * itemValueInCentavos
                             }
                         }
                     },
                     onFailure = {
                         // Se falhar ao buscar itens, usa cálculo simples
                         totalAmount = bill.orders.sumOf { order ->
-                            order.items.sumOf { item -> item.count * 1 }
+                            order.items.sumOf { item -> item.count * 100 } // Fallback para 1 real em centavos
                         }
                     }
                 )
@@ -47,7 +50,8 @@ internal class PaymentSummaryViewModel(
                     isLoading = false,
                     tableNumber = tableNumber.toString().padStart(2, '0'),
                     orders = bill.orders,
-                    totalAmount = totalAmount.toLong()
+                    totalAmount = totalAmount.toLong(),
+                    items = itemsList
                 )
             }.fold(
                 onSuccess = { newState -> 

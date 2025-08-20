@@ -13,25 +13,32 @@ internal data class PaymentSummaryScreenState(
     val orders: List<Order> = emptyList(),
     val isProcessingPayment: Boolean = false,
     internal val totalAmount: Long = 0L,
+    val items: List<Item> = emptyList(),
 ) {
     val totalAmountPresentation: String = formatCurrency(totalAmount)
     val appBarTitle = "Resumo do Pagamento"
     val contentTitle: String = "Mesa $tableNumber"
     
     val ordersPresentation: List<PaymentOrderItemState> = orders.mapIndexed { index, order ->
-        val orderTotal = order.items.sumOf { item ->
-            item.count * 1.0 // Convert to Double for consistent calculation
-        } * 1.0 // Placeholder - we need to get the price from somewhere else
+        val orderTotal = order.items.sumOf { orderItem ->
+            val foundItem = items.firstOrNull { it.id == orderItem.itemId }
+            val itemValueInReais = (foundItem?.value?.toDouble() ?: 0.0) / 100.0
+            orderItem.count * itemValueInReais
+        }
         
         PaymentOrderItemState(
             id = "Pedido Nº ${order.id ?: index + 1}",
-            items = order.items.map { item ->
+            items = order.items.map { orderItem ->
+                val foundItem = items.firstOrNull { it.id == orderItem.itemId }
+                val itemPriceInReais = (foundItem?.value?.toDouble() ?: 0.0) / 100.0
+                val itemTotal = orderItem.count * itemPriceInReais
+                
                 PaymentItemState(
-                    name = item.name,
-                    quantity = item.count,
-                    price = 1.0, // TODO: Need to get price from Item master data
-                    total = item.count * 1.0, // TODO: Calculate with real price
-                    observation = item.observation
+                    name = orderItem.name,
+                    quantity = orderItem.count,
+                    price = itemPriceInReais,
+                    total = itemTotal,
+                    observation = orderItem.observation
                 )
             },
             orderTotal = orderTotal,
@@ -62,7 +69,7 @@ internal data class PaymentOrderItemState(
     val orderTotal: Double,
     val status: PaymentOrderBadge
 ) {
-    val formattedOrderTotal: String = "R$ ${orderTotal.toString()}"
+    val formattedOrderTotal: String = "R$ ${"%.2f".format(orderTotal)}"
 }
 
 internal data class PaymentItemState(
@@ -72,8 +79,8 @@ internal data class PaymentItemState(
     val total: Double,
     val observation: String?
 ) {
-    val formattedPrice: String = "R$ ${price.toString()}"
-    val formattedTotal: String = "R$ ${total.toString()}"
+    val formattedPrice: String = "R$ ${"%.2f".format(price)}"
+    val formattedTotal: String = "R$ ${"%.2f".format(total)}"
     val quantityText: String = "${quantity}x"
 }
 
