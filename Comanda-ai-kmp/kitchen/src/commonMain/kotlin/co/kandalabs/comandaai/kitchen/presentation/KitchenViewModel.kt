@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 
 /**
  * ViewModel for the Kitchen screen that manages kitchen orders and item statuses.
@@ -31,6 +32,8 @@ class KitchenViewModel(
     
     private val _state = MutableStateFlow(KitchenScreenState())
     val state: StateFlow<KitchenScreenState> = _state.asStateFlow()
+    
+    private var sseJob: Job? = null
     
     init {
         loadActiveOrders()
@@ -153,11 +156,17 @@ class KitchenViewModel(
     /**
      * Refresh orders with a loading indicator.
      * Used for pull-to-refresh functionality.
+     * If disconnected, also attempts to reconnect SSE.
      */
     fun refreshOrders() {
         _state.update { it.copy(isRefreshing = true) }
         
         screenModelScope.launch {
+            // If not connected, restart SSE connection
+            if (!_state.value.isConnected) {
+                reconnectSSE()
+            }
+            
             repository.getActiveOrders()
                 .onSuccess { orders ->
                     _state.update { 
@@ -176,6 +185,20 @@ class KitchenViewModel(
                     }
                 }
         }
+    }
+    
+    /**
+     * Reconnect the SSE connection.
+     * Cancels existing connection and starts a new one.
+     */
+    fun reconnectSSE() {
+        _state.update { it.copy(isReconnecting = true) }
+        
+        // Cancel existing SSE connection
+        sseJob?.cancel()
+        
+        // Start new connection
+        startRealTimeUpdates()
     }
     
     /**
@@ -210,30 +233,38 @@ class KitchenViewModel(
      * Automatically handles connection, reconnection, and error states.
      */
     private fun startRealTimeUpdates() {
-        screenModelScope.launch {
+        sseJob = screenModelScope.launch {
             try {
                 repository.getOrdersRealTime().collect { event ->
                     when (event) {
                         is KitchenEvent.Connected -> {
-                            _state.update { it.copy(isConnected = true) }
+                            _state.update { 
+                                it.copy(
+                                    isConnected = true,
+                                    isReconnecting = false
+                                )
+                            }
                         }
                         is KitchenEvent.OrdersUpdate -> {
                             _state.update { 
                                 it.copy(
                                     orders = event.orders,
                                     isLoading = false,
-                                    isRefreshing = false
+                                    isRefreshing = false,
+                                    isConnected = true
                                 )
                             }
                         }
                         is KitchenEvent.Heartbeat -> {
-                            // Keep connection alive
+                            // Keep connection alive - ensure we're still connected
+                            _state.update { it.copy(isConnected = true) }
                         }
                         is KitchenEvent.Error -> {
                             _state.update { 
                                 it.copy(
                                     error = event.message,
-                                    isConnected = false
+                                    isConnected = false,
+                                    isReconnecting = false
                                 )
                             }
                         }
@@ -243,7 +274,8 @@ class KitchenViewModel(
                 _state.update { 
                     it.copy(
                         error = "Real-time connection failed: ${e.message}",
-                        isConnected = false
+                        isConnected = false,
+                        isReconnecting = false
                     )
                 }
             }

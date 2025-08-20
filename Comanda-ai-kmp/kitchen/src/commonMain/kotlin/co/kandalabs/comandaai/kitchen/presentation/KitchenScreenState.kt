@@ -7,5 +7,6 @@ data class KitchenScreenState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val isRefreshing: Boolean = false,
-    val isConnected: Boolean = false
+    val isConnected: Boolean = false,
+    val isReconnecting: Boolean = false
 )

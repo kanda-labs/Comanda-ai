@@ -6,6 +6,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
+import co.kandalabs.comandaai.core.session.SessionManager
+import co.kandalabs.comandaai.core.session.UserSession
+import co.kandalabs.comandaai.core.enums.UserRole
 import co.kandalabs.comandaai.kitchen.data.api.KitchenEvent
 import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.ItemUnitStatus
@@ -26,6 +29,7 @@ import kotlin.test.Test
 class KitchenViewModelTest {
     
     private lateinit var repository: FakeKitchenRepository
+    private lateinit var sessionManager: FakeSessionManager
     private lateinit var viewModel: KitchenViewModel
     private val testDispatcher = StandardTestDispatcher()
     
@@ -33,7 +37,8 @@ class KitchenViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         repository = FakeKitchenRepository()
-        viewModel = KitchenViewModel(repository)
+        sessionManager = FakeSessionManager()
+        viewModel = KitchenViewModel(repository, sessionManager)
     }
     
     @Test
@@ -290,5 +295,36 @@ private class FakeKitchenRepository : KitchenRepository {
     override fun getOrdersRealTime(): Flow<KitchenEvent> {
         // Para testes, retorna um fluxo vazio
         return emptyFlow()
+    }
+}
+
+// Fake session manager for testing
+private class FakeSessionManager : SessionManager {
+    private var session: UserSession? = UserSession(
+        userId = 1,
+        userName = "test",
+        email = "test@example.com",
+        role = UserRole.ADMIN,
+        token = "test-token"
+    )
+    
+    override suspend fun saveSession(session: UserSession) {
+        this.session = session
+    }
+    
+    override suspend fun getSession(): UserSession? {
+        return session
+    }
+    
+    override suspend fun clearSession() {
+        session = null
+    }
+    
+    override suspend fun logout() {
+        session = null
+    }
+    
+    override suspend fun hasActiveSession(): Boolean {
+        return session != null
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ class KitchenScreen : Screen {
             selectedTab = selectedTab,
             onTabChange = { selectedTab = it },
             onRefresh = viewModel::refreshOrders,
+            onReconnect = viewModel::reconnectSSE,
             onItemStatusChange = viewModel::updateItemStatus,
             onMarkAsDelivered = viewModel::markOrderAsDelivered,
             onMarkItemAsDelivered = viewModel::markItemAsDelivered,
@@ -87,6 +89,7 @@ private fun KitchenScreenContent(
     selectedTab: Int,
     onTabChange: (Int) -> Unit,
     onRefresh: () -> Unit,
+    onReconnect: () -> Unit,
     onItemStatusChange: (Int, Int, Int, ItemStatus) -> Unit,
     onMarkAsDelivered: (Int) -> Unit,
     onMarkItemAsDelivered: (Int, Int) -> Unit,
@@ -117,11 +120,24 @@ private fun KitchenScreenContent(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onRefresh) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Atualizar pedidos"
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Connection Status Bullet
+                        ConnectionStatusBullet(
+                            isConnected = state.isConnected,
+                            isReconnecting = state.isReconnecting,
+                            onReconnectClick = if (!state.isConnected && !state.isReconnecting) onReconnect else null
                         )
+                        
+                        // Refresh Button
+                        IconButton(onClick = onRefresh) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Atualizar pedidos"
+                            )
+                        }
                     }
                 }
             )
@@ -442,6 +458,51 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ConnectionStatusBullet(
+    isConnected: Boolean,
+    isReconnecting: Boolean,
+    onReconnectClick: (() -> Unit)? = null
+) {
+    val color = when {
+        isReconnecting -> MaterialTheme.colorScheme.primary
+        isConnected -> androidx.compose.ui.graphics.Color(0xFF4CAF50) // Green
+        else -> androidx.compose.ui.graphics.Color(0xFFFF5252) // Red
+    }
+    
+    val contentDescription = when {
+        isReconnecting -> "Reconectando..."
+        isConnected -> "Conectado"
+        else -> "Desconectado - Toque para reconectar"
+    }
+    
+    Box(
+        modifier = Modifier
+            .size(10.dp)
+            .then(
+                if (onReconnectClick != null) {
+                    Modifier.clickable { onReconnectClick() }
+                } else {
+                    Modifier
+                }
+            )
+    ) {
+        if (isReconnecting) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(10.dp),
+                strokeWidth = 1.dp,
+                color = color
+            )
+        } else {
+            Surface(
+                modifier = Modifier.size(10.dp),
+                shape = CircleShape,
+                color = color
+            ) {}
         }
     }
 }
