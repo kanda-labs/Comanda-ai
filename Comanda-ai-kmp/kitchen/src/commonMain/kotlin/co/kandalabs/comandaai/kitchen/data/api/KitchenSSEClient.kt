@@ -18,16 +18,31 @@ class KitchenSSEClient(
     private val logger: ComandaAiLogger
 ) {
     
+    // Test method to check if connection works
+    suspend fun testConnection(): Result<String> {
+        return try {
+            val response = httpClient.get("${baseUrl}api/v1/kitchen/orders")
+            Result.success("Connection test successful: ${response.status}")
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     fun connectToKitchenEvents(): Flow<KitchenEvent> = flow {
+        logger.d("Starting Kitchen SSE connection to: ${baseUrl}api/v1/kitchen/events")
         try {
             httpClient.sse(
                 urlString = "${baseUrl}api/v1/kitchen/events",
                 request = {
                     method = HttpMethod.Get
-                    parameter("clientId", "kitchen-${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}")
+                    val clientId = "kitchen-${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}"
+                    parameter("clientId", clientId)
+                    logger.d("Kitchen SSE request configured with clientId parameter: $clientId")
                 }
             ) {
+                logger.d("Kitchen SSE connection established, waiting for events...")
                 incoming.collect { event ->
+                    logger.d("Kitchen SSE received event: ${event.event} with data: ${event.data}")
                     when (event.event) {
                         "connection" -> {
                             logger.d("Kitchen SSE connection established: ${event.data}")
@@ -35,12 +50,17 @@ class KitchenSSEClient(
                         }
                         "kitchen_orders" -> {
                             try {
+                                logger.d("Kitchen SSE parsing kitchen_orders event")
+                                logger.d("Kitchen SSE raw data: ${event.data}")
                                 val ordersUpdate = json.decodeFromString<KitchenOrdersUpdateEvent>(
                                     event.data ?: "{}"
                                 )
+                                logger.d("Kitchen SSE parsed ${ordersUpdate.orders.size} orders")
+                                logger.d("Kitchen SSE orders: ${ordersUpdate.orders}")
                                 emit(KitchenEvent.OrdersUpdate(ordersUpdate.orders))
                             } catch (e: Exception) {
                                 logger.e(e, "Failed to parse kitchen orders update")
+                                logger.e(e, "Kitchen SSE raw data causing error: ${event.data}")
                                 emit(KitchenEvent.Error("Failed to parse orders: ${e.message}"))
                             }
                         }
@@ -73,7 +93,7 @@ sealed class KitchenEvent {
 }
 
 @Serializable
-private data class KitchenOrdersUpdateEvent(
+internal data class KitchenOrdersUpdateEvent(
     val type: String,
     val orders: List<KitchenOrder>,
     val timestamp: Long

@@ -26,6 +26,20 @@ class KitchenViewModel(
     init {
         loadActiveOrders()
         startRealTimeUpdates()
+        
+        // Test connection
+        screenModelScope.launch {
+            try {
+                val sseClient = repository as? co.kandalabs.comandaai.kitchen.data.repository.KitchenRepositoryImpl
+                if (sseClient != null) {
+                    // Basic connectivity test would go here
+                } else {
+                    println("KitchenViewModel: Repository type issue: ${repository::class}")
+                }
+            } catch (e: Exception) {
+                println("KitchenViewModel: Connection test failed: ${e.message}")
+            }
+        }
     }
     
     fun loadActiveOrders() {
@@ -161,31 +175,40 @@ class KitchenViewModel(
     
     private fun startRealTimeUpdates() {
         screenModelScope.launch {
-            repository.getOrdersRealTime().collect { event ->
-                when (event) {
-                    is KitchenEvent.Connected -> {
-                        _state.update { it.copy(isConnected = true) }
-                    }
-                    is KitchenEvent.OrdersUpdate -> {
-                        _state.update { 
-                            it.copy(
-                                orders = event.orders,
-                                isLoading = false,
-                                isRefreshing = false
-                            )
+            try {
+                repository.getOrdersRealTime().collect { event ->
+                    when (event) {
+                        is KitchenEvent.Connected -> {
+                            _state.update { it.copy(isConnected = true) }
+                        }
+                        is KitchenEvent.OrdersUpdate -> {
+                            _state.update { 
+                                it.copy(
+                                    orders = event.orders,
+                                    isLoading = false,
+                                    isRefreshing = false
+                                )
+                            }
+                        }
+                        is KitchenEvent.Heartbeat -> {}
+                        is KitchenEvent.Error -> {
+                            println("KitchenViewModel: Error event received: ${event.message}")
+                            _state.update { 
+                                it.copy(
+                                    error = event.message,
+                                    isConnected = false
+                                )
+                            }
                         }
                     }
-                    is KitchenEvent.Heartbeat -> {
-                        // Mantém conexão ativa, nada específico a fazer
-                    }
-                    is KitchenEvent.Error -> {
-                        _state.update { 
-                            it.copy(
-                                error = event.message,
-                                isConnected = false
-                            )
-                        }
-                    }
+                }
+            } catch (e: Exception) {
+                println("KitchenViewModel: Exception in real-time updates: ${e.message}")
+                _state.update { 
+                    it.copy(
+                        error = "Real-time connection failed: ${e.message}",
+                        isConnected = false
+                    )
                 }
             }
         }
@@ -199,21 +222,22 @@ class KitchenViewModel(
         unitIndex: Int,
         newStatus: ItemStatus
     ): List<KitchenOrder> {
-        return orders.map { order ->
+        return orders.mapNotNull { order ->
             if (order.id == orderId) {
                 val updatedItems = order.items.map { item ->
                     if (item.itemId == itemId) {
-                        val updatedUnitStatuses = item.unitStatuses.mapIndexed { index, unitStatus ->
-                            if (index == unitIndex) {
-                                unitStatus.copy(status = newStatus)
-                            } else {
-                                unitStatus
+                        val updatedUnitStatuses =
+                            item.unitStatuses.mapIndexed { index, unitStatus ->
+                                if (index == unitIndex) {
+                                    unitStatus.copy(status = newStatus)
+                                } else {
+                                    unitStatus
+                                }
                             }
-                        }
-                        
+
                         // Calculate new overall status
                         val newOverallStatus = calculateOverallStatus(updatedUnitStatuses)
-                        
+
                         item.copy(
                             unitStatuses = updatedUnitStatuses,
                             overallStatus = newOverallStatus
@@ -222,12 +246,12 @@ class KitchenViewModel(
                         item
                     }
                 }
-                
+
                 // Check if all items are delivered and remove order if so
                 val allItemsDelivered = updatedItems.all { item ->
                     item.unitStatuses.all { it.status == ItemStatus.DELIVERED }
                 }
-                
+
                 if (allItemsDelivered) {
                     null // Will be filtered out
                 } else {
@@ -236,7 +260,7 @@ class KitchenViewModel(
             } else {
                 order
             }
-        }.filterNotNull()
+        }
     }
     
     private fun markItemAsDeliveredOptimistically(
@@ -244,7 +268,7 @@ class KitchenViewModel(
         orderId: Int,
         itemId: Int
     ): List<KitchenOrder> {
-        return orders.map { order ->
+        return orders.mapNotNull { order ->
             if (order.id == orderId) {
                 val updatedItems = order.items.map { item ->
                     if (item.itemId == itemId) {
@@ -259,12 +283,12 @@ class KitchenViewModel(
                         item
                     }
                 }
-                
+
                 // Check if all items are delivered and remove order if so
                 val allItemsDelivered = updatedItems.all { item ->
                     item.unitStatuses.all { it.status == ItemStatus.DELIVERED }
                 }
-                
+
                 if (allItemsDelivered) {
                     null // Will be filtered out
                 } else {
@@ -273,7 +297,7 @@ class KitchenViewModel(
             } else {
                 order
             }
-        }.filterNotNull()
+        }
     }
     
     private fun calculateOverallStatus(unitStatuses: List<ItemUnitStatus>): ItemStatus {
