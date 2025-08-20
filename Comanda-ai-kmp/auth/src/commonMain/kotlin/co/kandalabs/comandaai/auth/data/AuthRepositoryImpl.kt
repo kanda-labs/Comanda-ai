@@ -10,7 +10,7 @@ import io.ktor.http.contentType
 
 class AuthRepositoryImpl(
     private val httpClient: HttpClient,
-    private val baseUrl: String = "http://192.168.1.34:8081/api/v1"
+    private val baseUrl: String = "http://192.168.0.56:8081/api/v1"
 ) : AuthRepository {
     
     override suspend fun login(request: LoginRequest): LoginResponse {

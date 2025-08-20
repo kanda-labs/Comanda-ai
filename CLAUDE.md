@@ -125,9 +125,7 @@ The system comes with these pre-configured menu items:
 
 ### Item Categories
 - `SKEWER`: Food items and appetizers
-- `CHOPP`: Draft beer
-- `NON_ALCOHOLIC_DRINKS`: Soft drinks and water
-- `DRINK`: Alcoholic beverages (other than chopp)
+- `DRINK`: Alcoholic and non alcoholic drinks
 
 ## 📋 API Endpoints
 

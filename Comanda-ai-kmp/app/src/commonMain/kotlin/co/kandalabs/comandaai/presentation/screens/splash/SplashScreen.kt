@@ -24,6 +24,7 @@ import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.kitchen.KitchenModule
 import co.kandalabs.comandaai.presentation.screens.tables.listing.TablesScreen
 import co.kandalabs.comandaai.core.enums.UserRole
+import co.kandalabs.comandaai.presentation.screens.admin.AdminScreen
 
 object SplashScreen : Screen {
     @Composable
@@ -43,9 +44,13 @@ object SplashScreen : Screen {
                         println("SplashScreen - Navigating to KitchenScreen")
                         navigator.replace(KitchenModule.getKitchenScreen())
                     }
-                    UserRole.WAITER, UserRole.MANAGER, UserRole.ADMIN -> {
+                    UserRole.WAITER, UserRole.MANAGER -> {
                         println("SplashScreen - Navigating to TablesScreen")
                         navigator.replace(TablesScreen)
+                    }
+
+                    UserRole.ADMIN -> {
+                        navigator.replace(AdminScreen)
                     }
                     null -> {
                         println("SplashScreen - Role is null, navigating to TablesScreen")

@@ -226,14 +226,14 @@ private fun BreedsListingScreenPreview() {
                         id = 3,
                         name = "Refrigerante",
                         value = 600,
-                        category = kandalabs.commander.domain.model.ItemCategory.NON_ALCOHOLIC_DRINKS,
+                        category = kandalabs.commander.domain.model.ItemCategory.DRINK,
                         description = "Refrigerante lata"
                     ),
                     Item(
                         id = 4,
                         name = "Chopp",
                         value = 1000,
-                        category = kandalabs.commander.domain.model.ItemCategory.CHOPP,
+                        category = kandalabs.commander.domain.model.ItemCategory.DRINK,
                         description = "Chopp artesanal"
                     )
                 ),

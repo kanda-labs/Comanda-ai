@@ -18,7 +18,7 @@ internal class ItemRepositoryImpl(
     override suspend fun getAllItems(): List<Item> {
         logger.debug { "Fetching all items" }
         return transaction {
-            itemTable.selectAll().map { it.toItem() }
+            itemTable.selectAll().orderBy(itemTable.value).map { it.toItem() }
         }
     }
 

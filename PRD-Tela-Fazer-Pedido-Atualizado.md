@@ -28,7 +28,6 @@ Desenvolver uma tela intuitiva para adicionar itens a um pedido de mesa, permiti
 - **Tabs horizontais** baseadas no enum `ItemCategory`:
   - "SKEWER" (Espetinhos)
   - "DRINK" (Bebidas)
-  - "NON_ALCOHOLIC_DRINKS" (Bebidas sem álcool)
   - "CHOPP" (Chopp)
 
 ### Lista de Produtos

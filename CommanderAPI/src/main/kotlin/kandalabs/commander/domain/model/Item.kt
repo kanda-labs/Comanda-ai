@@ -30,4 +30,4 @@ enum class ItemStatus {
     DELIVERED     // Entregue (novo)
 }
 
-enum class ItemCategory { SKEWER, DRINK, NON_ALCOHOLIC_DRINKS, CHOPP }
+enum class ItemCategory { SKEWER, DRINK, SNACK, PROMOTIONAL }

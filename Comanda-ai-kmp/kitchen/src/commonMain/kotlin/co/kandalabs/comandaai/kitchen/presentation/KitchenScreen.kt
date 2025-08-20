@@ -290,10 +290,10 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
                 val itemCategory = when {
                     item.name.contains("Espetinho") || item.name.contains("Filé") || item.name.contains(
                         "Medalhão"
-                    ) || item.name.contains("Batata") -> "SKEWER"
-
-                    item.name.contains("Chopp") -> "CHOPP"
-                    item.name.contains("Água") || item.name.contains("Refrigerante") -> "NON_ALCOHOLIC_DRINKS"
+                    )  -> "SKEWER"
+                    item.name.contains("Bolinho") || item.name.contains("Batata") || item.name.contains("Coxinha") -> "SNACK"
+                    item.name.contains("Combo") || item.name.contains("Promo") -> "PROMOTIONAL"
+                    item.name.contains("Chopp") || item.name.contains("Água") || item.name.contains("Refrigerante") -> "DRINK"
                     else -> "DRINK"
                 }
                 selectedCategories.contains(itemCategory)
@@ -321,9 +321,9 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
         // Category Filter - Horizontal Badges
         val availableCategories = listOf(
             "SKEWER" to "Espetinhos",
-            "CHOPP" to "Chopp",
-            "NON_ALCOHOLIC_DRINKS" to "Bebidas",
-            "DRINK" to "Bebidas Alcoólicas"
+            "SNACK" to "Petiscos",
+            "DRINK" to "Bebidas",
+            "PROMOTIONAL" to "Promo"
         )
 
         LazyRow(

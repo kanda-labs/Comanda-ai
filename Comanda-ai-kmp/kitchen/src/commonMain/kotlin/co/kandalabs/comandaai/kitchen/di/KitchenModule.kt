@@ -16,7 +16,7 @@ val kitchenModule = DI.Module("kitchenModule") {
     bindSingleton<KitchenApi> {
         KitchenApiImpl(
             httpClient = instance(),
-            baseUrl = "http://192.168.1.34:8081/" // Use same baseUrl as CommanderApi
+            baseUrl = "http://192.168.0.56:8081/" // Use same baseUrl as CommanderApi
         )
     }
     
@@ -24,7 +24,7 @@ val kitchenModule = DI.Module("kitchenModule") {
         KitchenSSEClient(
             httpClient = instance(),
             json = instance(),
-            baseUrl = "http://192.168.1.34:8081/",
+            baseUrl = "http://192.168.0.56:8081/",
             logger = instance()
         )
     }

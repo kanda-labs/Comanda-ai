@@ -42,8 +42,8 @@ private fun CategoryTab(
     val displayName = when (category) {
         ItemCategory.SKEWER -> "Espetinhos"
         ItemCategory.DRINK -> "Bebidas"
-        ItemCategory.NON_ALCOHOLIC_DRINKS -> "Sem Álcool"
-        ItemCategory.CHOPP -> "Chopp"
+        ItemCategory.SNACK -> "Petiscos"
+        ItemCategory.PROMOTIONAL -> "Promoções"
     }
     
     FilterChip(

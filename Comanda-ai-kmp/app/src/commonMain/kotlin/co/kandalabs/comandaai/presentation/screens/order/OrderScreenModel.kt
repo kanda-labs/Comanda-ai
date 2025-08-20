@@ -24,7 +24,7 @@ class OrderScreenModel(
 ) : ScreenModel {
     
     private val _allItems = MutableStateFlow<List<Item>>(emptyList())
-    private val _selectedCategory = MutableStateFlow(ItemCategory.DRINK)
+    private val _selectedCategory = MutableStateFlow(ItemCategory.SKEWER)
     private val _selectedItems = MutableStateFlow<Map<Int, Int>>(emptyMap()) // itemId -> count
     private val _isLoading = MutableStateFlow(false)
     private val _error = MutableStateFlow<String?>(null)

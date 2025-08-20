@@ -23,6 +23,7 @@ import co.kandalabs.comandaai.presentation.screens.splash.SplashViewModel
 import co.kandalabs.comandaai.presentation.screens.payment.PaymentSummaryViewModel
 import co.kandalabs.comandaai.presentation.screens.tables.details.TablesDetailsViewModel
 import co.kandalabs.comandaai.presentation.screens.tables.listing.TablesViewModel
+import co.kandalabs.comandaai.presentation.screens.admin.AdminViewModel
 import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClient
@@ -168,6 +169,11 @@ private val commonModule = DI.Module("commonModule") {
         )
     }
 
+    bindProvider {
+        AdminViewModel(
+            sessionManager = instance()
+        )
+    }
 
 }
 

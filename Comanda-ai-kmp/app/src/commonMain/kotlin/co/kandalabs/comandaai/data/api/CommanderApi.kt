@@ -18,7 +18,7 @@ import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
 
 internal interface CommanderApi {
     companion object {
-        const val baseUrl = "http://192.168.1.34:8081/"
+        const val baseUrl = "http://192.168.0.56:8081/"
     }
 
     @GET("api/v1/items")
