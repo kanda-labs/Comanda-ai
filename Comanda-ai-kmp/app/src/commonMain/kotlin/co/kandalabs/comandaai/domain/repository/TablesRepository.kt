@@ -14,5 +14,5 @@ interface TablesRepository {
     suspend fun openTable(tableId: Int, tableNumber: Int): ComandaAiResult<Unit>
     suspend fun closeTable(tableId: Int): ComandaAiResult<Unit>
     suspend fun getBillByTableId(tableId: Int): Bill
-    suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Double): ComandaAiResult<Unit>
+    suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Long): ComandaAiResult<Unit>
 }

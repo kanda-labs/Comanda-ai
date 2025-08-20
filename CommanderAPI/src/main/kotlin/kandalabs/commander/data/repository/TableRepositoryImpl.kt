@@ -56,11 +56,11 @@ class TableRepositoryImpl(
     }
 
     override suspend fun updateTable(tableId: Int, newBillId: Int?, newStatus: TableStatus?): Table? {
-        logger.debug { "Updating table with id: $tableId" }
+        logger.debug { "Updating table with id: $tableId, newBillId: $newBillId, newStatus: $newStatus" }
         return transaction {
             val rowsUpdated = tableTable.update({ tableTable.id eq tableId }) {
-                // Only update billId if it's explicitly provided (not null)
-                newBillId?.let { billIdValue -> it[billId] = billIdValue }
+                // Update billId - null value explicitly clears the billId
+                it[billId] = newBillId
                 newStatus?.let { safeStatus -> it[status] = safeStatus.name }
             }
             if (rowsUpdated > 0) {

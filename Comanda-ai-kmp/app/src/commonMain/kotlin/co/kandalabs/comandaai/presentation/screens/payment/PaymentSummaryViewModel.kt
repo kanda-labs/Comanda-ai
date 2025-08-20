@@ -5,18 +5,16 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.core.getOrThrow
 import co.kandalabs.comandaai.domain.repository.TablesRepository
+import co.kandalabs.comandaai.domain.repository.ItemsRepository
+import kandalabs.commander.domain.model.Item
 import io.ktor.util.reflect.instanceOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 internal class PaymentSummaryViewModel(
-    private val repository: TablesRepository
+    private val repository: TablesRepository,
+    private val itemsRepository: ItemsRepository
 ) : StateScreenModel<PaymentSummaryScreenState>(PaymentSummaryScreenState()) {
-
-    private companion object {
-        const val MAX_RETRIES = 3
-        const val RETRY_DELAY_MS = 100L
-    }
 
     fun setupPaymentSummaryById(tableId: Int, tableNumber: Int) {
         screenModelScope.launch {
@@ -25,14 +23,31 @@ internal class PaymentSummaryViewModel(
             
             safeRunCatching {
                 val bill = repository.getBillByTableId(tableId)
-                val totalAmount = bill.orders.sumOf { order ->
-                    order.items.sumOf { item -> item.count * 1.0 }
-                }
+                
+                var totalAmount = 0
+                itemsRepository.getItems(null).fold(
+                    onSuccess = { items ->
+                        totalAmount = bill.orders.sumOf { order ->
+                            order.items.sumOf { orderItem -> 
+                                val foundItem = items.firstOrNull { it.id == orderItem.itemId }
+                                val itemValueInReais = foundItem?.value ?: 0
+                                orderItem.count * itemValueInReais
+                            }
+                        }
+                    },
+                    onFailure = {
+                        // Se falhar ao buscar itens, usa cálculo simples
+                        totalAmount = bill.orders.sumOf { order ->
+                            order.items.sumOf { item -> item.count * 1 }
+                        }
+                    }
+                )
+                
                 PaymentSummaryScreenState(
                     isLoading = false,
                     tableNumber = tableNumber.toString().padStart(2, '0'),
                     orders = bill.orders,
-                    totalAmount = totalAmount
+                    totalAmount = totalAmount.toLong()
                 )
             }.fold(
                 onSuccess = { newState -> 
@@ -72,31 +87,6 @@ internal class PaymentSummaryViewModel(
                             isProcessingPayment = false,
                             error = error
                         )
-                    }
-                }
-            )
-        }
-    }
-
-    private suspend fun retryOnCancellation(block: suspend () -> PaymentSummaryScreenState) {
-        var attempts = 0
-        while (attempts < MAX_RETRIES) {
-            val result = safeRunCatching { block() }
-            result.fold(
-                onSuccess = { state -> return updateState { state } },
-                onFailure = { error ->
-                    println("Attempt $attempts failed: ${error.message}")
-                    if (error is kotlinx.coroutines.CancellationException && attempts < MAX_RETRIES - 1) {
-                        attempts++
-                        println("Retrying after cancellation, attempt ${attempts + 1}")
-                        delay(RETRY_DELAY_MS)
-                    } else {
-                        return updateState {
-                            it.copy(
-                                isLoading = false,
-                                error = error
-                            )
-                        }
                     }
                 }
             )

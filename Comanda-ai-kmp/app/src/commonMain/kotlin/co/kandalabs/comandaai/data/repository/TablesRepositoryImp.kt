@@ -74,9 +74,8 @@ internal class TablesRepositoryImp(
         return  commanderApi.getBillByTableId(tableId)
     }
 
-    override suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Double): ComandaAiResult<Unit> {
+    override suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Long): ComandaAiResult<Unit> {
         return safeRunCatching {
-            // First mark bill as PAID
             val updatedBill = Bill(
                 id = billId,
                 tableId = tableId,
@@ -87,10 +86,11 @@ internal class TablesRepositoryImp(
             )
             commanderApi.updateBill(billId, updatedBill)
             
-            // Then mark table as FREE and clear billId
+            // Then mark table as FREE and clear billId (null removes the link)
             commanderApi.updateTable(
                 id = tableId,
                 request = UpdateTableRequest(
+                    billId = null,  // Clear the billId to remove link to paid bill
                     status = TableStatus.FREE
                 )
             )

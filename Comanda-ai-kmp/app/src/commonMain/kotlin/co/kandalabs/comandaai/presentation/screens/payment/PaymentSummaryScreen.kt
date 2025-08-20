@@ -296,7 +296,7 @@ private fun PaymentSummaryBottom(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = state.formattedTotalAmount,
+                    text = state.totalAmountPresentation,
                     style = ComandaAiTypography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = ComandaAiColors.Primary.value

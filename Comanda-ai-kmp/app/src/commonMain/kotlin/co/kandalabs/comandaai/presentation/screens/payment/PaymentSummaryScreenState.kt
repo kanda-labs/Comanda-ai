@@ -11,9 +11,10 @@ internal data class PaymentSummaryScreenState(
     val error: ComandaAiException? = null,
     val tableNumber: String = "",
     val orders: List<Order> = emptyList(),
-    val totalAmount: Double = 0.0,
-    val isProcessingPayment: Boolean = false
+    val isProcessingPayment: Boolean = false,
+    internal val totalAmount: Long = 0L,
 ) {
+    val totalAmountPresentation: String = formatCurrency(totalAmount)
     val appBarTitle = "Resumo do Pagamento"
     val contentTitle: String = "Mesa $tableNumber"
     
@@ -53,8 +54,6 @@ internal data class PaymentSummaryScreenState(
             }
         )
     }
-    
-    val formattedTotalAmount: String = "R$ ${totalAmount.toString()}"
 }
 
 internal data class PaymentOrderItemState(
@@ -83,3 +82,9 @@ internal data class PaymentOrderBadge(
     val color: ComandaAiColors,
     val textColor: ComandaAiColors = ComandaAiColors.OnSurface
 )
+
+fun formatCurrency(amountInCents: Long): String {
+    val reais = amountInCents / 100
+    val cents = amountInCents % 100
+    return "R$ $reais,${cents.toString().padStart(2, '0')}"
+}
