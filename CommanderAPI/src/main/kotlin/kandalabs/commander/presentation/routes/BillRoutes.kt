@@ -29,6 +29,16 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
             }
         }
 
+        get("/table/{tableId}") {
+            val tableId = call.parameters["tableId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val bill = billService.getBillByTableId(tableId.toInt())
+            if (bill != null) {
+                call.respond(bill)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
         post {
             runCatching {
                 val request = call.receive<CreateBillRequest>()

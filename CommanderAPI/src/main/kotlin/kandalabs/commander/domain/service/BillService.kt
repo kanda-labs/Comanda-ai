@@ -14,6 +14,10 @@ class BillService(private val billRepository: BillRepository) {
         return billRepository.getBillById(id)
     }
 
+    suspend fun getBillByTableId(tableId: Int): Bill? {
+        return billRepository.getBillByTableId(tableId)
+    }
+
     suspend fun createBill(bill: Bill): Bill {
         return billRepository.createBill(bill)
     }

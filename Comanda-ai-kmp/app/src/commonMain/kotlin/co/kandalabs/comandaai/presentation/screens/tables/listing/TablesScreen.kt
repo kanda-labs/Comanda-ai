@@ -74,7 +74,7 @@ public object TablesScreen : Screen {
             showUserModal = showUserModal,
             retry = { viewModel.retrieveTables() },
             onClick = { table: Table ->
-                navigator?.push(TableDetailsScreen(table = table))
+                navigator?.push(TableDetailsScreen(tableId = table.id ?: 0, tableNumber = table.number))
             },
             onUserAvatarClick = {
                 scope.launch {
@@ -108,7 +108,7 @@ private fun TablesScreenContent(
         } else if (state.error != null) {
             ErrorView(
                 error = state.error,
-                retry = retry
+                onRetry = retry
             )
         } else {
             Column(

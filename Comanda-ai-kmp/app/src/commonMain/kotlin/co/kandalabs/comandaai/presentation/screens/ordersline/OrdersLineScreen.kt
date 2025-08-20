@@ -84,7 +84,7 @@ private fun OrdersLineScreenContent(
         } else if (state.error != null && !state.hasOrders) {
             ErrorView(
                 error = state.error,
-                retry = onRefresh
+                onRetry = onRefresh
             )
         } else {
             Column(

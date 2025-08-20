@@ -3,6 +3,7 @@ package co.kandalabs.comandaai.presentation.screens.tables.details
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
+import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.domain.repository.TablesRepository
 import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.Table
@@ -12,6 +13,7 @@ import kotlin.collections.emptyList
 
 internal class TablesDetailsViewModel(
     private val repository: TablesRepository,
+    private val sessionManager: SessionManager,
 ) : StateScreenModel<TableDetailsScreenState>(TableDetailsScreenState()) {
 
     fun setupDetails(table: Table) {
@@ -19,13 +21,14 @@ internal class TablesDetailsViewModel(
             mutableState.emit(TableDetailsScreenState(isLoading = true))
 
             safeRunCatching {
+                val userSession = sessionManager.getSession()
                 val updatedTable = table.id?.let { tableId ->
                     repository.getTableById(tableId).fold(
                         onSuccess = { it },
                         onFailure = { table }
                     )
                 } ?: table
-                TableDetailsScreenState(table = updatedTable, isLoading = false)
+                TableDetailsScreenState(table = updatedTable, userSession = userSession, isLoading = false)
             }.fold(
                 onSuccess = { tableDetailsScreenState ->
                     mutableState.emit(tableDetailsScreenState)
@@ -95,10 +98,37 @@ internal class TablesDetailsViewModel(
     }
 
 
+    fun setupDetailsById(tableId: Int) {
+        screenModelScope.launch {
+            mutableState.emit(TableDetailsScreenState(isLoading = true))
+
+            safeRunCatching {
+                val userSession = sessionManager.getSession()
+                val table = repository.getTableById(tableId).fold(
+                    onSuccess = { it },
+                    onFailure = { throw it }
+                )
+                TableDetailsScreenState(table = table, userSession = userSession, isLoading = false)
+            }.fold(
+                onSuccess = { tableDetailsScreenState ->
+                    mutableState.emit(tableDetailsScreenState)
+                },
+                onFailure = { error ->
+                    mutableState.emit(
+                        TableDetailsScreenState(isLoading = false, error = error)
+                    )
+                }
+            )
+        }
+    }
+
     fun refreshData() {
         val currentTable = state.value.currentTable
         if (currentTable != null) {
-            setupDetails(currentTable)
+            val tableId = currentTable.id
+            if (tableId != null) {
+                setupDetailsById(tableId)
+            }
         }
     }
 }

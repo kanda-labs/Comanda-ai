@@ -3,9 +3,15 @@ package kandalabs.commander.data.repository
 import kandalabs.commander.core.extensions.getOrThrow
 import kandalabs.commander.data.model.sqlModels.BillTable
 import kandalabs.commander.data.model.sqlModels.OrderTable
+import kandalabs.commander.data.model.sqlModels.OrderItemTable
 import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.BillStatus
+import kandalabs.commander.domain.model.OrderResponse
+import kandalabs.commander.domain.model.OrderStatus
+import kandalabs.commander.domain.model.ItemOrder
+import kandalabs.commander.domain.model.ItemStatus
 import kandalabs.commander.domain.repository.BillRepository
+import kandalabs.commander.data.repository.toOrder
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -50,6 +56,29 @@ class BillRepositoryImpl(
             billTable.selectAll().where { billTable.id eq id }
                 .map { it.toBill() }
                 .singleOrNull()
+        }
+    }
+
+    override suspend fun getBillByTableId(tableId: Int): Bill? {
+        logger.debug { "Fetching bill by table id: $tableId" }
+        return transaction {
+            runCatching {
+                billTable.selectAll()
+                    .where { (billTable.tableId eq tableId) and (billTable.status eq BillStatus.OPEN.name) }
+                    .map { billFromTable ->
+                        val bill = billFromTable.toBill()
+                        val orders = orderTable.selectAll().where { orderTable.billId eq bill.id.getOrThrow() }
+                            .map { order -> order.toOrder() }
+                        bill.copy(orders = orders)
+                    }
+                    .singleOrNull()
+            }.fold(
+                onSuccess = { it },
+                onFailure = {
+                    logger.error(it) { "Error fetching bill by table id: $tableId" }
+                    null
+                }
+            )
         }
     }
 
@@ -108,3 +137,4 @@ class BillRepositoryImpl(
 
 internal fun Long.toLocalDateTime() = Instant.fromEpochMilliseconds(this)
     .toLocalDateTime(TimeZone.currentSystemDefault())
+

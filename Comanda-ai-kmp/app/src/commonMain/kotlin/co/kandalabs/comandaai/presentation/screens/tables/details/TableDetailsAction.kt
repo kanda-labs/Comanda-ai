@@ -6,4 +6,5 @@ enum class TableDetailsAction {
     MAKE_ORDER,
     BACK,
     SHOW_ORDER_DETAILS,
+    CLOSE_TABLE_MANAGER,
 }

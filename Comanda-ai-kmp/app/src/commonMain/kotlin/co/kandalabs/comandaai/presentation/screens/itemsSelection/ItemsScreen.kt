@@ -62,20 +62,20 @@ internal class ItemsScreen : Screen {
         val screenModel = rememberScreenModel<BreedsListingViewModel>()
         val state = screenModel.state.collectAsState().value
         val fetchMoreItems = {
-            screenModel.retrieveBreeds()
+            screenModel.retrieveItems()
         }
-        val retry = {
-            screenModel.retrieveBreeds()
+        val onRetry = {
+            screenModel.retrieveItems()
         }
 
         BreedsListingScreenContent(
             state = state,
             fetchMoreItems = fetchMoreItems,
-            retry = retry
+            retry = onRetry
         )
 
         LaunchedEffect(Unit) {
-            screenModel.retrieveBreeds()
+            screenModel.retrieveItems()
         }
     }
 }

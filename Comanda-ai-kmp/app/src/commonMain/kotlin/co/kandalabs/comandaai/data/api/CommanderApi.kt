@@ -9,6 +9,7 @@ import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Path
+import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.Item
 import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.OrderWithStatuses
@@ -51,4 +52,10 @@ internal interface CommanderApi {
     
     @PUT("api/v1/orders/{id}/with-statuses")
     suspend fun updateOrderWithIndividualStatuses(@Path("id") id: Int, @Body request: UpdateOrderWithStatusesRequest): Order
+    
+    @GET("api/v1/bills/table/{tableId}")
+    suspend fun getBillByTableId(@Path("tableId") tableId: Int): Bill
+    
+    @PUT("api/v1/bills/{id}")
+    suspend fun updateBill(@Path("id") id: Int, @Body bill: Bill): Bill
 }

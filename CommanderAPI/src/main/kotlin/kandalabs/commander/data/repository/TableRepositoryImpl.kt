@@ -59,7 +59,8 @@ class TableRepositoryImpl(
         logger.debug { "Updating table with id: $tableId" }
         return transaction {
             val rowsUpdated = tableTable.update({ tableTable.id eq tableId }) {
-                it[billId] = newBillId
+                // Only update billId if it's explicitly provided (not null)
+                newBillId?.let { billIdValue -> it[billId] = billIdValue }
                 newStatus?.let { safeStatus -> it[status] = safeStatus.name }
             }
             if (rowsUpdated > 0) {

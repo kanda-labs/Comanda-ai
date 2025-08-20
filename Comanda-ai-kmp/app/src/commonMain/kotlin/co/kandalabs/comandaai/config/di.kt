@@ -21,6 +21,7 @@ import co.kandalabs.comandaai.presentation.screens.order.OrderScreenModel
 import co.kandalabs.comandaai.presentation.screens.ordercontrol.OrderControlViewModel
 import co.kandalabs.comandaai.presentation.screens.ordersline.OrdersLineViewModel
 import co.kandalabs.comandaai.presentation.screens.splash.SplashViewModel
+import co.kandalabs.comandaai.presentation.screens.payment.PaymentSummaryViewModel
 import co.kandalabs.comandaai.presentation.screens.tables.details.TablesDetailsViewModel
 import co.kandalabs.comandaai.presentation.screens.tables.listing.TablesViewModel
 import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
@@ -133,7 +134,16 @@ private val commonModule = DI.Module("commonModule") {
     }
 
     bindProvider {
-        TablesDetailsViewModel(repository = instance())
+        TablesDetailsViewModel(
+            repository = instance(),
+            sessionManager = instance()
+        )
+    }
+
+    bindProvider {
+        PaymentSummaryViewModel(
+            repository = instance()
+        )
     }
 
     bindProvider {

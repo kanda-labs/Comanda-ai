@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.kandalabs.comandaai.presentation.screens.order.OrderScreen
 import co.kandalabs.comandaai.presentation.screens.ordercontrol.OrderControlScreen
+import co.kandalabs.comandaai.presentation.screens.payment.PaymentSummaryScreen
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
@@ -47,7 +48,7 @@ import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.OrderStatus
 import kotlinx.datetime.LocalDateTime
 
-public data class TableDetailsScreen(val table: Table) : Screen {
+public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : Screen {
 
     @Composable
     override fun Content() {
@@ -56,8 +57,24 @@ public data class TableDetailsScreen(val table: Table) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val actions: (TableDetailsAction) -> Unit = { action ->
             when (action) {
-                TableDetailsAction.OPEN_TABLE -> viewModel.openTable(table)
-                TableDetailsAction.CLOSE_TABLE -> viewModel.closeTable(table)
+                TableDetailsAction.OPEN_TABLE -> {
+                    val currentTable = state.currentTable
+                    if (currentTable != null) {
+                        viewModel.openTable(currentTable)
+                    }
+                }
+                TableDetailsAction.CLOSE_TABLE -> {
+                    val currentTable = state.currentTable
+                    if (currentTable != null) {
+                        viewModel.closeTable(currentTable)
+                    }
+                }
+                TableDetailsAction.CLOSE_TABLE_MANAGER -> {
+                    val currentTable = state.currentTable
+                    if (currentTable != null) {
+                        navigator.push(PaymentSummaryScreen(currentTable.id ?: 0, currentTable.number))
+                    }
+                }
                 TableDetailsAction.MAKE_ORDER -> {
                     val currentTable = state.currentTable
                     val billId = currentTable?.billId
@@ -71,7 +88,7 @@ public data class TableDetailsScreen(val table: Table) : Screen {
                         )
                     } else {
                         // TODO: Mostrar erro - mesa sem bill ativa
-                        println("Erro: Mesa ${currentTable?.number ?: table.number} não possui bill ativa")
+                        println("Erro: Mesa ${currentTable?.number ?: tableNumber} não possui bill ativa")
                     }
                 }
                 TableDetailsAction.BACK -> navigator.pop()
@@ -80,7 +97,7 @@ public data class TableDetailsScreen(val table: Table) : Screen {
 
         }
         LaunchedEffect(Unit) {
-            viewModel.setupDetails(table = table)
+            viewModel.setupDetailsById(tableId = tableId)
         }
         
         LaunchedEffect(navigator.size) {

@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 internal class BreedsListingViewModel(
     private val repository: ItemsRepository,
 ) : StateScreenModel<ItemsSelectionScreenState>(ItemsSelectionScreenState()) {
-    fun retrieveBreeds() {
+    fun retrieveItems() {
         screenModelScope.launch {
             if (mutableState.value.Items.isEmpty()) {
                 mutableState.emit(ItemsSelectionScreenState(isLoading = true))

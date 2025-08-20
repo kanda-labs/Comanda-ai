@@ -1,6 +1,7 @@
 package co.kandalabs.comandaai.domain.repository
 
 import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
+import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.Item
 import kandalabs.commander.domain.model.ItemStatus
 import kandalabs.commander.domain.model.Order
@@ -12,4 +13,6 @@ interface TablesRepository {
     suspend fun getTableOrders(id: Int): ComandaAiResult<List<Order>>
     suspend fun openTable(tableId: Int, tableNumber: Int): ComandaAiResult<Unit>
     suspend fun closeTable(tableId: Int): ComandaAiResult<Unit>
+    suspend fun getBillByTableId(tableId: Int): Bill
+    suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Double): ComandaAiResult<Unit>
 }

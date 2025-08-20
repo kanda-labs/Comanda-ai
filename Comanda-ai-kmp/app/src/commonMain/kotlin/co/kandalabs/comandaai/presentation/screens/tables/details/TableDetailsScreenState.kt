@@ -1,6 +1,8 @@
 package co.kandalabs.comandaai.presentation.screens.tables.details
 
 import co.kandalabs.comandaai.core.error.ComandaAiException
+import co.kandalabs.comandaai.core.enums.UserRole
+import co.kandalabs.comandaai.core.session.UserSession
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.Table
@@ -10,6 +12,7 @@ import kotlinx.datetime.LocalDateTime
 
 internal data class TableDetailsScreenState(
     private val table: Table? = null,
+    val userSession: UserSession? = null,
     val isLoading: Boolean = true,
     val error: ComandaAiException? = null
 ) {
@@ -61,7 +64,22 @@ internal data class TableDetailsScreenState(
             action = TableDetailsAction.CLOSE_TABLE
         )
 
-        TableStatus.FREE, TableStatus.ON_PAYMENT -> TableDetailsScreenButton(
+        TableStatus.ON_PAYMENT -> {
+            // Only manager can close table (finalize payment) when ON_PAYMENT
+            if (userSession?.role == UserRole.MANAGER) {
+                TableDetailsScreenButton(
+                    text = "Fechar mesa",
+                    action = TableDetailsAction.CLOSE_TABLE_MANAGER
+                )
+            } else {
+                TableDetailsScreenButton(
+                    text = "Voltar",
+                    action = TableDetailsAction.BACK
+                )
+            }
+        }
+
+        TableStatus.FREE -> TableDetailsScreenButton(
             text = "Voltar",
             action = TableDetailsAction.BACK
         )

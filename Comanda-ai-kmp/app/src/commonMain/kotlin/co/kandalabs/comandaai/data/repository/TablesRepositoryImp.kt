@@ -6,9 +6,14 @@ import co.kandalabs.comandaai.data.api.CommanderApi
 import co.kandalabs.comandaai.data.repository.CreateBillRequest
 import co.kandalabs.comandaai.data.repository.UpdateTableRequest
 import co.kandalabs.comandaai.domain.repository.TablesRepository
+import kandalabs.commander.domain.model.Bill
+import kandalabs.commander.domain.model.BillStatus
 import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.Table
 import kandalabs.commander.domain.model.TableStatus
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 internal class TablesRepositoryImp(
     private val commanderApi: CommanderApi,
@@ -50,15 +55,48 @@ internal class TablesRepositoryImp(
 
     override suspend fun closeTable(tableId: Int): ComandaAiResult<Unit> {
         return safeRunCatching {
+            // First get current table to preserve billId
+            val currentTable = commanderApi.getTable(tableId)
             commanderApi.updateTable(
                 id = tableId,
                 request = UpdateTableRequest(
+                    billId = currentTable.billId, // Preserve current billId
                     status = TableStatus.ON_PAYMENT
                 )
             )
             Unit // Convert Table return to Unit
         }.onFailure { error ->
             println("Error closing table: $error")
+        }
+    }
+
+    override suspend fun getBillByTableId(tableId: Int): Bill {
+        return  commanderApi.getBillByTableId(tableId)
+    }
+
+    override suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Double): ComandaAiResult<Unit> {
+        return safeRunCatching {
+            // First mark bill as PAID
+            val updatedBill = Bill(
+                id = billId,
+                tableId = tableId,
+                tableNumber = null,
+                orders = emptyList(),
+                status = BillStatus.PAID,
+                createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            )
+            commanderApi.updateBill(billId, updatedBill)
+            
+            // Then mark table as FREE and clear billId
+            commanderApi.updateTable(
+                id = tableId,
+                request = UpdateTableRequest(
+                    status = TableStatus.FREE
+                )
+            )
+            Unit
+        }.onFailure { error ->
+            println("Error finishing table payment: $error")
         }
     }
 }
