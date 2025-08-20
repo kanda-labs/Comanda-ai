@@ -7,6 +7,8 @@ import co.kandalabs.comandaai.core.getOrThrow
 import co.kandalabs.comandaai.domain.repository.TablesRepository
 import co.kandalabs.comandaai.domain.repository.ItemsRepository
 import kandalabs.commander.domain.model.Item
+import kandalabs.commander.domain.model.ItemStatus
+import kandalabs.commander.domain.model.OrderStatus
 import io.ktor.util.reflect.instanceOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,19 +32,27 @@ internal class PaymentSummaryViewModel(
                 itemsRepository.getItems(null).fold(
                     onSuccess = { items ->
                         itemsList = items
-                        totalAmount = bill.orders.sumOf { order ->
-                            order.items.sumOf { orderItem -> 
-                                val foundItem = items.firstOrNull { it.id == orderItem.itemId }
-                                val itemValueInCentavos = foundItem?.value ?: 0
-                                orderItem.count * itemValueInCentavos
+                        totalAmount = bill.orders
+                            .filter { order -> order.status != OrderStatus.CANCELED } // Excluir pedidos cancelados
+                            .sumOf { order ->
+                                order.items
+                                    .filter { orderItem -> orderItem.status != ItemStatus.CANCELED } // Excluir itens cancelados
+                                    .sumOf { orderItem -> 
+                                        val foundItem = items.firstOrNull { it.id == orderItem.itemId }
+                                        val itemValueInCentavos = foundItem?.value ?: 0
+                                        orderItem.count * itemValueInCentavos
+                                    }
                             }
-                        }
                     },
                     onFailure = {
                         // Se falhar ao buscar itens, usa cálculo simples
-                        totalAmount = bill.orders.sumOf { order ->
-                            order.items.sumOf { item -> item.count * 100 } // Fallback para 1 real em centavos
-                        }
+                        totalAmount = bill.orders
+                            .filter { order -> order.status != OrderStatus.CANCELED } // Excluir pedidos cancelados
+                            .sumOf { order ->
+                                order.items
+                                    .filter { item -> item.status != ItemStatus.CANCELED } // Excluir itens cancelados
+                                    .sumOf { item -> item.count * 100 } // Fallback para 1 real em centavos
+                            }
                     }
                 )
                 

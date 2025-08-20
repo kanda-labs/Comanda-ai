@@ -5,6 +5,7 @@ import co.kandalabs.comandaai.tokens.ComandaAiColors
 import kandalabs.commander.domain.model.Order
 import kandalabs.commander.domain.model.OrderStatus
 import kandalabs.commander.domain.model.Item
+import kandalabs.commander.domain.model.ItemStatus
 
 internal data class PaymentSummaryScreenState(
     val isLoading: Boolean = true,
@@ -19,48 +20,52 @@ internal data class PaymentSummaryScreenState(
     val appBarTitle = "Resumo do Pagamento"
     val contentTitle: String = "Mesa $tableNumber"
     
-    val ordersPresentation: List<PaymentOrderItemState> = orders.mapIndexed { index, order ->
-        val orderTotal = order.items.sumOf { orderItem ->
-            val foundItem = items.firstOrNull { it.id == orderItem.itemId }
-            val itemValueInReais = (foundItem?.value?.toDouble() ?: 0.0) / 100.0
-            orderItem.count * itemValueInReais
-        }
-        
-        PaymentOrderItemState(
-            id = "Pedido Nº ${order.id ?: index + 1}",
-            items = order.items.map { orderItem ->
+    val ordersPresentation: List<PaymentOrderItemState> = orders
+        .filter { order -> order.status != OrderStatus.CANCELED } // Excluir pedidos cancelados
+        .mapIndexed { index, order ->
+            val validItems = order.items.filter { it.status != ItemStatus.CANCELED } // Excluir itens cancelados
+            
+            val orderTotal = validItems.sumOf { orderItem ->
                 val foundItem = items.firstOrNull { it.id == orderItem.itemId }
-                val itemPriceInReais = (foundItem?.value?.toDouble() ?: 0.0) / 100.0
-                val itemTotal = orderItem.count * itemPriceInReais
-                
-                PaymentItemState(
-                    name = orderItem.name,
-                    quantity = orderItem.count,
-                    price = itemPriceInReais,
-                    total = itemTotal,
-                    observation = orderItem.observation
-                )
-            },
-            orderTotal = orderTotal,
-            status = when (order.status) {
-                OrderStatus.GRANTED -> PaymentOrderBadge(
-                    text = "Atendido",
-                    color = ComandaAiColors.Green500,
-                    textColor = ComandaAiColors.OnSurface
-                )
-                OrderStatus.OPEN -> PaymentOrderBadge(
-                    text = "Pendente", 
-                    color = ComandaAiColors.Blue500,
-                    textColor = ComandaAiColors.OnSurface
-                )
-                OrderStatus.CANCELED -> PaymentOrderBadge(
-                    text = "Cancelado",
-                    color = ComandaAiColors.Error,
-                    textColor = ComandaAiColors.OnError
-                )
+                val itemValueInReais = (foundItem?.value?.toDouble() ?: 0.0) / 100.0
+                orderItem.count * itemValueInReais
             }
-        )
-    }
+            
+            PaymentOrderItemState(
+                id = "Pedido Nº ${order.id ?: index + 1}",
+                items = validItems.map { orderItem ->
+                    val foundItem = items.firstOrNull { it.id == orderItem.itemId }
+                    val itemPriceInReais = (foundItem?.value?.toDouble() ?: 0.0) / 100.0
+                    val itemTotal = orderItem.count * itemPriceInReais
+                    
+                    PaymentItemState(
+                        name = orderItem.name,
+                        quantity = orderItem.count,
+                        price = itemPriceInReais,
+                        total = itemTotal,
+                        observation = orderItem.observation
+                    )
+                },
+                orderTotal = orderTotal,
+                status = when (order.status) {
+                    OrderStatus.GRANTED -> PaymentOrderBadge(
+                        text = "Atendido",
+                        color = ComandaAiColors.Green500,
+                        textColor = ComandaAiColors.OnSurface
+                    )
+                    OrderStatus.OPEN -> PaymentOrderBadge(
+                        text = "Pendente", 
+                        color = ComandaAiColors.Blue500,
+                        textColor = ComandaAiColors.OnSurface
+                    )
+                    OrderStatus.CANCELED -> PaymentOrderBadge(
+                        text = "Cancelado",
+                        color = ComandaAiColors.Error,
+                        textColor = ComandaAiColors.OnError
+                    )
+                }
+            )
+        }
 }
 
 internal data class PaymentOrderItemState(
