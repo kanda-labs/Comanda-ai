@@ -48,6 +48,8 @@ import kandalabs.commander.presentation.routes.authRoutes
 import kandalabs.commander.presentation.routes.kitchenRoutes
 import kotlinx.serialization.json.Json
 import mu.KLogger
+import kandalabs.commander.core.monitoring.HealthMonitor
+import kandalabs.commander.core.monitoring.SystemTrayManager
 
 private val logger = KotlinLogging.logger {}
 
@@ -64,12 +66,29 @@ fun main() {
 
         logger.info { "Starting server on $host:$port" }
 
+        // Initialize health monitoring
+        val healthMonitor = HealthMonitor()
+        val systemTrayManager = SystemTrayManager(healthMonitor)
+
+        // Start health monitoring
+        healthMonitor.start()
+        
+        // Initialize system tray (if supported)
+        systemTrayManager.initialize()
+        systemTrayManager.startStatusUpdater()
+
+        // Add shutdown hook for graceful cleanup
+        Runtime.getRuntime().addShutdownHook(Thread {
+            logger.info { "Shutdown hook triggered" }
+            healthMonitor.stop()
+        })
+
         // Start the server
         embeddedServer(
             factory = Netty,
             port = port,
             host = host,
-            module = Application::module
+            module = { module(healthMonitor) }
         ).start(wait = true)
     } catch (e: Exception) {
         logger.error(e) { "Failed to start application: ${e.message}" }
@@ -80,13 +99,13 @@ fun main() {
 /**
  * Application module configuration
  */
-fun Application.module() {
+fun Application.module(healthMonitor: HealthMonitor) {
     logger.info { "Configuring application module" }
 
     // Install Koin for dependency injection
     install(Koin) {
         slf4jLogger()
-        modules(appModule)
+        modules(appModule(healthMonitor))
     }
 
     configurePlugins()
@@ -106,11 +125,26 @@ fun Application.configureRouting() {
     val itemService by inject<ItemService>()
     val orderService by inject<OrderService>()
     val kitchenService by inject<KitchenService>()
+    val healthMonitor by inject<HealthMonitor>()
 
     routing {
-        // Health check endpoint
+        // Enhanced health check endpoint
         get("/health") {
-            call.respondText("OK")
+            healthMonitor.recordHealthCheck()
+            val status = healthMonitor.getHealthStatus()
+            
+            if (status.isHealthy) {
+                call.respondText("OK")
+            } else {
+                call.respondText("UNHEALTHY - Consecutive failures: ${status.consecutiveFailures}")
+            }
+        }
+
+        // Detailed health status endpoint
+        get("/health/status") {
+            healthMonitor.recordHealthCheck()
+            val status = healthMonitor.getHealthStatus()
+            call.respond(status)
         }
 
         // API version endpoint
@@ -135,7 +169,10 @@ fun Application.configureRouting() {
 /**
  * Koin dependency injection module
  */
-private val appModule = module {
+private fun appModule(healthMonitor: HealthMonitor) = module {
+    // Provide the health monitor instance
+    single<HealthMonitor> { healthMonitor }
+    
     single<UserTable> { UserTable }
     single<BillTable> { BillTable }
     single<TableTable> { TableTable }

@@ -94,18 +94,18 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_22
-    targetCompatibility = JavaVersion.VERSION_22
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 kotlin {
-    jvmToolchain(22) // Changed to JVM 22, supported by Kotlin 2.0.0
+    jvmToolchain(17) // Use JVM 17 for better compatibility
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "22" // Align with JVM 22
-        freeCompilerArgs = listOf("-Xjsr305=strict")
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
 
@@ -115,4 +115,137 @@ tasks.test {
 
 application {
     mainClass.set("kandalabs.commander.application.ApplicationKt")
+}
+
+// Fat JAR configuration using standard Gradle jar task
+tasks.jar {
+    archiveFileName.set("CommanderAPI.jar")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    
+    manifest {
+        attributes(
+            mapOf(
+                "Main-Class" to "kandalabs.commander.application.ApplicationKt",
+                "Implementation-Title" to "CommanderAPI",
+                "Implementation-Version" to version.toString(),
+                "Built-By" to System.getProperty("user.name"),
+                "Built-JDK" to System.getProperty("java.version")
+            )
+        )
+    }
+    
+    // Include all dependencies in the JAR
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    
+    // Exclude signature files to avoid conflicts
+    exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
+}
+
+// Create a fat JAR task
+val fatJarTask = tasks.register<Jar>("fatJar") {
+    archiveFileName.set("CommanderAPI-fat.jar")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    
+    manifest {
+        attributes(
+            mapOf(
+                "Main-Class" to "kandalabs.commander.application.ApplicationKt",
+                "Implementation-Title" to "CommanderAPI",
+                "Implementation-Version" to version.toString(),
+                "Built-By" to System.getProperty("user.name"),
+                "Built-JDK" to System.getProperty("java.version")
+            )
+        )
+    }
+    
+    from(sourceSets.main.get().output)
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    
+    exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
+}
+
+// jpackage configuration
+val jpackageTask = tasks.register<Exec>("jpackage") {
+    dependsOn(fatJarTask)
+    
+    group = "distribution"
+    description = "Create native application installer using jpackage"
+    
+    val jarFile = fatJarTask.get().archiveFile.get().asFile
+    val appName = "CommanderAPI"
+    val appVersion = version.toString().replace("-SNAPSHOT", "")
+    val outputDir = file("build/jpackage")
+    
+    doFirst {
+        // Ensure output directory exists
+        outputDir.mkdirs()
+        
+        // Clean previous builds
+        file("$outputDir/$appName").deleteRecursively()
+    }
+    
+    val javaHome = System.getProperty("java.home")
+    executable = "$javaHome/bin/jpackage"
+    
+    args(
+        "--input", jarFile.parent,
+        "--main-jar", jarFile.name,
+        "--main-class", "kandalabs.commander.application.ApplicationKt",
+        "--name", appName,
+        "--app-version", appVersion,
+        "--description", "CommanderAPI Restaurant Order Management System",
+        "--vendor", "KandaLabs",
+        "--dest", outputDir.absolutePath,
+        "--java-options", "-Xmx512m"
+    )
+    
+    // Add Windows-specific options
+    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+        args(
+            "--win-console",
+            "--win-dir-chooser",
+            "--win-menu",
+            "--win-shortcut"
+        )
+    }
+    
+    // Add macOS-specific options
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        args(
+            "--mac-package-name", appName,
+            "--mac-package-identifier", "co.kandalabs.commander.api"
+        )
+    }
+    
+    // Add Linux-specific options
+    if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+        args(
+            "--linux-package-name", appName.lowercase(),
+            "--linux-app-category", "Office",
+            "--linux-shortcut"
+        )
+    }
+}
+
+// Build all distribution formats
+tasks.register("buildDistribution") {
+    group = "distribution"
+    description = "Build all distribution formats (JAR + Native)"
+    
+    dependsOn(fatJarTask, jpackageTask)
+    
+    doLast {
+        val jarFile = fatJarTask.get().archiveFile.get().asFile
+        val jpackageDir = file("build/jpackage")
+        
+        println("Distribution build completed!")
+        println("=============================================")
+        println("JAR File: ${jarFile.absolutePath}")
+        println("JAR Size: ${jarFile.length() / (1024 * 1024)} MB")
+        println("Native Installer: ${jpackageDir.absolutePath}")
+        println("=============================================")
+        println("Usage:")
+        println("  JAR: java -jar ${jarFile.name}")
+        println("  Native: Install and run from ${jpackageDir.name}/")
+    }
 }
