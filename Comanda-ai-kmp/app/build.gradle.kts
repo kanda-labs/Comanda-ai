@@ -58,6 +58,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            implementation(projects.network)
             implementation(projects.auth)
             implementation(projects.designsystem)
             implementation(projects.core)
@@ -129,6 +130,17 @@ android {
         }
     }
     buildTypes {
+        getByName("debug") {
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+        }
+        create("sandbox") {
+            initWith(getByName("debug"))
+            isDebuggable = true
+            applicationIdSuffix = ".sandbox"
+            versionNameSuffix = "-sandbox"
+            matchingFallbacks += listOf("debug", "release")
+        }
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")

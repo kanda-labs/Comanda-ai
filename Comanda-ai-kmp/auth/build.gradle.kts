@@ -61,6 +61,7 @@ kotlin {
             implementation(libs.kodein.compose)
 
             // Project modules
+            implementation(projects.network)
             implementation(projects.core)
             implementation(projects.designsystem)
         }
@@ -82,6 +83,12 @@ android {
 
     defaultConfig {
         minSdk = 25
+    }
+
+    buildTypes {
+        create("sandbox") {
+            initWith(getByName("debug"))
+        }
     }
 
     compileOptions {

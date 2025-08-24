@@ -16,25 +16,30 @@ internal data class PaymentSummaryScreenState(
     
     // Propriedades derivadas diretamente do PaymentSummaryResponse
     val totalAmountPresentation: String = paymentSummary?.totalAmountFormatted ?: "R$ 0,00"
-    val ordersPresentation: List<PaymentOrderItemState> = paymentSummary?.orders?.map { order ->
-        PaymentOrderItemState(
-            id = order.id,
-            items = order.items.map { item ->
-                PaymentItemState(
-                    name = item.name,
-                    quantity = item.quantity,
-                    price = item.priceFormatted,
-                    total = item.totalFormatted,
-                    observation = item.observation
-                )
-            },
-            orderTotal = order.orderTotalFormatted,
-            status = PaymentOrderBadge(
-                text = order.status.text,
-                color = parseColor(order.status.colorHex)
+    
+    // Compilado de todos os itens de todos os pedidos (itens cancelados já foram filtrados no backend)
+    val compiledItems: List<PaymentItemState> = paymentSummary?.orders
+        ?.flatMap { order -> order.items }
+        ?.groupBy { it.name }
+        ?.map { (itemName, items) ->
+            val totalQuantity = items.sumOf { it.quantity }
+            val totalPrice = items.sumOf { it.totalInCentavos }
+            val firstItem = items.first()
+            
+            PaymentItemState(
+                name = itemName,
+                quantity = totalQuantity,
+                price = firstItem.priceFormatted,
+                total = formatCurrency(totalPrice),
+                observation = items.mapNotNull { it.observation }.distinct().joinToString("; ").takeIf { it.isNotBlank() }
             )
-        )
-    } ?: emptyList()
+        } ?: emptyList()
+    
+    private fun formatCurrency(amountInCentavos: Long): String {
+        val reais = amountInCentavos / 100
+        val centavos = amountInCentavos % 100
+        return "R$ $reais,${centavos.toString().padStart(2, '0')}"
+    }
     
     private fun parseColor(colorHex: String): ComandaAiColors {
         return when (colorHex) {
@@ -44,15 +49,6 @@ internal data class PaymentSummaryScreenState(
             else -> ComandaAiColors.OnSurface
         }
     }
-}
-
-internal data class PaymentOrderItemState(
-    val id: String,
-    val items: List<PaymentItemState>,
-    val orderTotal: String, // Already formatted from backend
-    val status: PaymentOrderBadge
-) {
-    val formattedOrderTotal: String = orderTotal
 }
 
 internal data class PaymentItemState(
@@ -66,9 +62,3 @@ internal data class PaymentItemState(
     val formattedTotal: String = total
     val quantityText: String = "${quantity}x"
 }
-
-internal data class PaymentOrderBadge(
-    val text: String,
-    val color: ComandaAiColors,
-    val textColor: ComandaAiColors = ComandaAiColors.OnSurface
-)

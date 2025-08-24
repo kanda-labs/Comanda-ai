@@ -1,7 +1,9 @@
 package co.kandalabs.comandaai.config
 
 import co.kandalabs.comandaai.auth.AuthModule
+import co.kandalabs.comandaai.config.AppConfigProvider
 import co.kandalabs.comandaai.kitchen.KitchenModule
+import co.kandalabs.comandaai.kitchen.di.KitchenDIModule
 import co.kandalabs.comandaai.config.sqldelight.createDatabase
 import co.kandalabs.comandaai.core.cache.CacheManager
 import co.kandalabs.comandaai.core.cache.CacheManagerImpl
@@ -80,18 +82,28 @@ private val commonModule = DI.Module("commonModule") {
     }
 
     bindSingleton<CommanderApi> {
+        val baseUrl = if (AppConfigProvider.apiBaseUrl.endsWith("/")) {
+            AppConfigProvider.apiBaseUrl
+        } else {
+            "${AppConfigProvider.apiBaseUrl}/"
+        }
         Ktorfit.Builder()
-            .baseUrl(CommanderApi.baseUrl)
+            .baseUrl(baseUrl)
             .httpClient(instance<HttpClient>())
             .build()
             .create<CommanderApi>()
     }
     
     bindSingleton<OrderSSEClient> {
+        val baseUrl = if (AppConfigProvider.apiBaseUrl.endsWith("/")) {
+            AppConfigProvider.apiBaseUrl
+        } else {
+            "${AppConfigProvider.apiBaseUrl}/"
+        }
         OrderSSEClient(
             httpClient = instance(),
             json = instance(),
-            baseUrl = CommanderApi.baseUrl,
+            baseUrl = baseUrl,
             logger = instance()
         )
     }
@@ -181,7 +193,7 @@ object AppModule {
     fun DI.MainBuilder.initializeKodein() {
         import(commonModule)
         import(AuthModule.authModule)
-        import(KitchenModule.kitchenDI)
+        import(KitchenDIModule.kitchenModule)
     }
 }
 
@@ -190,7 +202,7 @@ expect val platformDI: DI.Module
 val di = DI.lazy {
     import(commonModule)
     import(AuthModule.authModule)
-    import(KitchenModule.kitchenDI)
+    import(KitchenDIModule.kitchenModule)
     import(platformDI)
 }
 

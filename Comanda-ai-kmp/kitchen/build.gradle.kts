@@ -67,6 +67,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
 
             // Project modules
+            implementation(projects.network)
             implementation(projects.core)
             implementation(projects.designsystem)
             implementation(projects.auth)
@@ -91,6 +92,12 @@ android {
 
     defaultConfig {
         minSdk = 25
+    }
+
+    buildTypes {
+        create("sandbox") {
+            initWith(getByName("debug"))
+        }
     }
 
     compileOptions {

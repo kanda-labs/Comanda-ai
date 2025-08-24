@@ -42,4 +42,10 @@ android {
         minSdk = 25
         targetSdk = 35
     }
+
+    buildTypes {
+        create("sandbox") {
+            initWith(getByName("debug"))
+        }
+    }
 }

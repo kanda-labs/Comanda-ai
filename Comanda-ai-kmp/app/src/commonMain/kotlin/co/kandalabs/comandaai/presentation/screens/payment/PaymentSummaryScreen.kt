@@ -44,7 +44,6 @@ import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.Err
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.tokens.ComandaAiColors
-import co.kandalabs.comandaai.presentation.designSystem.components.CommandaBadge
 import kandalabs.commander.domain.model.Table
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -124,7 +123,7 @@ private fun PaymentSummaryScreenContent(
                     )
                     Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
                     Text(
-                        "Resumo dos pedidos",
+                        "Itens da conta",
                         modifier = Modifier.padding(horizontal = ComandaAiSpacing.Medium.value),
                         color = ComandaAiColors.Gray700.value,
                         style = ComandaAiTypography.titleMedium
@@ -136,10 +135,10 @@ private fun PaymentSummaryScreenContent(
                             .padding(horizontal = ComandaAiSpacing.Medium.value),
                         verticalArrangement = Arrangement.spacedBy(ComandaAiSpacing.Small.value)
                     ) {
-                        if (state.ordersPresentation.isEmpty()) {
+                        if (state.compiledItems.isEmpty()) {
                             item {
                                 Text(
-                                    text = "No orders found for this table",
+                                    text = "Nenhum item encontrado para esta mesa",
                                     style = ComandaAiTypography.bodyLarge,
                                     color = ComandaAiColors.Gray600.value,
                                     modifier = Modifier
@@ -149,8 +148,8 @@ private fun PaymentSummaryScreenContent(
                                 )
                             }
                         } else {
-                            items(state.ordersPresentation) { order ->
-                                OrderSummaryCard(order = order)
+                            items(state.compiledItems) { item ->
+                                CompiledItemCard(item = item)
                             }
                         }
                     }
@@ -162,109 +161,60 @@ private fun PaymentSummaryScreenContent(
 }
 
 @Composable
-private fun OrderSummaryCard(order: PaymentOrderItemState) {
+private fun CompiledItemCard(item: PaymentItemState) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(ComandaAiSpacing.Medium.value)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(ComandaAiSpacing.Medium.value),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = order.id,
-                    style = ComandaAiTypography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
+            Column(modifier = Modifier.weight(1f)) {
+                Row {
+                    Text(
+                        text = item.quantityText,
+                        style = ComandaAiTypography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = ComandaAiColors.Gray600.value
+                    )
+                    Text(
+                        text = " ${item.name}",
+                        style = ComandaAiTypography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
 
-                CommandaBadge(
-                    text = order.status.text,
-                    containerColor = order.status.color.value,
-                    contentColor = order.status.textColor.value
-                )
+                item.observation?.let { obs ->
+                    if (obs.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(ComandaAiSpacing.xSmall.value))
+                        Text(
+                            text = "Obs: $obs",
+                            style = ComandaAiTypography.bodySmall,
+                            color = ComandaAiColors.Gray500.value
+                        )
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
-
-            order.items.forEach { item ->
-                ItemSummaryRow(item = item)
-                Spacer(modifier = Modifier.height(ComandaAiSpacing.xSmall.value))
-            }
-
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = ComandaAiSpacing.Small.value),
-                color = ComandaAiColors.Gray300.value
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "Total do pedido:",
-                    style = ComandaAiTypography.bodyLarge,
-                    fontWeight = FontWeight.Bold
+                    text = item.formattedPrice,
+                    style = ComandaAiTypography.bodyMedium,
+                    color = ComandaAiColors.Gray600.value
                 )
                 Text(
-                    text = order.formattedOrderTotal,
-                    style = ComandaAiTypography.bodyLarge,
+                    text = item.formattedTotal,
+                    style = ComandaAiTypography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = ComandaAiColors.Primary.value
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun ItemSummaryRow(item: PaymentItemState) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Row {
-                Text(
-                    text = item.quantityText,
-                    style = ComandaAiTypography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = ComandaAiColors.Gray600.value
-                )
-                Text(
-                    text = " ${item.name}",
-                    style = ComandaAiTypography.bodyMedium
-                )
-            }
-
-            item.observation?.let { obs ->
-                if (obs.isNotBlank()) {
-                    Text(
-                        text = "Obs: $obs",
-                        style = ComandaAiTypography.bodySmall,
-                        color = ComandaAiColors.Gray500.value
-                    )
-                }
-            }
-        }
-
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = item.formattedPrice,
-                style = ComandaAiTypography.bodyMedium,
-                color = ComandaAiColors.Gray600.value
-            )
-            Text(
-                text = item.formattedTotal,
-                style = ComandaAiTypography.bodyMedium,
-                fontWeight = FontWeight.Medium
-            )
         }
     }
 }
