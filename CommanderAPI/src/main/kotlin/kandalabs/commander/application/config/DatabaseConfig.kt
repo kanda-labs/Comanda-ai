@@ -21,10 +21,11 @@ private val logger = KotlinLogging.logger {}
 object DatabaseConfig {
     
     fun init() {
-        val databaseUrl = System.getenv("DATABASE_URL") ?: "jdbc:sqlite:data.db"
+        val environment = System.getenv("ENVIRONMENT") ?: "production"
+        val databaseUrl = System.getenv("DATABASE_URL") ?: getDefaultDatabaseUrl(environment)
         val databaseDriver = System.getenv("DATABASE_DRIVER") ?: "org.sqlite.JDBC"
         
-        logger.info { "Initializing database connection with URL: $databaseUrl" }
+        logger.info { "Initializing database connection for environment: $environment with URL: $databaseUrl" }
         
         try {
             Database.connect(databaseUrl, driver = databaseDriver)
@@ -42,6 +43,18 @@ object DatabaseConfig {
         } catch (e: Exception) {
             logger.error(e) { "Failed to initialize database: ${e.message}" }
             throw RuntimeException("Database initialization failed", e)
+        }
+    }
+    
+    private fun getDefaultDatabaseUrl(environment: String): String {
+        return when (environment.lowercase()) {
+            "debug", "development" -> "jdbc:sqlite:data-debug.db"
+            "test" -> "jdbc:sqlite:data-test.db"
+            "production" -> "jdbc:sqlite:data.db"
+            else -> {
+                logger.warn { "Unknown environment: $environment, using production database" }
+                "jdbc:sqlite:data.db"
+            }
         }
     }
 }
