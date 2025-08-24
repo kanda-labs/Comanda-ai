@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 data class CreateOrderRequest(
     val billId: Int,
     val tableId: Int,
+    val userName: String,
     val items: List<CreateOrderItemRequest>
 )
 

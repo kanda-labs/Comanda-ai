@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 data class UserSession(
     val userId: Int,
     val userName: String,
+    val name: String,
     val email: String?,
     val token: String,
     val role: UserRole

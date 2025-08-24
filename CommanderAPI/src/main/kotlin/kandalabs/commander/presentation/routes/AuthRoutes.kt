@@ -23,6 +23,7 @@ data class LoginRequest(
 data class LoginResponse(
     val id: Int,
     val name: String,
+    val userName: String,
     val email: String?,
     val role: String,
     val token: String
@@ -74,6 +75,7 @@ fun Route.authRoutes(userService: UserService) {
                     val response = LoginResponse(
                         id = user.id ?: 0,
                         name = user.name,
+                        userName = user.userName,
                         email = user.email,
                         role = user.role.name,
                         token = token

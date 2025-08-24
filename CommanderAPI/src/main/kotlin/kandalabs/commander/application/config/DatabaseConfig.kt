@@ -40,6 +40,9 @@ object DatabaseConfig {
                 SchemaUtils.create(ItemTable)
                 logger.info { "Database schema created/verified successfully" }
             }
+            
+            // Run migrations after schema creation
+            DatabaseMigrations.runAllMigrations()
         } catch (e: Exception) {
             logger.error(e) { "Failed to initialize database: ${e.message}" }
             throw RuntimeException("Database initialization failed", e)

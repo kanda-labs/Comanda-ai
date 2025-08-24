@@ -117,6 +117,17 @@ application {
     mainClass.set("kandalabs.commander.application.ApplicationKt")
 }
 
+// Task para rodar em modo debug na porta 8082
+tasks.register<JavaExec>("runDebug") {
+    group = "application"
+    description = "Runs the application in debug mode on port 8082"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("kandalabs.commander.application.ApplicationKt")
+    environment("PORT", "8082")
+    environment("HOST", "0.0.0.0")
+    environment("LOG_LEVEL", "DEBUG")
+}
+
 // Fat JAR configuration using standard Gradle jar task
 tasks.jar {
     archiveFileName.set("CommanderAPI.jar")

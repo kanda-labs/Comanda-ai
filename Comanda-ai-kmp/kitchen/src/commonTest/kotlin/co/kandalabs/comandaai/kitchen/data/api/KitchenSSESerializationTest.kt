@@ -26,6 +26,7 @@ class KitchenSSESerializationTest {
                 {
                     "id": 29,
                     "tableNumber": 1,
+                    "userName": "test-user",
                     "items": [
                         {
                             "itemId": 1,
@@ -59,6 +60,7 @@ class KitchenSSESerializationTest {
         val order = event.orders.first()
         assertEquals(29, order.id)
         assertEquals(1, order.tableNumber)
+        assertEquals("test-user", order.userName)
         assertEquals(1, order.items.size)
         
         val item = order.items.first()

@@ -45,7 +45,7 @@ import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-private val commonModule = DI.Module("commonModule") {
+internal val commonModule = DI.Module("commonModule") {
 
     bindSingleton<ComandaAiDatabase> {
         createDatabase(instance())
@@ -165,7 +165,8 @@ private val commonModule = DI.Module("commonModule") {
     bindProvider {
         OrderScreenModel(
             itemsRepository = instance(),
-            orderRepository = instance()
+            orderRepository = instance(),
+            sessionManager = instance()
         )
     }
 

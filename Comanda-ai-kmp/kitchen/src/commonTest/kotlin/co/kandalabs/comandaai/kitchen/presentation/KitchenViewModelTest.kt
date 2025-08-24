@@ -48,6 +48,7 @@ class KitchenViewModelTest {
             KitchenOrder(
                 id = 1,
                 tableNumber = 1,
+                userName = "test-user",
                 items = listOf(
                     KitchenItemDetail(
                         itemId = 1,
@@ -111,6 +112,7 @@ class KitchenViewModelTest {
             KitchenOrder(
                 id = 1,
                 tableNumber = 1,
+                userName = "test-user",
                 items = listOf(
                     KitchenItemDetail(
                         itemId = 1,
@@ -189,6 +191,7 @@ class KitchenViewModelTest {
             KitchenOrder(
                 id = 1,
                 tableNumber = 1,
+                userName = "test-user",
                 items = emptyList(),
                 createdAt = 1234567890L
             )
@@ -303,6 +306,7 @@ private class FakeSessionManager : SessionManager {
     private var session: UserSession? = UserSession(
         userId = 1,
         userName = "test",
+        name = "Test User",
         email = "test@example.com",
         role = UserRole.ADMIN,
         token = "test-token"

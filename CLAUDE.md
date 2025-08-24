@@ -15,7 +15,8 @@ comanda-ai/
 ### Backend Development
 ```bash
 cd CommanderAPI
-./gradlew run                    # Start server (localhost:8081)
+./gradlew run                    # Start server (localhost:8081) - Production
+./gradlew runDebug               # Start server (localhost:8082) - Debug mode
 ./gradlew test                   # Run tests
 docker-compose up -d             # Start with Docker
 ```

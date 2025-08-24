@@ -8,6 +8,7 @@ data class Order(
     val id: Int? = null,
     val billId: Int,
     val tableNumber: Int,
+    val userName: String,
     val items: List<ItemOrder>,
     val status: OrderStatus,
     val createdAt: LocalDateTime

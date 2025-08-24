@@ -9,6 +9,7 @@ interface OrderRepository {
     suspend fun createOrder(
         tableId: Int,
         billId: Int,
+        userName: String,
         items: List<CreateOrderItemRequest>
     ): ComandaAiResult<Order>
     

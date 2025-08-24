@@ -38,6 +38,7 @@ object OrderTable : SQLTable("orders") {
     val billId = integer("bill_id").references(BillTable.id)
     val tableId = integer("table_id").references(TableTable.id)
     val status = varchar("status", 32)
+    val userName = varchar("user_name", 255).default("")
     val createdAt = long("created_at")
     override val primaryKey = PrimaryKey(id)
 }

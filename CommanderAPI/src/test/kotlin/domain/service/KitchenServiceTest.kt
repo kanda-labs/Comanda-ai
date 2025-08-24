@@ -34,6 +34,7 @@ class KitchenServiceTest {
         val completeOrder = KitchenOrder(
             id = 1,
             tableNumber = 1,
+            userName = "test-user",
             items = listOf(
                 KitchenItemDetail(
                     itemId = 1,
@@ -53,6 +54,7 @@ class KitchenServiceTest {
         val incompleteOrder = KitchenOrder(
             id = 2,
             tableNumber = 2,
+            userName = "test-user2",
             items = listOf(
                 KitchenItemDetail(
                     itemId = 2,

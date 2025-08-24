@@ -3,6 +3,7 @@ package kandalabs.commander.data.repository
 import kandalabs.commander.data.model.sqlModels.OrderItemStatusTable
 import kandalabs.commander.data.model.sqlModels.OrderItemTable
 import kandalabs.commander.data.model.sqlModels.OrderTable
+import kandalabs.commander.data.model.sqlModels.UserTable
 import kandalabs.commander.domain.model.*
 import kandalabs.commander.domain.repository.OrderRepository
 import kandalabs.commander.presentation.models.request.CreateOrderRequest
@@ -17,6 +18,7 @@ class OrderRepositoryImpl(
     val orderTable: OrderTable,
     val orderItemTable: OrderItemTable,
     val orderItemStatusTable: OrderItemStatusTable,
+    val userTable: UserTable,
     val logger: KLogger
 ) : OrderRepository {
     override suspend fun getAllOrders(): List<OrderResponse> {
@@ -74,6 +76,7 @@ class OrderRepositoryImpl(
                 id = order.id,
                 billId = order.billId,
                 tableNumber = order.tableNumber,
+                userName = order.userName,
                 items = order.items,
                 status = order.status,
                 createdAt = order.createdAt,
@@ -98,6 +101,7 @@ class OrderRepositoryImpl(
                     it[status] = OrderStatus.OPEN.name
                     it[tableId] = createOrderRequest.tableId
                     it[billId] = createOrderRequest.billId
+                    it[userName] = createOrderRequest.userName
                     it[createdAt] = localDateTimeAsLong()
                 } get orderTable.id
 
@@ -167,7 +171,6 @@ class OrderRepositoryImpl(
                     return@transaction null
                 }
                 
-                // Update individual item statuses in OrderItemStatusTable
                 individualStatuses.forEach { (key, status) ->
                     val parts = key.split("_")
                     if (parts.size == 2) {
@@ -244,6 +247,14 @@ class OrderRepositoryImpl(
                     .where { orderTable.status neq OrderStatus.GRANTED.name }
                     .map { orderRow ->
                         val orderId = orderRow[OrderTable.id]
+                        val orderUserName = orderRow[OrderTable.userName]
+                        
+                        // Get user name from UserTable
+                        val actualUserName = userTable.selectAll()
+                            .where { userTable.userName eq orderUserName }
+                            .singleOrNull()
+                            ?.get(userTable.name) ?: orderUserName // fallback to userName if user not found
+
                         val items = OrderItemTable.selectAll()
                             .where { OrderItemTable.orderId eq orderId }
                             .map { itemRow ->
@@ -280,7 +291,6 @@ class OrderRepositoryImpl(
                                     }
                                 }
                                 
-                                // Calculate overall status based on unit statuses
                                 val overallStatus = calculateOverallStatus(unitStatuses.map { it.status })
                                 
                                 KitchenItemDetail(
@@ -296,6 +306,7 @@ class OrderRepositoryImpl(
                         KitchenOrder(
                             id = orderId,
                             tableNumber = orderRow[OrderTable.tableId],
+                            userName = actualUserName,
                             items = items,
                             createdAt = orderRow[OrderTable.createdAt]
                         )
@@ -588,6 +599,7 @@ public fun ResultRow.toOrder(): OrderResponse {
         id = orderId,
         billId = this[OrderTable.billId],
         status = OrderStatus.valueOf(this[OrderTable.status]),
+        userName = this[OrderTable.userName],
         items = transaction {
             OrderItemTable.selectAll().where { OrderItemTable.orderId eq orderId }
                 .map { it.toItemOrder() }

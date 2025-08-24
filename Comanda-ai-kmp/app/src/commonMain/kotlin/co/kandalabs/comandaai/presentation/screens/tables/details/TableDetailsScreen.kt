@@ -241,6 +241,7 @@ private fun TableDetailsScreenPreview() {
                                 id = 1,
                                 billId = 1,
                                 tableNumber = 1,
+                                userName = "usuario-teste",
                                 items = emptyList(),
                                 status = OrderStatus.OPEN,
                                 createdAt = LocalDateTime(2025, 1, 28, 20, 0, 0),

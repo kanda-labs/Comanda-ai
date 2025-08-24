@@ -55,7 +55,8 @@ internal class LoginViewModel(
                 
                 val session = UserSession(
                     userId = response.id,
-                    userName = response.name,
+                    userName = response.userName,
+                    name = response.name,
                     email = response.email,
                     token = response.token,
                     role = try {

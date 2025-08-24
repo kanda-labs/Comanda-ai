@@ -198,7 +198,8 @@ private fun appModule(healthMonitor: HealthMonitor) = module {
     single<ItemRepository> { ItemRepositoryImpl(itemTable = get(), logger = get()) }
     single<OrderRepository> { OrderRepositoryImpl(
         orderTable = get(), logger = get(),
-        orderItemTable = get(), orderItemStatusTable = get()
+        orderItemTable = get(), orderItemStatusTable = get(),
+        userTable = get()
     ) }
 
     single { UserService(get()) }

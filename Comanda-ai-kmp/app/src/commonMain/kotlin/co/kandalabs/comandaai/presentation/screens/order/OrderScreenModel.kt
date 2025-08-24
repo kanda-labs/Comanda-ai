@@ -3,6 +3,7 @@ package co.kandalabs.comandaai.presentation.screens.order
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
+import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.domain.model.ItemWithCount
 import co.kandalabs.comandaai.domain.repository.CreateOrderItemRequest
 import co.kandalabs.comandaai.domain.repository.ItemsRepository
@@ -20,7 +21,8 @@ import kotlinx.coroutines.flow.SharingStarted
 
 class OrderScreenModel(
     private val itemsRepository: ItemsRepository,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    private val sessionManager: SessionManager,
 ) : ScreenModel {
     
     private val _allItems = MutableStateFlow<List<Item>>(emptyList())
@@ -127,10 +129,14 @@ class OrderScreenModel(
                         )
                     }
                 }
+
+                val userSession = sessionManager.getSession()
+                val userName = userSession?.userName ?: ""
                 
                 val result = orderRepository.createOrder(
                     tableId = tableId,
                     billId = billId,
+                    userName = userName,
                     items = orderItems
                 )
                 

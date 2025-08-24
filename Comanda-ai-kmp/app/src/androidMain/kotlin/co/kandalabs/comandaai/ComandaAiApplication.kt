@@ -2,28 +2,22 @@ package co.kandalabs.comandaai
 
 import android.app.Application
 import android.content.Context
-import co.kandalabs.comandaai.config.AppModule.initializeKodein
-import co.kandalabs.comandaai.config.sqldelight.DriverFactory
-import co.kandalabs.comandaai.core.session.SessionManager
-import co.kandalabs.comandaai.core.session.SessionManagerImpl
+import co.kandalabs.comandaai.config.commonModule
+import co.kandalabs.comandaai.config.platformDI
+import co.kandalabs.comandaai.auth.AuthModule
+import co.kandalabs.comandaai.kitchen.di.KitchenDIModule
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.bindSingleton
-import org.kodein.di.instance
 
 class ComandaAiApplication : Application(), DIAware {
     override val di: DI = DI.lazy {
-        initializeKodein()
+        import(commonModule)
+        import(AuthModule.authModule)
+        import(KitchenDIModule.kitchenModule)
+        import(platformDI)
         bindSingleton<Context> {
             applicationContext
-        }
-
-        bindSingleton<DriverFactory> {
-            DriverFactory(instance())
-        }
-        
-        bindSingleton<SessionManager> {
-            SessionManagerImpl(instance<Context>())
         }
     }
 }

@@ -75,6 +75,7 @@ class OrderControlViewModel(
                             id = orderWithStatuses.id,
                             billId = orderWithStatuses.billId,
                             tableNumber = orderWithStatuses.tableNumber,
+                            userName = orderWithStatuses.userName,
                             items = orderWithStatuses.items,
                             status = orderWithStatuses.status,
                             createdAt = orderWithStatuses.createdAt

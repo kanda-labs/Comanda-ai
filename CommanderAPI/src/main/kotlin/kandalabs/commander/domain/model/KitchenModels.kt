@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class KitchenOrder(
     val id: Int,
     val tableNumber: Int,
+    val userName: String,
     val items: List<KitchenItemDetail>,
     val createdAt: Long
 )

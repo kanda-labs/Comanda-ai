@@ -16,6 +16,7 @@ internal class OrderRepositoryImpl(
     override suspend fun createOrder(
         tableId: Int,
         billId: Int,
+        userName: String,
         items: List<CreateOrderItemRequest>
     ): ComandaAiResult<Order> =
         safeRunCatching {
@@ -23,6 +24,7 @@ internal class OrderRepositoryImpl(
                 CreateOrderRequest(
                     tableId = tableId,
                     billId = billId,
+                    userName = userName,
                     items = items.map { 
                         CreateOrderItemDto(
                             itemId = it.itemId,
@@ -89,6 +91,7 @@ internal class OrderRepositoryImpl(
 data class CreateOrderRequest(
     val tableId: Int,
     val billId: Int,
+    val userName: String,
     val items: List<CreateOrderItemDto>
 )
 

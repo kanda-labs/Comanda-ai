@@ -148,6 +148,12 @@ private fun OrderHeader(order: KitchenOrder) {
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
+                    text = order.userName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
                     text = "${order.items.size} ${if (order.items.size == 1) "item" else "itens"}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -90,7 +91,7 @@ private fun CommandaBadge(
     containerColor: androidx.compose.ui.graphics.Color,
     contentColor: androidx.compose.ui.graphics.Color
 ) {
-    androidx.compose.material3.Badge(
+    Badge(
         containerColor = containerColor,
         contentColor = contentColor
     ) {
@@ -119,6 +120,7 @@ internal fun OrderListItemPreview() {
                     id = 1,
                     billId = 1,
                     tableNumber = 1,
+                    userName = "usuario-teste",
                     items = emptyList(),
                     status = OrderStatus.OPEN,
                     createdAt = LocalDateTime(2025, 1, 28, 20, 0, 0),
