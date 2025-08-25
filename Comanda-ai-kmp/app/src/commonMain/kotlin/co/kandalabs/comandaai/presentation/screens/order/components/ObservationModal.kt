@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import co.kandalabs.comandaai.components.ComandaAiButton
-import kandalabs.commander.domain.model.Item
+import co.kandalabs.comandaai.domain.Item
 
 @Composable
 fun ObservationModal(

@@ -1,7 +1,7 @@
 package co.kandalabs.comandaai.presentation.screens.itemsSelection
 
 import co.kandalabs.comandaai.core.error.ComandaAiException
-import kandalabs.commander.domain.model.Item
+import co.kandalabs.comandaai.domain.Item
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

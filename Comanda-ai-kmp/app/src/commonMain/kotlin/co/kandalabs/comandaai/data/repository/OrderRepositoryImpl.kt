@@ -5,9 +5,9 @@ import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.data.api.CommanderApi
 import co.kandalabs.comandaai.domain.repository.CreateOrderItemRequest
 import co.kandalabs.comandaai.domain.repository.OrderRepository
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.OrderWithStatuses
-import kandalabs.commander.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.OrderWithStatuses
+import co.kandalabs.comandaai.domain.ItemStatus
 import kotlinx.serialization.Serializable
 
 internal class OrderRepositoryImpl(
@@ -119,5 +119,5 @@ data class UpdateOrderWithStatusesRequest(
 @Serializable
 data class UpdateTableRequest(
     val billId: Int? = null,
-    val status: kandalabs.commander.domain.model.TableStatus? = null
+    val status: co.kandalabs.comandaai.domain.models.model.TableStatus? = null
 )

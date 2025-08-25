@@ -69,6 +69,7 @@ kotlin {
             // Project modules
             implementation(projects.network)
             implementation(projects.core)
+            implementation(projects.domain)
             implementation(projects.designsystem)
             implementation(projects.auth)
         }

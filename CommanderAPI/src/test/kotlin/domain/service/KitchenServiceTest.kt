@@ -3,6 +3,7 @@ package domain.service
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kandalabs.commander.domain.model.ItemCategory
 import kandalabs.commander.domain.model.ItemStatus
 import kandalabs.commander.domain.model.ItemUnitStatus
 import kandalabs.commander.domain.model.KitchenItemDetail
@@ -45,7 +46,8 @@ class KitchenServiceTest {
                         ItemUnitStatus(0, ItemStatus.DELIVERED, System.currentTimeMillis(), "user1"),
                         ItemUnitStatus(1, ItemStatus.DELIVERED, System.currentTimeMillis(), "user1")
                     ),
-                    overallStatus = ItemStatus.DELIVERED
+                    overallStatus = ItemStatus.DELIVERED,
+                    category = ItemCategory.SKEWER
                 )
             ),
             createdAt = System.currentTimeMillis()
@@ -65,7 +67,8 @@ class KitchenServiceTest {
                         ItemUnitStatus(0, ItemStatus.DELIVERED, System.currentTimeMillis(), "user1"),
                         ItemUnitStatus(1, ItemStatus.OPEN, System.currentTimeMillis(), "user1")
                     ),
-                    overallStatus = ItemStatus.OPEN
+                    overallStatus = ItemStatus.OPEN,
+                    category = ItemCategory.DRINK
                 )
             ),
             createdAt = System.currentTimeMillis()

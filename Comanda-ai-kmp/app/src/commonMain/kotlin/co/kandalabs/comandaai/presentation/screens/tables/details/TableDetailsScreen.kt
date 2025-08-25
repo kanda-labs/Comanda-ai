@@ -39,13 +39,13 @@ import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.Err
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.tokens.ComandaAiColors
-import kandalabs.commander.domain.model.Table
-import kandalabs.commander.domain.model.TableStatus
+import co.kandalabs.comandaai.domain.models.model.Table
+import co.kandalabs.comandaai.domain.models.model.TableStatus
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import co.kandalabs.comandaai.presentation.screens.tables.details.component.TableDetailsOrders
 import co.kandalabs.comandaai.presentation.designSystem.components.CommandaBadge
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.OrderStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.OrderStatus
 import kotlinx.datetime.LocalDateTime
 
 public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : Screen {

@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.ItemStatus
 
 @Composable
 fun StatusBadge(
@@ -43,6 +43,11 @@ fun StatusBadge(
             Icons.Default.Done
         )
         ItemStatus.DELIVERED -> Triple(
+            androidx.compose.ui.graphics.Color(0xFF4CAF50).copy(alpha = 0.15f),
+            androidx.compose.ui.graphics.Color(0xFF4CAF50),
+            Icons.Default.CheckCircle
+        )
+        ItemStatus.GRANTED -> Triple(
             androidx.compose.ui.graphics.Color(0xFF4CAF50).copy(alpha = 0.15f),
             androidx.compose.ui.graphics.Color(0xFF4CAF50),
             Icons.Default.CheckCircle
@@ -105,6 +110,7 @@ private fun getStatusText(status: ItemStatus): String {
         ItemStatus.IN_PRODUCTION -> "Produzindo"
         ItemStatus.COMPLETED -> "Pronto"
         ItemStatus.DELIVERED -> "Entregue"
+        ItemStatus.GRANTED -> "Concluído"
         ItemStatus.CANCELED -> "Cancelado"
     }
 }

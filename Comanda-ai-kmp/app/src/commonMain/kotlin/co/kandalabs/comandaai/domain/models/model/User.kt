@@ -1,4 +1,4 @@
-package kandalabs.commander.domain.model
+package co.kandalabs.comandaai.domain.models.model
 
 import co.kandalabs.comandaai.core.enums.UserRole
 import kotlinx.datetime.Clock

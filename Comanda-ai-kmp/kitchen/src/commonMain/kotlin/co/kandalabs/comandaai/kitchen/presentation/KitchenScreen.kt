@@ -29,7 +29,8 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.core.session.UserSession
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.ItemCategory
+import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.presentation.components.OrderCard
 import co.kandalabs.comandaai.kitchen.presentation.components.UserAvatar
 import co.kandalabs.comandaai.kitchen.presentation.components.UserProfileModal
@@ -297,22 +298,12 @@ private fun OrderControlTab(
 
 @Composable
 private fun OrderOverviewTab(state: KitchenScreenState) {
-    var selectedCategories by remember { mutableStateOf(setOf("SKEWER")) }
+    var selectedCategories by remember { mutableStateOf(setOf(ItemCategory.SKEWER)) }
 
     val itemSummary = remember(state.orders, selectedCategories) {
         state.orders.flatMap { order ->
             order.items.filter { item ->
-                // Filtrar por categoria usando o nome do item para inferir categoria
-                val itemCategory = when {
-                    item.name.contains("Espetinho") || item.name.contains("Filé") || item.name.contains(
-                        "Medalhão"
-                    )  -> "SKEWER"
-                    item.name.contains("Bolinho") || item.name.contains("Batata") || item.name.contains("Coxinha") -> "SNACK"
-                    item.name.contains("Combo") || item.name.contains("Promo") -> "PROMOTIONAL"
-                    item.name.contains("Chopp") || item.name.contains("Água") || item.name.contains("Refrigerante") -> "DRINK"
-                    else -> "DRINK"
-                }
-                selectedCategories.contains(itemCategory)
+                selectedCategories.contains(item.category)
             }
         }.groupBy { it.itemId }
             .mapValues { (_, items) ->
@@ -336,10 +327,10 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
     ) {
         // Category Filter - Horizontal Badges
         val availableCategories = listOf(
-            "SKEWER" to "Espetinhos",
-            "SNACK" to "Petiscos",
-            "DRINK" to "Bebidas",
-            "PROMOTIONAL" to "Promo"
+            ItemCategory.SKEWER to "Espetinhos",
+            ItemCategory.SNACK to "Petiscos",
+            ItemCategory.DRINK to "Bebidas",
+            ItemCategory.PROMOTIONAL to "Promo"
         )
 
         LazyRow(
@@ -347,14 +338,14 @@ private fun OrderOverviewTab(state: KitchenScreenState) {
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(availableCategories) { (categoryId, categoryName) ->
-                val isSelected = selectedCategories.contains(categoryId)
+            items(availableCategories) { (categoryEnum, categoryName) ->
+                val isSelected = selectedCategories.contains(categoryEnum)
                 Surface(
                     modifier = Modifier.clickable {
                         selectedCategories = if (isSelected) {
-                            selectedCategories - categoryId
+                            selectedCategories - categoryEnum
                         } else {
-                            selectedCategories + categoryId
+                            selectedCategories + categoryEnum
                         }
                     },
                     shape = MaterialTheme.shapes.small,

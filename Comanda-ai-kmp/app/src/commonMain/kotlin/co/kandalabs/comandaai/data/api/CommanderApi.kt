@@ -9,11 +9,11 @@ import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Path
-import kandalabs.commander.domain.model.Bill
-import kandalabs.commander.domain.model.Item
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.OrderWithStatuses
-import kandalabs.commander.domain.model.Table
+import co.kandalabs.comandaai.domain.models.model.Bill
+import co.kandalabs.comandaai.domain.Item
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.OrderWithStatuses
+import co.kandalabs.comandaai.domain.models.model.Table
 import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
 
 internal interface CommanderApi {

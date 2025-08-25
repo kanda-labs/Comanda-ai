@@ -20,7 +20,7 @@ import co.kandalabs.comandaai.presentation.screens.order.components.CategoryTabs
 import co.kandalabs.comandaai.presentation.screens.order.components.ObservationModal
 import co.kandalabs.comandaai.presentation.screens.order.components.OrderConfirmationModal
 import co.kandalabs.comandaai.presentation.screens.order.components.OrderItemCard
-import kandalabs.commander.domain.model.ItemCategory
+import co.kandalabs.comandaai.domain.ItemCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

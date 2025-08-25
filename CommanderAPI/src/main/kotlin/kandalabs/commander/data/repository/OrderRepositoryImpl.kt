@@ -1,5 +1,6 @@
 package kandalabs.commander.data.repository
 
+import kandalabs.commander.data.model.sqlModels.ItemTable
 import kandalabs.commander.data.model.sqlModels.OrderItemStatusTable
 import kandalabs.commander.data.model.sqlModels.OrderItemTable
 import kandalabs.commander.data.model.sqlModels.OrderTable
@@ -263,6 +264,14 @@ class OrderRepositoryImpl(
                                 val itemName = itemRow[OrderItemTable.name]
                                 val observation = itemRow[OrderItemTable.observation]
                                 
+                                // Get item category from ItemTable
+                                val itemCategory = ItemTable.selectAll()
+                                    .where { ItemTable.id eq itemId }
+                                    .singleOrNull()
+                                    ?.get(ItemTable.category)
+                                    ?.let { ItemCategory.valueOf(it) }
+                                    ?: ItemCategory.DRINK // default fallback
+                                
                                 // Get unit statuses from OrderItemStatusTable
                                 val unitStatuses = (0 until totalCount).map { unitIndex ->
                                     val statusRow = orderItemStatusTable.selectAll()
@@ -299,7 +308,8 @@ class OrderRepositoryImpl(
                                     totalCount = totalCount,
                                     observation = observation,
                                     unitStatuses = unitStatuses,
-                                    overallStatus = overallStatus
+                                    overallStatus = overallStatus,
+                                    category = itemCategory
                                 )
                             }
                         

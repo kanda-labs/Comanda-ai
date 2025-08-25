@@ -1,5 +1,6 @@
-package kandalabs.commander.domain.model
+package co.kandalabs.comandaai.domain.models.model
 
+import co.kandalabs.comandaai.domain.ItemOrder
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 

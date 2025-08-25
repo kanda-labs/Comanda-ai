@@ -42,7 +42,7 @@ import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
 import coil3.compose.AsyncImage
-import kandalabs.commander.domain.model.Item
+import co.kandalabs.comandaai.domain.Item
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -212,28 +212,28 @@ private fun BreedsListingScreenPreview() {
                         id = 1,
                         name = "Espetinho de Frango",
                         value = 1200,
-                        category = kandalabs.commander.domain.model.ItemCategory.SKEWER,
+                        category = co.kandalabs.comandaai.domain.ItemCategory.SKEWER,
                         description = "Espetinho de frango suculento"
                     ),
                     Item(
                         id = 2,
                         name = "Cerveja",
                         value = 800,
-                        category = kandalabs.commander.domain.model.ItemCategory.DRINK,
+                        category = co.kandalabs.comandaai.domain.ItemCategory.DRINK,
                         description = "Cerveja gelada"
                     ),
                     Item(
                         id = 3,
                         name = "Refrigerante",
                         value = 600,
-                        category = kandalabs.commander.domain.model.ItemCategory.DRINK,
+                        category = co.kandalabs.comandaai.domain.ItemCategory.DRINK,
                         description = "Refrigerante lata"
                     ),
                     Item(
                         id = 4,
                         name = "Chopp",
                         value = 1000,
-                        category = kandalabs.commander.domain.model.ItemCategory.DRINK,
+                        category = co.kandalabs.comandaai.domain.ItemCategory.DRINK,
                         description = "Chopp artesanal"
                     )
                 ),

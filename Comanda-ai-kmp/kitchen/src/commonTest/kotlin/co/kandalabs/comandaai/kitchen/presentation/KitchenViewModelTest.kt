@@ -10,7 +10,8 @@ import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.core.session.UserSession
 import co.kandalabs.comandaai.core.enums.UserRole
 import co.kandalabs.comandaai.kitchen.data.api.KitchenEvent
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.ItemCategory
+import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.ItemUnitStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenItemDetail
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
@@ -59,7 +60,8 @@ class KitchenViewModelTest {
                             ItemUnitStatus(0, ItemStatus.OPEN, 1234567890L, null),
                             ItemUnitStatus(1, ItemStatus.OPEN, 1234567890L, null)
                         ),
-                        overallStatus = ItemStatus.OPEN
+                        overallStatus = ItemStatus.OPEN,
+                        category = ItemCategory.SKEWER
                     )
                 ),
                 createdAt = 1234567890L
@@ -122,7 +124,8 @@ class KitchenViewModelTest {
                         unitStatuses = listOf(
                             ItemUnitStatus(0, ItemStatus.OPEN, 1234567890L, null)
                         ),
-                        overallStatus = ItemStatus.OPEN
+                        overallStatus = ItemStatus.OPEN,
+                        category = ItemCategory.SKEWER
                     )
                 ),
                 createdAt = 1234567890L

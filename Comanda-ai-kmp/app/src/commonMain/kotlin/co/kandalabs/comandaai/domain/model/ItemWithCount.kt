@@ -1,6 +1,6 @@
 package co.kandalabs.comandaai.domain.model
 
-import kandalabs.commander.domain.model.Item
+import co.kandalabs.comandaai.domain.Item
 
 data class ItemWithCount(
     val item: Item,

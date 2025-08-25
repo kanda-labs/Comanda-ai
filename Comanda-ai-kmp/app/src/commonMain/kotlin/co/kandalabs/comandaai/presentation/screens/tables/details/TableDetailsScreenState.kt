@@ -4,9 +4,10 @@ import co.kandalabs.comandaai.core.error.ComandaAiException
 import co.kandalabs.comandaai.core.enums.UserRole
 import co.kandalabs.comandaai.core.session.UserSession
 import co.kandalabs.comandaai.tokens.ComandaAiColors
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.Table
-import kandalabs.commander.domain.model.TableStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.OrderStatus
+import co.kandalabs.comandaai.domain.models.model.Table
+import co.kandalabs.comandaai.domain.models.model.TableStatus
 import kotlinx.datetime.Month
 import kotlinx.datetime.LocalDateTime
 
@@ -109,15 +110,15 @@ internal data class OrdersDetailsState(
 ){
     val ordersPresentation: List<OrdersDetailsItemState> = orders.map {
         val (color, textColor) = when (it.status) {
-            kandalabs.commander.domain.model.OrderStatus.GRANTED -> Pair(
+            OrderStatus.GRANTED -> Pair(
                 ComandaAiColors.Green500,
                 ComandaAiColors.OnSurface
             )
-            kandalabs.commander.domain.model.OrderStatus.OPEN -> Pair(
+            OrderStatus.OPEN -> Pair(
                 ComandaAiColors.Blue500,
                 ComandaAiColors.OnSurface
             )
-            kandalabs.commander.domain.model.OrderStatus.CANCELED -> Pair(
+            OrderStatus.CANCELED -> Pair(
                 ComandaAiColors.Error,
                 ComandaAiColors.OnError
             )

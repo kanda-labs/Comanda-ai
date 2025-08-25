@@ -1,11 +1,11 @@
 package co.kandalabs.comandaai.domain.repository
 
 import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
-import kandalabs.commander.domain.model.Bill
-import kandalabs.commander.domain.model.Item
-import kandalabs.commander.domain.model.ItemStatus
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.Table
+import co.kandalabs.comandaai.domain.models.model.Bill
+import co.kandalabs.comandaai.domain.Item
+import co.kandalabs.comandaai.domain.ItemStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.Table
 import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
 
 interface TablesRepository {

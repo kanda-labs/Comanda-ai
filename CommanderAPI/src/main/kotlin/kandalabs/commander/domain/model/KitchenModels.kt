@@ -18,7 +18,8 @@ data class KitchenItemDetail(
     val totalCount: Int,
     val observation: String?,
     val unitStatuses: List<ItemUnitStatus>,
-    val overallStatus: ItemStatus
+    val overallStatus: ItemStatus,
+    val category: ItemCategory
 )
 
 @Serializable

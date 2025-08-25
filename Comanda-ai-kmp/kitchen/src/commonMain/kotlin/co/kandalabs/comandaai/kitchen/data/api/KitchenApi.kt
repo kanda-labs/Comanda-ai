@@ -1,6 +1,6 @@
 package co.kandalabs.comandaai.kitchen.data.api
 
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
 import io.ktor.client.*
 import io.ktor.client.call.*

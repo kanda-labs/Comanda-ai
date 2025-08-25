@@ -5,7 +5,7 @@ import io.ktor.client.*
 import io.ktor.client.plugins.sse.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kandalabs.commander.domain.model.Order
+import co.kandalabs.comandaai.domain.models.model.Order
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json

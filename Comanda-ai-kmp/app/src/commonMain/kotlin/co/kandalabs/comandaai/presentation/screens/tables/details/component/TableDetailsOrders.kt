@@ -23,8 +23,8 @@ import co.kandalabs.comandaai.presentation.screens.tables.details.OrdersDetailsI
 import co.kandalabs.comandaai.presentation.screens.tables.details.TableDetailsScreenBadge
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.OrderStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.OrderStatus
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

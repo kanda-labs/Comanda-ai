@@ -1,9 +1,10 @@
 package co.kandalabs.comandaai.kitchen.data.api
 
+import co.kandalabs.comandaai.domain.ItemCategory
+import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenItemDetail
 import co.kandalabs.comandaai.kitchen.domain.model.ItemUnitStatus
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -41,7 +42,8 @@ class KitchenSSESerializationTest {
                                     "updatedBy": null
                                 }
                             ],
-                            "overallStatus": "OPEN"
+                            "overallStatus": "OPEN",
+                            "category": "SKEWER"
                         }
                     ],
                     "createdAt": 1755707273395
@@ -69,6 +71,7 @@ class KitchenSSESerializationTest {
         assertEquals(1, item.totalCount)
         assertEquals(null, item.observation)
         assertEquals(ItemStatus.OPEN, item.overallStatus)
+        assertEquals(ItemCategory.SKEWER, item.category)
         assertEquals(1, item.unitStatuses.size)
         
         val unitStatus = item.unitStatuses.first()

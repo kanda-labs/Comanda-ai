@@ -49,8 +49,8 @@ import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.Err
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
 import co.kandalabs.comandaai.presentation.screens.tables.details.TableDetailsScreen
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
-import kandalabs.commander.domain.model.Table
-import kandalabs.commander.domain.model.TableStatus
+import co.kandalabs.comandaai.domain.models.model.Table
+import co.kandalabs.comandaai.domain.models.model.TableStatus
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

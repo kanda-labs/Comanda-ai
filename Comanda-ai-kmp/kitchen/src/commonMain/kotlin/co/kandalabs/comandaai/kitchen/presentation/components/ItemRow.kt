@@ -23,7 +23,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenItemDetail
 
 @Composable

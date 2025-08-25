@@ -5,8 +5,8 @@ import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.core.logger.ComandaAiLogger
 import co.kandalabs.comandaai.data.api.CommanderApi
 import co.kandalabs.comandaai.domain.repository.ItemsRepository
-import kandalabs.commander.domain.model.Item
-import kandalabs.commander.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.Item
+import co.kandalabs.comandaai.domain.ItemStatus
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

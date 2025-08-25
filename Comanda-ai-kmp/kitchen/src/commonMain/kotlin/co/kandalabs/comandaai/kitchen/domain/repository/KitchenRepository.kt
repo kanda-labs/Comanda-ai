@@ -1,7 +1,7 @@
 package co.kandalabs.comandaai.kitchen.domain.repository
 
 import co.kandalabs.comandaai.kitchen.data.api.KitchenEvent
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
 import kotlinx.coroutines.flow.Flow
 

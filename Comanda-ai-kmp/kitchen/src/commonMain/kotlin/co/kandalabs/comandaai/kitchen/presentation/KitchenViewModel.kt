@@ -5,7 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.core.session.UserSession
 import co.kandalabs.comandaai.kitchen.data.api.KitchenEvent
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
 import co.kandalabs.comandaai.kitchen.domain.model.ItemUnitStatus
 import co.kandalabs.comandaai.kitchen.domain.repository.KitchenRepository

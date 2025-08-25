@@ -5,8 +5,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.domain.repository.TablesRepository
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.Table
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.Table
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 import kotlin.collections.emptyList

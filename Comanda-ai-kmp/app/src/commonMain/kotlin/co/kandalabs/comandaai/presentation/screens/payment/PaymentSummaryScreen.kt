@@ -44,7 +44,7 @@ import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.Err
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.tokens.ComandaAiColors
-import kandalabs.commander.domain.model.Table
+import co.kandalabs.comandaai.domain.models.model.Table
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 public data class PaymentSummaryScreen(val tableId: Int, val tableNumber: Int) : Screen {

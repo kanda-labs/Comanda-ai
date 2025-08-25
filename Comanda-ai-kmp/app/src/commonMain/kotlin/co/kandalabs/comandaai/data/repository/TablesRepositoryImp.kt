@@ -7,11 +7,11 @@ import co.kandalabs.comandaai.data.repository.CreateBillRequest
 import co.kandalabs.comandaai.data.repository.UpdateTableRequest
 import co.kandalabs.comandaai.domain.repository.TablesRepository
 import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
-import kandalabs.commander.domain.model.Bill
-import kandalabs.commander.domain.model.BillStatus
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.Table
-import kandalabs.commander.domain.model.TableStatus
+import co.kandalabs.comandaai.domain.models.model.Bill
+import co.kandalabs.comandaai.domain.models.model.BillStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.Table
+import co.kandalabs.comandaai.domain.models.model.TableStatus
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

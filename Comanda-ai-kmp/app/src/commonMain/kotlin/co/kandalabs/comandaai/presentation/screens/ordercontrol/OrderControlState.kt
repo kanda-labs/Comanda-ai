@@ -1,9 +1,9 @@
 package co.kandalabs.comandaai.presentation.screens.ordercontrol
 
 import co.kandalabs.comandaai.core.error.ComandaAiException
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.ItemOrder
-import kandalabs.commander.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.ItemOrder
+import co.kandalabs.comandaai.domain.ItemStatus
 
 data class OrderControlState(
     val order: Order? = null,

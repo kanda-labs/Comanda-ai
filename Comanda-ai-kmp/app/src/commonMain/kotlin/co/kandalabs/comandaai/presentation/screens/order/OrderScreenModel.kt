@@ -8,8 +8,8 @@ import co.kandalabs.comandaai.domain.model.ItemWithCount
 import co.kandalabs.comandaai.domain.repository.CreateOrderItemRequest
 import co.kandalabs.comandaai.domain.repository.ItemsRepository
 import co.kandalabs.comandaai.domain.repository.OrderRepository
-import kandalabs.commander.domain.model.Item
-import kandalabs.commander.domain.model.ItemCategory
+import co.kandalabs.comandaai.domain.Item
+import co.kandalabs.comandaai.domain.ItemCategory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -192,18 +192,19 @@ class OrderScreenModel(
         if (item?.id != null) {
             // Add or update observation
             val currentObservations = _itemObservations.value.toMutableMap()
+            val itemId = item.id ?: return
             if (observation.isNotBlank()) {
-                currentObservations[item.id] = observation
+                currentObservations[itemId] = observation
             } else {
-                currentObservations.remove(item.id)
+                currentObservations.remove(itemId)
             }
             _itemObservations.value = currentObservations
             
             // Only add item if quantity is 0
             val currentSelectedItems = _selectedItems.value
-            val currentQuantity = currentSelectedItems[item.id] ?: 0
+            val currentQuantity = currentSelectedItems[itemId] ?: 0
             if (currentQuantity == 0) {
-                incrementItem(item.id)
+                incrementItem(itemId)
             }
             
             // Hide modal

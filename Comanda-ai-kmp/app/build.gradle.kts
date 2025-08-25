@@ -62,6 +62,7 @@ kotlin {
             implementation(projects.auth)
             implementation(projects.designsystem)
             implementation(projects.core)
+            implementation(projects.domain)
             implementation(projects.kitchen)
             implementation(compose.runtime)
             implementation(compose.foundation)

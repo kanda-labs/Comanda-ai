@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import co.kandalabs.comandaai.kitchen.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.ItemStatus
 
 @Composable
 fun ItemUnitControl(
@@ -60,6 +60,7 @@ private fun getStatusColor(status: ItemStatus): androidx.compose.ui.graphics.Col
         ItemStatus.IN_PRODUCTION -> MaterialTheme.colorScheme.primary
         ItemStatus.COMPLETED -> MaterialTheme.colorScheme.secondary
         ItemStatus.DELIVERED -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
+        ItemStatus.GRANTED -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
         ItemStatus.CANCELED -> androidx.compose.ui.graphics.Color(0xFF757575)
     }
 }
@@ -70,6 +71,7 @@ private fun getStatusText(status: ItemStatus): String {
         ItemStatus.IN_PRODUCTION -> "Produzindo"
         ItemStatus.COMPLETED -> "Pronto"
         ItemStatus.DELIVERED -> "Entregue"
+        ItemStatus.GRANTED -> "Concluído"
         ItemStatus.CANCELED -> "Cancelado"
     }
 }

@@ -31,10 +31,10 @@ import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.Loa
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.ItemOrder
-import kandalabs.commander.domain.model.ItemStatus
-import kandalabs.commander.domain.model.OrderStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.ItemOrder
+import co.kandalabs.comandaai.domain.ItemStatus
+import co.kandalabs.comandaai.domain.models.model.OrderStatus
 
 public data class OrderControlScreen(val orderId: Int) : Screen {
 
@@ -293,6 +293,16 @@ private fun OrderControlItemAccordion(
             ComandaAiColors.Error.value,
             ComandaAiColors.OnError.value
         )
+
+        ItemStatus.IN_PRODUCTION -> Pair(
+            ComandaAiColors.Blue500.value,
+            ComandaAiColors.OnSurface.value
+        )
+
+        ItemStatus.COMPLETED -> Pair(
+            ComandaAiColors.Green500.value,
+            ComandaAiColors.OnSurface.value
+        )
     }
 
     val statusText = when (item.status) {
@@ -300,6 +310,8 @@ private fun OrderControlItemAccordion(
         ItemStatus.DELIVERED -> "Entregue"
         ItemStatus.OPEN -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
+        ItemStatus.IN_PRODUCTION -> "Em Produção"
+        ItemStatus.COMPLETED -> "Finalizado"
     }
 
     Card(
@@ -464,6 +476,16 @@ private fun IndividualItemRow(
             ComandaAiColors.Error.value.copy(alpha = 0.1f),
             ComandaAiColors.Error.value
         )
+
+        ItemStatus.IN_PRODUCTION -> Pair(
+            ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
+            ComandaAiColors.Blue500.value
+        )
+
+        ItemStatus.COMPLETED -> Pair(
+            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
+            ComandaAiColors.Green500.value
+        )
     }
 
     val statusText = when (individualStatus) {
@@ -471,6 +493,8 @@ private fun IndividualItemRow(
         ItemStatus.DELIVERED -> "Entregue"
         ItemStatus.OPEN -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
+        ItemStatus.IN_PRODUCTION -> "Em Produção"
+        ItemStatus.COMPLETED -> "Finalizado"
     }
 
     Card(
@@ -533,6 +557,16 @@ private fun OrderControlItem(
             ComandaAiColors.Error.value,
             ComandaAiColors.OnError.value
         )
+
+        ItemStatus.IN_PRODUCTION -> Pair(
+            ComandaAiColors.Blue500.value,
+            ComandaAiColors.OnSurface.value
+        )
+
+        ItemStatus.COMPLETED -> Pair(
+            ComandaAiColors.Green500.value,
+            ComandaAiColors.OnSurface.value
+        )
     }
 
     val statusText = when (item.status) {
@@ -540,6 +574,8 @@ private fun OrderControlItem(
         ItemStatus.DELIVERED -> "Entregue"
         ItemStatus.OPEN -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
+        ItemStatus.IN_PRODUCTION -> "Em Produção"
+        ItemStatus.COMPLETED -> "Finalizado"
     }
 
     Card(
@@ -639,6 +675,8 @@ private fun StatusSelectionModal(
                     ItemStatus.DELIVERED -> "Entregue"
                     ItemStatus.OPEN -> "Pendente"
                     ItemStatus.CANCELED -> "Cancelado"
+                    ItemStatus.IN_PRODUCTION -> "Em Produção"
+                    ItemStatus.COMPLETED -> "Finalizado"
                 }
 
                 Text(
@@ -663,6 +701,8 @@ private fun StatusSelectionModal(
                         ItemStatus.DELIVERED -> "Entregue"
                         ItemStatus.OPEN -> "Pendente"
                         ItemStatus.CANCELED -> "Cancelado"
+                        ItemStatus.IN_PRODUCTION -> "Em Produção"
+                        ItemStatus.COMPLETED -> "Finalizado"
                         else -> ""
                     }
 
@@ -681,6 +721,17 @@ private fun StatusSelectionModal(
                             ComandaAiColors.Error.value.copy(alpha = 0.1f),
                             ComandaAiColors.OnSurface.value
                         )
+
+                        ItemStatus.IN_PRODUCTION -> Pair(
+                            ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
+                            ComandaAiColors.OnSurface.value
+                        )
+
+                        ItemStatus.COMPLETED -> Pair(
+                            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
+                            ComandaAiColors.OnSurface.value
+                        )
+                        
                         else -> Pair(
                             ComandaAiColors.Gray200.value,
                             ComandaAiColors.OnSurface.value
@@ -776,6 +827,8 @@ private fun IndividualItemStatusModal(
                     ItemStatus.DELIVERED -> "Entregue"
                     ItemStatus.OPEN -> "Pendente"
                     ItemStatus.CANCELED -> "Cancelado"
+                    ItemStatus.IN_PRODUCTION -> "Em Produção"
+                    ItemStatus.COMPLETED -> "Finalizado"
                 }
 
                 Text(
@@ -800,6 +853,8 @@ private fun IndividualItemStatusModal(
                         ItemStatus.DELIVERED -> "Entregue"
                         ItemStatus.OPEN -> "Pendente"
                         ItemStatus.CANCELED -> "Cancelado"
+                        ItemStatus.IN_PRODUCTION -> "Em Produção"
+                        ItemStatus.COMPLETED -> "Finalizado"
                         else -> ""
                     }
 
@@ -818,6 +873,17 @@ private fun IndividualItemStatusModal(
                             ComandaAiColors.Error.value.copy(alpha = 0.1f),
                             ComandaAiColors.OnSurface.value
                         )
+
+                        ItemStatus.IN_PRODUCTION -> Pair(
+                            ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
+                            ComandaAiColors.OnSurface.value
+                        )
+
+                        ItemStatus.COMPLETED -> Pair(
+                            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
+                            ComandaAiColors.OnSurface.value
+                        )
+                        
                         else -> Pair(
                             ComandaAiColors.Gray200.value,
                             ComandaAiColors.OnSurface.value
@@ -870,5 +936,7 @@ private fun getNextStatus(currentStatus: ItemStatus): ItemStatus {
         ItemStatus.DELIVERED -> ItemStatus.OPEN
         ItemStatus.GRANTED -> ItemStatus.DELIVERED
         ItemStatus.CANCELED -> ItemStatus.OPEN
+        ItemStatus.IN_PRODUCTION -> ItemStatus.COMPLETED
+        ItemStatus.COMPLETED -> ItemStatus.DELIVERED
     }
 }

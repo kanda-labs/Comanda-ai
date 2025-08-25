@@ -1,9 +1,9 @@
 package co.kandalabs.comandaai.domain.repository
 
 import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.OrderWithStatuses
-import kandalabs.commander.domain.model.ItemStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.OrderWithStatuses
+import co.kandalabs.comandaai.domain.ItemStatus
 
 interface OrderRepository {
     suspend fun createOrder(

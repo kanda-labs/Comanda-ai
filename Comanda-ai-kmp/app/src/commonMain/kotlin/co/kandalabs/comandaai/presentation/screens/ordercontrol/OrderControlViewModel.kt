@@ -10,10 +10,10 @@ import co.kandalabs.comandaai.domain.repository.OrderRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kandalabs.commander.domain.model.Order
-import kandalabs.commander.domain.model.ItemOrder
-import kandalabs.commander.domain.model.ItemStatus
-import kandalabs.commander.domain.model.OrderStatus
+import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.ItemOrder
+import co.kandalabs.comandaai.domain.ItemStatus
+import co.kandalabs.comandaai.domain.models.model.OrderStatus
 
 class OrderControlViewModel(
     private val sessionManager: SessionManager,

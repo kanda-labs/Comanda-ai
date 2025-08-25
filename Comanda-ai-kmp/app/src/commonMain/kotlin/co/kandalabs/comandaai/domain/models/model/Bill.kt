@@ -1,4 +1,4 @@
-package kandalabs.commander.domain.model
+package co.kandalabs.comandaai.domain.models.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.datetime.LocalDateTime

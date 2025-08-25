@@ -1,4 +1,4 @@
-package kandalabs.commander.domain.model
+package co.kandalabs.comandaai.domain
 
 import kotlinx.serialization.Serializable
 
@@ -20,12 +20,3 @@ data class ItemOrder(
     val observation: String? = null,
     val status: ItemStatus
 )
-
-enum class ItemStatus { 
-    GRANTED, 
-    OPEN, 
-    DELIVERED, 
-    CANCELED 
-}
-
-enum class ItemCategory { SKEWER, DRINK, SNACK, PROMOTIONAL }

@@ -3,8 +3,8 @@ package co.kandalabs.comandaai.presentation.screens.tables.listing
 import androidx.compose.ui.graphics.Color
 import co.kandalabs.comandaai.core.error.ComandaAiException
 import co.kandalabs.comandaai.tokens.ComandaAiColors
-import kandalabs.commander.domain.model.Table
-import kandalabs.commander.domain.model.TableStatus
+import co.kandalabs.comandaai.domain.models.model.Table
+import co.kandalabs.comandaai.domain.models.model.TableStatus
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
