@@ -70,13 +70,13 @@ class KitchenSSESerializationTest {
         assertEquals("Espetinho de Alcatra", item.name)
         assertEquals(1, item.totalCount)
         assertEquals(null, item.observation)
-        assertEquals(ItemStatus.OPEN, item.overallStatus)
+        assertEquals(ItemStatus.PENDING, item.overallStatus)
         assertEquals(ItemCategory.SKEWER, item.category)
         assertEquals(1, item.unitStatuses.size)
         
         val unitStatus = item.unitStatuses.first()
         assertEquals(0, unitStatus.unitIndex)
-        assertEquals(ItemStatus.OPEN, unitStatus.status)
+        assertEquals(ItemStatus.PENDING, unitStatus.status)
         assertEquals(1755707429754, unitStatus.updatedAt)
         assertEquals(null, unitStatus.updatedBy)
     }

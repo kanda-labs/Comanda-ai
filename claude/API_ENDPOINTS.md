@@ -294,17 +294,14 @@ Atualiza o status de uma unidade específica de um item
 **Request Body:**
 ```json
 {
-  "status": "OPEN|IN_PRODUCTION|COMPLETED|DELIVERED|CANCELED|GRANTED"
+  "status": "PENDING|DELIVERED|CANCELED"
 }
 ```
 
 **Status Values:**
-- `OPEN`: Pendente, aguardando processamento
-- `IN_PRODUCTION`: Em produção/preparação  
-- `COMPLETED`: Finalizado, pronto para entrega
+- `PENDING`: Pendente, aguardando processamento ou em preparo
 - `DELIVERED`: Entregue ao cliente
 - `CANCELED`: Cancelado
-- `GRANTED`: Concluído (compatibilidade legacy)
 
 **Response:**
 ```json

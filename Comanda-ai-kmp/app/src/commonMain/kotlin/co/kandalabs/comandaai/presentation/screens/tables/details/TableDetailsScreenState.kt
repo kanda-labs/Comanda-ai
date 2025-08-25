@@ -110,11 +110,11 @@ internal data class OrdersDetailsState(
 ){
     val ordersPresentation: List<OrdersDetailsItemState> = orders.map {
         val (color, textColor) = when (it.status) {
-            OrderStatus.GRANTED -> Pair(
+            OrderStatus.DELIVERED -> Pair(
                 ComandaAiColors.Green500,
                 ComandaAiColors.OnSurface
             )
-            OrderStatus.OPEN -> Pair(
+            OrderStatus.PENDING -> Pair(
                 ComandaAiColors.Blue500,
                 ComandaAiColors.OnSurface
             )

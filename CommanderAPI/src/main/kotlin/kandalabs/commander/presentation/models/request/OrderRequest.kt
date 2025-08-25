@@ -26,7 +26,7 @@ data class CreateOrderItemRequest(
         name = name,
         count = count,
         observation = observation,
-        status = ItemStatus.OPEN,
+        status = ItemStatus.PENDING,
     )
 }
 

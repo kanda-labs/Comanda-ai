@@ -2,6 +2,7 @@ package co.kandalabs.comandaai.kitchen.presentation
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import co.kandalabs.comandaai.core.session.LogoutManager
 import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.core.session.UserSession
 import co.kandalabs.comandaai.kitchen.data.api.KitchenEvent
@@ -326,9 +327,8 @@ class KitchenViewModel(
      * Log out the current user and clear session data.
      */
     fun logout() {
-        screenModelScope.launch {
-            sessionManager.logout()
-        }
+        // Use LogoutManager to prevent "Parent job is Completed" errors
+        LogoutManager.performLogout(sessionManager)
     }
     
     // =================================
@@ -489,7 +489,7 @@ class KitchenViewModel(
     private fun calculateOverallStatus(unitStatuses: List<ItemUnitStatus>): ItemStatus {
         return when {
             unitStatuses.all { it.status == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
-            else -> ItemStatus.OPEN
+            else -> ItemStatus.PENDING
         }
     }
     

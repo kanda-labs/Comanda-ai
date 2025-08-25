@@ -57,10 +57,10 @@ class KitchenViewModelTest {
                         totalCount = 2,
                         observation = null,
                         unitStatuses = listOf(
-                            ItemUnitStatus(0, ItemStatus.OPEN, 1234567890L, null),
-                            ItemUnitStatus(1, ItemStatus.OPEN, 1234567890L, null)
+                            ItemUnitStatus(0, ItemStatus.PENDING, 1234567890L, null),
+                            ItemUnitStatus(1, ItemStatus.PENDING, 1234567890L, null)
                         ),
-                        overallStatus = ItemStatus.OPEN,
+                        overallStatus = ItemStatus.PENDING,
                         category = ItemCategory.SKEWER
                     )
                 ),
@@ -122,9 +122,9 @@ class KitchenViewModelTest {
                         totalCount = 1,
                         observation = null,
                         unitStatuses = listOf(
-                            ItemUnitStatus(0, ItemStatus.OPEN, 1234567890L, null)
+                            ItemUnitStatus(0, ItemStatus.PENDING, 1234567890L, null)
                         ),
-                        overallStatus = ItemStatus.OPEN,
+                        overallStatus = ItemStatus.PENDING,
                         category = ItemCategory.SKEWER
                     )
                 ),
@@ -137,9 +137,9 @@ class KitchenViewModelTest {
                 items = listOf(
                     initialOrders[0].items[0].copy(
                         unitStatuses = listOf(
-                            ItemUnitStatus(0, ItemStatus.IN_PRODUCTION, 1234567890L, "kitchen_user")
+                            ItemUnitStatus(0, ItemStatus.DELIVERED, 1234567890L, "kitchen_user")
                         ),
-                        overallStatus = ItemStatus.IN_PRODUCTION
+                        overallStatus = ItemStatus.DELIVERED
                     )
                 )
             )
@@ -155,7 +155,7 @@ class KitchenViewModelTest {
             
             // When - update item status
             repository.setOrders(updatedOrders)
-            viewModel.updateItemStatus(1, 1, 0, ItemStatus.IN_PRODUCTION)
+            viewModel.updateItemStatus(1, 1, 0, ItemStatus.DELIVERED)
             testDispatcher.scheduler.advanceUntilIdle()
             
             // Then - should have updated orders
@@ -178,7 +178,7 @@ class KitchenViewModelTest {
             awaitItem() // loaded empty orders
             
             // When - update item status fails
-            viewModel.updateItemStatus(1, 1, 0, ItemStatus.IN_PRODUCTION)
+            viewModel.updateItemStatus(1, 1, 0, ItemStatus.DELIVERED)
             testDispatcher.scheduler.advanceUntilIdle()
             
             // Then - should show error

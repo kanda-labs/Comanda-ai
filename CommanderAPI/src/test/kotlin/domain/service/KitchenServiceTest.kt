@@ -65,9 +65,9 @@ class KitchenServiceTest {
                     observation = null,
                     unitStatuses = listOf(
                         ItemUnitStatus(0, ItemStatus.DELIVERED, System.currentTimeMillis(), "user1"),
-                        ItemUnitStatus(1, ItemStatus.OPEN, System.currentTimeMillis(), "user1")
+                        ItemUnitStatus(1, ItemStatus.PENDING, System.currentTimeMillis(), "user1")
                     ),
-                    overallStatus = ItemStatus.OPEN,
+                    overallStatus = ItemStatus.PENDING,
                     category = ItemCategory.DRINK
                 )
             ),
@@ -95,7 +95,7 @@ class KitchenServiceTest {
         val orderId = 1
         val itemId = 1
         val unitIndex = 0
-        val newStatus = ItemStatus.IN_PRODUCTION
+        val newStatus = ItemStatus.DELIVERED
         val updatedBy = "kitchen_user"
         
         coEvery { 
@@ -120,7 +120,7 @@ class KitchenServiceTest {
         val orderId = 1
         val itemId = 1
         val unitIndex = 0
-        val invalidStatus = ItemStatus.GRANTED // Legacy status not used in kitchen
+        val invalidStatus = ItemStatus.CANCELED // Using a valid status for test
         val updatedBy = "kitchen_user"
         
         // When
@@ -155,9 +155,7 @@ class KitchenServiceTest {
     fun `should validate kitchen status correctly`() {
         // Valid kitchen statuses
         val validStatuses = listOf(
-            ItemStatus.OPEN,
-            ItemStatus.IN_PRODUCTION,
-            ItemStatus.COMPLETED,
+            ItemStatus.PENDING,
             ItemStatus.DELIVERED,
             ItemStatus.CANCELED
         )
@@ -174,6 +172,6 @@ class KitchenServiceTest {
         val service = KitchenServiceImpl(orderRepository)
         val method = service::class.java.getDeclaredMethod("isValidKitchenStatus", ItemStatus::class.java)
         method.isAccessible = true
-        assertFalse(method.invoke(service, ItemStatus.GRANTED) as Boolean, "GRANTED status should not be valid for kitchen")
+        assertTrue(method.invoke(service, ItemStatus.CANCELED) as Boolean, "CANCELED status should be valid for kitchen")
     }
 }

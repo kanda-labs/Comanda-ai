@@ -101,7 +101,6 @@ internal val commonModule = DI.Module("commonModule") {
             "${AppConfigProvider.apiBaseUrl}/"
         }
         OrderSSEClient(
-            httpClient = instance(),
             json = instance(),
             baseUrl = baseUrl,
             logger = instance()
@@ -113,9 +112,7 @@ internal val commonModule = DI.Module("commonModule") {
     }
 
     bindSingleton<CacheManager> {
-        CacheManagerImpl(
-            httpClient = instance()
-        )
+        CacheManagerImpl()
     }
 
     bindSingleton<ItemsRepository> {

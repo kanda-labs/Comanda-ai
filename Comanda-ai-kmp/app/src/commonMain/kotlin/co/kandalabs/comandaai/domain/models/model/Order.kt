@@ -16,7 +16,7 @@ data class Order(
 )
 
 enum class OrderStatus(val presentationName: String) {
-    GRANTED("Atendido"),
-    OPEN("Pendente"),
+    PENDING("Pendente"),
+    DELIVERED("Entregue"),
     CANCELED("Cancelado")
 }

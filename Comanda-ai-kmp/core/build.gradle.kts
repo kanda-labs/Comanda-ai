@@ -19,7 +19,11 @@ kotlin {
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.io.core)
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.serialization.kotlinx.json)
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+            implementation(project(":network"))
         }
         
         androidMain.dependencies {

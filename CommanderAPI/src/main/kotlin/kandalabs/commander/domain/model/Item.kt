@@ -22,12 +22,9 @@ data class ItemOrder(
 )
 
 enum class ItemStatus { 
-    GRANTED,       // Concluído (mantém compatibilidade)
-    OPEN,         // Pendente (mantém compatibilidade)
-    CANCELED,     // Cancelado (mantém compatibilidade)
-    IN_PRODUCTION, // Em produção (novo)
-    COMPLETED,    // Finalizado (novo)
-    DELIVERED     // Entregue (novo)
+    PENDING,       // Pendente - item aguardando processamento
+    DELIVERED,     // Entregue - item finalizado e entregue ao cliente
+    CANCELED       // Cancelado - item cancelado
 }
 
 enum class ItemCategory { SKEWER, DRINK, SNACK, PROMOTIONAL }

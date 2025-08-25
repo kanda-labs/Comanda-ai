@@ -46,12 +46,9 @@ class KitchenServiceImpl(
     
     private fun isValidKitchenStatus(status: ItemStatus): Boolean {
         return when (status) {
-            ItemStatus.OPEN,
-            ItemStatus.IN_PRODUCTION,
-            ItemStatus.COMPLETED,
+            ItemStatus.PENDING,
             ItemStatus.DELIVERED,
             ItemStatus.CANCELED -> true
-            ItemStatus.GRANTED -> false // Legacy status, not used in kitchen
         }
     }
 }

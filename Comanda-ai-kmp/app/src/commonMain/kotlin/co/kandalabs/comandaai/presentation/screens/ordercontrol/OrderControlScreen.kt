@@ -138,11 +138,11 @@ private fun OrderControlScreenContent(
                     // Status do pedido
                     state.order?.let { order ->
                         val (statusContainerColor, statusContentColor) = when (order.status) {
-                            OrderStatus.GRANTED -> Pair(
+                            OrderStatus.DELIVERED -> Pair(
                                 ComandaAiColors.Green500.value,
                                 ComandaAiColors.OnSurface.value
                             )
-                            OrderStatus.OPEN -> Pair(
+                            OrderStatus.PENDING -> Pair(
                                 ComandaAiColors.Yellow500.value,
                                 ComandaAiColors.OnSurface.value
                             )
@@ -153,8 +153,8 @@ private fun OrderControlScreenContent(
                         }
 
                         val statusText = when (order.status) {
-                            OrderStatus.GRANTED -> "Atendido"
-                            OrderStatus.OPEN -> "Pendente"
+                            OrderStatus.DELIVERED -> "Entregue"
+                            OrderStatus.PENDING -> "Pendente"
                             OrderStatus.CANCELED -> "Cancelado"
                         }
 
@@ -274,17 +274,12 @@ private fun OrderControlItemAccordion(
     modifier: Modifier = Modifier
 ) {
     val (containerColor, contentColor) = when (item.status) {
-        ItemStatus.GRANTED -> Pair(
-            ComandaAiColors.Yellow500.value,
-            ComandaAiColors.OnSurface.value
-        )
-
         ItemStatus.DELIVERED -> Pair(
             ComandaAiColors.Green500.value,
             ComandaAiColors.OnSurface.value
         )
 
-        ItemStatus.OPEN -> Pair(
+        ItemStatus.PENDING -> Pair(
             ComandaAiColors.Yellow500.value,
             ComandaAiColors.OnSurface.value
         )
@@ -293,25 +288,12 @@ private fun OrderControlItemAccordion(
             ComandaAiColors.Error.value,
             ComandaAiColors.OnError.value
         )
-
-        ItemStatus.IN_PRODUCTION -> Pair(
-            ComandaAiColors.Blue500.value,
-            ComandaAiColors.OnSurface.value
-        )
-
-        ItemStatus.COMPLETED -> Pair(
-            ComandaAiColors.Green500.value,
-            ComandaAiColors.OnSurface.value
-        )
     }
 
     val statusText = when (item.status) {
-        ItemStatus.GRANTED -> "Atendido"
         ItemStatus.DELIVERED -> "Entregue"
-        ItemStatus.OPEN -> "Pendente"
+        ItemStatus.PENDING -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
-        ItemStatus.IN_PRODUCTION -> "Em Produção"
-        ItemStatus.COMPLETED -> "Finalizado"
     }
 
     Card(
@@ -415,7 +397,7 @@ private fun OrderControlItemAccordion(
                             IndividualItemRow(
                                 item = item,
                                 index = index + 1,
-                                individualStatus = individualItemStatuses["${item.itemId}_$index"] ?: ItemStatus.GRANTED,
+                                individualStatus = individualItemStatuses["${item.itemId}_$index"] ?: ItemStatus.DELIVERED,
                                 onItemClick = { onIndividualItemClick(item, index) }
                             )
 
@@ -457,17 +439,12 @@ private fun IndividualItemRow(
     modifier: Modifier = Modifier
 ) {
     val (containerColor, contentColor) = when (individualStatus) {
-        ItemStatus.GRANTED -> Pair(
-            ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
-            ComandaAiColors.Blue500.value
-        )
-
         ItemStatus.DELIVERED -> Pair(
             ComandaAiColors.Green500.value.copy(alpha = 0.1f),
             ComandaAiColors.Green500.value
         )
 
-        ItemStatus.OPEN -> Pair(
+        ItemStatus.PENDING -> Pair(
             ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
             ComandaAiColors.Blue500.value
         )
@@ -476,25 +453,12 @@ private fun IndividualItemRow(
             ComandaAiColors.Error.value.copy(alpha = 0.1f),
             ComandaAiColors.Error.value
         )
-
-        ItemStatus.IN_PRODUCTION -> Pair(
-            ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
-            ComandaAiColors.Blue500.value
-        )
-
-        ItemStatus.COMPLETED -> Pair(
-            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
-            ComandaAiColors.Green500.value
-        )
     }
 
     val statusText = when (individualStatus) {
-        ItemStatus.GRANTED -> "Atendido"
         ItemStatus.DELIVERED -> "Entregue"
-        ItemStatus.OPEN -> "Pendente"
+        ItemStatus.PENDING -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
-        ItemStatus.IN_PRODUCTION -> "Em Produção"
-        ItemStatus.COMPLETED -> "Finalizado"
     }
 
     Card(
@@ -538,17 +502,12 @@ private fun OrderControlItem(
     modifier: Modifier = Modifier
 ) {
     val (containerColor, contentColor) = when (item.status) {
-        ItemStatus.GRANTED -> Pair(
-            ComandaAiColors.Yellow500.value,
-            ComandaAiColors.OnSurface.value
-        )
-
         ItemStatus.DELIVERED -> Pair(
             ComandaAiColors.Green500.value,
             ComandaAiColors.OnSurface.value
         )
 
-        ItemStatus.OPEN -> Pair(
+        ItemStatus.PENDING -> Pair(
             ComandaAiColors.Yellow500.value,
             ComandaAiColors.OnSurface.value
         )
@@ -557,25 +516,12 @@ private fun OrderControlItem(
             ComandaAiColors.Error.value,
             ComandaAiColors.OnError.value
         )
-
-        ItemStatus.IN_PRODUCTION -> Pair(
-            ComandaAiColors.Blue500.value,
-            ComandaAiColors.OnSurface.value
-        )
-
-        ItemStatus.COMPLETED -> Pair(
-            ComandaAiColors.Green500.value,
-            ComandaAiColors.OnSurface.value
-        )
     }
 
     val statusText = when (item.status) {
-        ItemStatus.GRANTED -> "Atendido"
         ItemStatus.DELIVERED -> "Entregue"
-        ItemStatus.OPEN -> "Pendente"
+        ItemStatus.PENDING -> "Pendente"
         ItemStatus.CANCELED -> "Cancelado"
-        ItemStatus.IN_PRODUCTION -> "Em Produção"
-        ItemStatus.COMPLETED -> "Finalizado"
     }
 
     Card(
@@ -634,8 +580,8 @@ private fun StatusSelectionModal(
     onDismiss: () -> Unit,
     onStatusSelected: (ItemStatus) -> Unit
 ) {
-    // Filtra os status disponíveis excluindo o status atual e GRANTED
-    val availableStatuses = ItemStatus.values().filter { it != item.status && it != ItemStatus.GRANTED }
+    // Filtra os status disponíveis excluindo o status atual
+    val availableStatuses = ItemStatus.values().filter { it != item.status }
 
     Box(
         modifier = Modifier
@@ -671,12 +617,9 @@ private fun StatusSelectionModal(
                 )
 
                 val currentStatusText = when (item.status) {
-                    ItemStatus.GRANTED -> "Atendido"
                     ItemStatus.DELIVERED -> "Entregue"
-                    ItemStatus.OPEN -> "Pendente"
+                    ItemStatus.PENDING -> "Pendente"
                     ItemStatus.CANCELED -> "Cancelado"
-                    ItemStatus.IN_PRODUCTION -> "Em Produção"
-                    ItemStatus.COMPLETED -> "Finalizado"
                 }
 
                 Text(
@@ -699,11 +642,8 @@ private fun StatusSelectionModal(
                 availableStatuses.forEach { status ->
                     val statusText = when (status) {
                         ItemStatus.DELIVERED -> "Entregue"
-                        ItemStatus.OPEN -> "Pendente"
+                        ItemStatus.PENDING -> "Pendente"
                         ItemStatus.CANCELED -> "Cancelado"
-                        ItemStatus.IN_PRODUCTION -> "Em Produção"
-                        ItemStatus.COMPLETED -> "Finalizado"
-                        else -> ""
                     }
 
                     val (bgColor, textColor) = when (status) {
@@ -712,23 +652,13 @@ private fun StatusSelectionModal(
                             ComandaAiColors.OnSurface.value
                         )
 
-                        ItemStatus.OPEN -> Pair(
+                        ItemStatus.PENDING -> Pair(
                             ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
                             ComandaAiColors.OnSurface.value
                         )
 
                         ItemStatus.CANCELED -> Pair(
                             ComandaAiColors.Error.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
-                        )
-
-                        ItemStatus.IN_PRODUCTION -> Pair(
-                            ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
-                        )
-
-                        ItemStatus.COMPLETED -> Pair(
-                            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
                             ComandaAiColors.OnSurface.value
                         )
                         
@@ -786,8 +716,8 @@ private fun IndividualItemStatusModal(
     onDismiss: () -> Unit,
     onStatusSelected: (ItemStatus) -> Unit
 ) {
-    // Filtra os status disponíveis excluindo o status atual individual e GRANTED
-    val availableStatuses = ItemStatus.values().filter { it != currentIndividualStatus && it != ItemStatus.GRANTED }
+    // Filtra os status disponíveis excluindo o status atual individual
+    val availableStatuses = ItemStatus.values().filter { it != currentIndividualStatus }
 
     Box(
         modifier = Modifier
@@ -823,12 +753,9 @@ private fun IndividualItemStatusModal(
                 )
 
                 val currentStatusText = when (currentIndividualStatus) {
-                    ItemStatus.GRANTED -> "Atendido"
                     ItemStatus.DELIVERED -> "Entregue"
-                    ItemStatus.OPEN -> "Pendente"
+                    ItemStatus.PENDING -> "Pendente"
                     ItemStatus.CANCELED -> "Cancelado"
-                    ItemStatus.IN_PRODUCTION -> "Em Produção"
-                    ItemStatus.COMPLETED -> "Finalizado"
                 }
 
                 Text(
@@ -851,11 +778,8 @@ private fun IndividualItemStatusModal(
                 availableStatuses.forEach { status ->
                     val statusText = when (status) {
                         ItemStatus.DELIVERED -> "Entregue"
-                        ItemStatus.OPEN -> "Pendente"
+                        ItemStatus.PENDING -> "Pendente"
                         ItemStatus.CANCELED -> "Cancelado"
-                        ItemStatus.IN_PRODUCTION -> "Em Produção"
-                        ItemStatus.COMPLETED -> "Finalizado"
-                        else -> ""
                     }
 
                     val (bgColor, textColor) = when (status) {
@@ -864,23 +788,13 @@ private fun IndividualItemStatusModal(
                             ComandaAiColors.OnSurface.value
                         )
 
-                        ItemStatus.OPEN -> Pair(
+                        ItemStatus.PENDING -> Pair(
                             ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
                             ComandaAiColors.OnSurface.value
                         )
 
                         ItemStatus.CANCELED -> Pair(
                             ComandaAiColors.Error.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
-                        )
-
-                        ItemStatus.IN_PRODUCTION -> Pair(
-                            ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
-                        )
-
-                        ItemStatus.COMPLETED -> Pair(
-                            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
                             ComandaAiColors.OnSurface.value
                         )
                         
@@ -932,11 +846,8 @@ private fun IndividualItemStatusModal(
 
 private fun getNextStatus(currentStatus: ItemStatus): ItemStatus {
     return when (currentStatus) {
-        ItemStatus.OPEN -> ItemStatus.DELIVERED
-        ItemStatus.DELIVERED -> ItemStatus.OPEN
-        ItemStatus.GRANTED -> ItemStatus.DELIVERED
-        ItemStatus.CANCELED -> ItemStatus.OPEN
-        ItemStatus.IN_PRODUCTION -> ItemStatus.COMPLETED
-        ItemStatus.COMPLETED -> ItemStatus.DELIVERED
+        ItemStatus.PENDING -> ItemStatus.DELIVERED
+        ItemStatus.DELIVERED -> ItemStatus.PENDING
+        ItemStatus.CANCELED -> ItemStatus.PENDING
     }
 }

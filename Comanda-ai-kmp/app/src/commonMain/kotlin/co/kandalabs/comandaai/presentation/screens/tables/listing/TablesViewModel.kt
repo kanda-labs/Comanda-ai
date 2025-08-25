@@ -2,6 +2,7 @@ package co.kandalabs.comandaai.presentation.screens.tables.listing
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import co.kandalabs.comandaai.core.session.LogoutManager
 import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.domain.repository.TablesRepository
 import kotlinx.collections.immutable.toPersistentList
@@ -38,9 +39,8 @@ internal class TablesViewModel(
     }
     
     fun logout() {
-        screenModelScope.launch {
-            sessionManager.logout()
-        }
+        // Use LogoutManager to prevent "Parent job is Completed" errors
+        LogoutManager.performLogout(sessionManager)
     }
     
     suspend fun getUserSession() = sessionManager.getSession()

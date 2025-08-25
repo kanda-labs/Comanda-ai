@@ -2,6 +2,8 @@ package co.kandalabs.comandaai.kitchen.data.api
 
 import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
+import co.kandalabs.comandaai.network.HttpClientFactory
+import co.kandalabs.comandaai.network.HttpClientType
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -22,16 +24,19 @@ interface KitchenApi {
 }
 
 class KitchenApiImpl(
-    private val httpClient: HttpClient,
     private val baseUrl: String
 ) : KitchenApi {
     
     override suspend fun getActiveOrders(): List<KitchenOrder> {
-        return httpClient.get("$baseUrl/api/v1/kitchen/orders").body()
+        return HttpClientFactory.withSafeHttpClient(HttpClientType.API) { httpClient ->
+            httpClient.get("$baseUrl/api/v1/kitchen/orders").body()
+        }
     }
     
     override suspend fun getDeliveredOrders(): List<KitchenOrder> {
-        return httpClient.get("$baseUrl/api/v1/kitchen/orders/delivered").body()
+        return HttpClientFactory.withSafeHttpClient(HttpClientType.API) { httpClient ->
+            httpClient.get("$baseUrl/api/v1/kitchen/orders/delivered").body()
+        }
     }
     
     override suspend fun updateItemUnitStatus(
@@ -40,18 +45,24 @@ class KitchenApiImpl(
         unitIndex: Int,
         status: ItemStatus
     ) {
-        httpClient.put("$baseUrl/api/v1/kitchen/orders/$orderId/items/$itemId/unit/$unitIndex") {
-            contentType(ContentType.Application.Json)
-            setBody(UpdateItemStatusRequest(status.name))
+        HttpClientFactory.withSafeHttpClient(HttpClientType.API) { httpClient ->
+            httpClient.put("$baseUrl/api/v1/kitchen/orders/$orderId/items/$itemId/unit/$unitIndex") {
+                contentType(ContentType.Application.Json)
+                setBody(UpdateItemStatusRequest(status.name))
+            }
         }
     }
     
     override suspend fun markOrderAsDelivered(orderId: Int) {
-        httpClient.put("$baseUrl/api/v1/kitchen/orders/$orderId/deliver")
+        HttpClientFactory.withSafeHttpClient(HttpClientType.API) { httpClient ->
+            httpClient.put("$baseUrl/api/v1/kitchen/orders/$orderId/deliver")
+        }
     }
     
     override suspend fun markItemAsDelivered(orderId: Int, itemId: Int) {
-        httpClient.put("$baseUrl/api/v1/kitchen/orders/$orderId/items/$itemId/deliver")
+        HttpClientFactory.withSafeHttpClient(HttpClientType.API) { httpClient ->
+            httpClient.put("$baseUrl/api/v1/kitchen/orders/$orderId/items/$itemId/deliver")
+        }
     }
 }
 

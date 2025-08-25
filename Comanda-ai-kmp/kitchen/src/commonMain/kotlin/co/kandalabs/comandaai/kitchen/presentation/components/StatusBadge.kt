@@ -28,27 +28,12 @@ fun StatusBadge(
     onClick: () -> Unit = {}
 ) {
     val (backgroundColor, textColor, icon) = when (status) {
-        ItemStatus.OPEN -> Triple(
+        ItemStatus.PENDING -> Triple(
             MaterialTheme.colorScheme.error.copy(alpha = 0.15f),
             MaterialTheme.colorScheme.error,
             Icons.Default.Schedule
         )
-        ItemStatus.IN_PRODUCTION -> Triple(
-            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
-            MaterialTheme.colorScheme.tertiary,
-            Icons.Default.PlayArrow
-        )
-        ItemStatus.COMPLETED -> Triple(
-            MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f),
-            MaterialTheme.colorScheme.secondary,
-            Icons.Default.Done
-        )
         ItemStatus.DELIVERED -> Triple(
-            androidx.compose.ui.graphics.Color(0xFF4CAF50).copy(alpha = 0.15f),
-            androidx.compose.ui.graphics.Color(0xFF4CAF50),
-            Icons.Default.CheckCircle
-        )
-        ItemStatus.GRANTED -> Triple(
             androidx.compose.ui.graphics.Color(0xFF4CAF50).copy(alpha = 0.15f),
             androidx.compose.ui.graphics.Color(0xFF4CAF50),
             Icons.Default.CheckCircle
@@ -107,11 +92,8 @@ fun StatusBadge(
 
 private fun getStatusText(status: ItemStatus): String {
     return when (status) {
-        ItemStatus.OPEN -> "Pendente"
-        ItemStatus.IN_PRODUCTION -> "Produzindo"
-        ItemStatus.COMPLETED -> "Pronto"
+        ItemStatus.PENDING -> "Pendente"
         ItemStatus.DELIVERED -> "Entregue"
-        ItemStatus.GRANTED -> "Concluído"
         ItemStatus.CANCELED -> "Cancelado"
     }
 }

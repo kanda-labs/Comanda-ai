@@ -14,5 +14,5 @@ data class OrderResponse(
     val createdAt: LocalDateTime
 )
 
-enum class OrderStatus { GRANTED, OPEN, CANCELED }
+enum class OrderStatus { PENDING, DELIVERED, CANCELED }
 

@@ -66,12 +66,15 @@ class OrderRepositoryImpl(
                     val status = if (statusRow != null) {
                         ItemStatus.valueOf(statusRow[orderItemStatusTable.status])
                     } else {
-                        ItemStatus.OPEN // Default status
+                        ItemStatus.PENDING // Default status
                     }
                     
                     individualStatuses["${itemId}_${unitIndex}"] = status
                 }
             }
+            
+            // Calculate overall order status based on individual item statuses
+            val orderStatus = calculateOrderStatus(individualStatuses.values.toList())
             
             OrderWithStatusesResponse(
                 id = order.id,
@@ -79,7 +82,7 @@ class OrderRepositoryImpl(
                 tableNumber = order.tableNumber,
                 userName = order.userName,
                 items = order.items,
-                status = order.status,
+                status = orderStatus,
                 createdAt = order.createdAt,
                 individualStatuses = individualStatuses
             )
@@ -99,7 +102,7 @@ class OrderRepositoryImpl(
         return transaction {
             runCatching {
                 val orderId = orderTable.insert {
-                    it[status] = OrderStatus.OPEN.name
+                    it[status] = OrderStatus.PENDING.name
                     it[tableId] = createOrderRequest.tableId
                     it[billId] = createOrderRequest.billId
                     it[userName] = createOrderRequest.userName
@@ -112,7 +115,7 @@ class OrderRepositoryImpl(
                         it[OrderItemTable.name] = item.name
                         it[OrderItemTable.itemId] = item.itemId
                         it[OrderItemTable.count] = item.count
-                        it[OrderItemTable.status] = ItemStatus.OPEN.name
+                        it[OrderItemTable.status] = ItemStatus.PENDING.name
                         it[OrderItemTable.observation] = item.observation
                     }
                 }
@@ -245,7 +248,7 @@ class OrderRepositoryImpl(
             val orders = transaction {
                 // Get all orders except those with GRANTED status
                 orderTable.selectAll()
-                    .where { orderTable.status neq OrderStatus.GRANTED.name }
+                    .where { orderTable.status neq OrderStatus.DELIVERED.name }
                     .map { orderRow ->
                         val orderId = orderRow[OrderTable.id]
                         val orderUserName = orderRow[OrderTable.userName]
@@ -293,7 +296,7 @@ class OrderRepositoryImpl(
                                         // Create default status if not exists
                                         ItemUnitStatus(
                                             unitIndex = unitIndex,
-                                            status = ItemStatus.OPEN,
+                                            status = ItemStatus.PENDING,
                                             updatedAt = localDateTimeAsLong(),
                                             updatedBy = null
                                         )
@@ -351,7 +354,7 @@ class OrderRepositoryImpl(
                 // Get orders from today that are not GRANTED status
                 orderTable.selectAll()
                     .where { 
-                        (orderTable.status neq OrderStatus.GRANTED.name) and
+                        (orderTable.status neq OrderStatus.DELIVERED.name) and
                         (orderTable.createdAt greaterEq startOfDay) and
                         (orderTable.createdAt lessEq endOfDay)
                     }
@@ -402,7 +405,7 @@ class OrderRepositoryImpl(
                                         // Create default status if not exists
                                         ItemUnitStatus(
                                             unitIndex = unitIndex,
-                                            status = ItemStatus.OPEN,
+                                            status = ItemStatus.PENDING,
                                             updatedAt = localDateTimeAsLong(),
                                             updatedBy = null
                                         )
@@ -680,10 +683,20 @@ class OrderRepositoryImpl(
         return when {
             unitStatuses.all { it == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
             unitStatuses.all { it == ItemStatus.CANCELED } -> ItemStatus.CANCELED
-            unitStatuses.all { it == ItemStatus.COMPLETED } -> ItemStatus.COMPLETED
-            unitStatuses.any { it == ItemStatus.IN_PRODUCTION } -> ItemStatus.IN_PRODUCTION
-            unitStatuses.any { it == ItemStatus.OPEN } -> ItemStatus.OPEN
-            else -> ItemStatus.OPEN
+            unitStatuses.any { it == ItemStatus.PENDING } -> ItemStatus.PENDING
+            else -> ItemStatus.PENDING
+        }
+    }
+    
+    /**
+     * Calculate overall order status based on all item statuses
+     */
+    private fun calculateOrderStatus(individualStatuses: List<ItemStatus>): OrderStatus {
+        return when {
+            individualStatuses.isEmpty() -> OrderStatus.PENDING
+            individualStatuses.all { it == ItemStatus.DELIVERED } -> OrderStatus.DELIVERED
+            individualStatuses.all { it == ItemStatus.CANCELED } -> OrderStatus.PENDING // Order remains pending if all canceled
+            else -> OrderStatus.PENDING
         }
     }
     
@@ -707,6 +720,28 @@ class OrderRepositoryImpl(
                 { (OrderItemTable.orderId eq orderId) and (OrderItemTable.itemId eq itemId) }
             ) {
                 it[OrderItemTable.status] = overallStatus.name
+            }
+            
+            // Check if we need to update the overall order status
+            updateOverallOrderStatus(orderId)
+        }
+    }
+    
+    /**
+     * Update overall order status based on all item statuses
+     */
+    private fun updateOverallOrderStatus(orderId: Int) {
+        // Get all individual item unit statuses for this order
+        val allItemStatuses = orderItemStatusTable.selectAll()
+            .where { orderItemStatusTable.orderId eq orderId }
+            .map { ItemStatus.valueOf(it[orderItemStatusTable.status]) }
+        
+        if (allItemStatuses.isNotEmpty()) {
+            val orderStatus = calculateOrderStatus(allItemStatuses)
+            
+            // Update order status
+            orderTable.update({ orderTable.id eq orderId }) {
+                it[status] = orderStatus.name
             }
         }
     }

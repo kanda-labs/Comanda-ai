@@ -1,13 +1,9 @@
 package co.kandalabs.comandaai.core.cache
 
-import io.ktor.client.HttpClient
-
 /**
  * Implementation of CacheManager for clearing application cache
  */
-class CacheManagerImpl(
-    private val httpClient: HttpClient
-) : CacheManager {
+class CacheManagerImpl : CacheManager {
     
     private val inMemoryCallbacks = mutableListOf<suspend () -> Unit>()
     private val repositories = mutableListOf<CacheableRepository>()
@@ -18,13 +14,9 @@ class CacheManagerImpl(
     }
     
     override suspend fun clearHttpCache() {
-        try {
-            // Close and recreate HTTP client to clear any internal cache
-            httpClient.close()
-        } catch (e: Exception) {
-            // HTTP client might already be closed, ignore error
-            println("CacheManager - HTTP client already closed or error: ${e.message}")
-        }
+        // HttpClient cache clearing is now handled by HttpClientFactory
+        // Each new request gets a fresh client, so no manual cache clearing needed
+        println("CacheManager - HTTP cache cleared via HttpClientFactory fresh clients")
     }
     
     override suspend fun clearInMemoryCache() {

@@ -137,7 +137,7 @@ class BillRepositoryImpl(
                                 val status = if (statusRow != null) {
                                     ItemStatus.valueOf(statusRow[orderItemStatusTable.status])
                                 } else {
-                                    ItemStatus.OPEN // Default status
+                                    ItemStatus.PENDING // Default status
                                 }
                                 
                                 if (status != ItemStatus.CANCELED) {
@@ -171,8 +171,8 @@ class BillRepositoryImpl(
                             orderTotalInCentavos = orderTotalInCentavos,
                             orderTotalFormatted = formatCurrency(orderTotalInCentavos),
                             status = when (orderStatus) {
-                                OrderStatus.GRANTED -> PaymentOrderStatus("Atendido", "#4CAF50")
-                                OrderStatus.OPEN -> PaymentOrderStatus("Pendente", "#2196F3")
+                                OrderStatus.DELIVERED -> PaymentOrderStatus("Entregue", "#4CAF50")
+                                OrderStatus.PENDING -> PaymentOrderStatus("Pendente", "#2196F3")
                                 OrderStatus.CANCELED -> PaymentOrderStatus("Cancelado", "#F44336")
                             }
                         )
@@ -259,7 +259,7 @@ class BillRepositoryImpl(
 
                 orders.forEach { orderId ->
                     orderTable.update({ orderTable.id eq orderId }) {
-                        it[status] = OrderStatus.GRANTED.name
+                        it[status] = OrderStatus.DELIVERED.name
                     }
                 }
 

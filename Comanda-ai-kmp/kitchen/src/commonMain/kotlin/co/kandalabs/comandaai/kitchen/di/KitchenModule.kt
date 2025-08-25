@@ -17,14 +17,12 @@ object KitchenDIModule {
         
         bindSingleton<KitchenApi> {
             KitchenApiImpl(
-                httpClient = instance(),
                 baseUrl = NetworkConfig.currentBaseUrl
             )
         }
         
         bindSingleton<KitchenSSEClient> {
             KitchenSSEClient(
-                httpClient = instance(),
                 json = instance(),
                 baseUrl = NetworkConfig.currentBaseUrl,
                 logger = instance()

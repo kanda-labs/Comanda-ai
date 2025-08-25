@@ -17,6 +17,8 @@ object DatabaseMigrations {
         logger.info { "Running database migrations..." }
         
         migration001_AddUserNameToOrders()
+        migration002_UpdateItemStatusesToSimplified()
+        migration003_UpdateOrderStatusesToSimplified()
         
         logger.info { "All database migrations completed successfully" }
     }
@@ -41,6 +43,84 @@ object DatabaseMigrations {
                     logger.error(migrationError) { "Failed to add user_name column: ${migrationError.message}" }
                     throw migrationError
                 }
+            }
+        }
+    }
+    
+    /**
+     * Migration 002: Update ItemStatus values to simplified system
+     * OPEN -> PENDING, GRANTED/IN_PRODUCTION/COMPLETED -> DELIVERED
+     */
+    private fun migration002_UpdateItemStatusesToSimplified() {
+        logger.info { "Running migration 002: Update ItemStatus values to simplified system" }
+        
+        transaction {
+            try {
+                // Update order_items table
+                val orderItemsUpdated = exec("""
+                    UPDATE order_items 
+                    SET status = CASE 
+                        WHEN status = 'OPEN' THEN 'PENDING'
+                        WHEN status IN ('GRANTED', 'IN_PRODUCTION', 'COMPLETED') THEN 'DELIVERED'
+                        ELSE status
+                    END
+                    WHERE status IN ('OPEN', 'GRANTED', 'IN_PRODUCTION', 'COMPLETED')
+                """) { rs ->
+                    var count = 0
+                    while (rs.next()) count++
+                    count
+                }
+                
+                // Update order_item_statuses table
+                val orderItemStatusesUpdated = exec("""
+                    UPDATE order_item_statuses 
+                    SET status = CASE 
+                        WHEN status = 'OPEN' THEN 'PENDING'
+                        WHEN status IN ('GRANTED', 'IN_PRODUCTION', 'COMPLETED') THEN 'DELIVERED'
+                        ELSE status
+                    END
+                    WHERE status IN ('OPEN', 'GRANTED', 'IN_PRODUCTION', 'COMPLETED')
+                """) { rs ->
+                    var count = 0
+                    while (rs.next()) count++
+                    count
+                }
+                
+                logger.info { "Updated ItemStatus values in order_items and order_item_statuses tables" }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to update ItemStatus values: ${e.message}" }
+                throw e
+            }
+        }
+    }
+    
+    /**
+     * Migration 003: Update OrderStatus values to simplified system  
+     * OPEN -> PENDING, GRANTED -> DELIVERED
+     */
+    private fun migration003_UpdateOrderStatusesToSimplified() {
+        logger.info { "Running migration 003: Update OrderStatus values to simplified system" }
+        
+        transaction {
+            try {
+                val ordersUpdated = exec("""
+                    UPDATE orders 
+                    SET status = CASE 
+                        WHEN status = 'OPEN' THEN 'PENDING'
+                        WHEN status = 'GRANTED' THEN 'DELIVERED'
+                        ELSE status
+                    END
+                    WHERE status IN ('OPEN', 'GRANTED')
+                """) { rs ->
+                    var count = 0
+                    while (rs.next()) count++
+                    count
+                }
+                
+                logger.info { "Updated OrderStatus values in orders table" }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to update OrderStatus values: ${e.message}" }
+                throw e
             }
         }
     }

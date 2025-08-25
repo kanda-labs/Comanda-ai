@@ -72,18 +72,18 @@ OPEN → [Pagar conta] → PAID
 
 ### Definition: `OrderStatus`
 ```kotlin
-enum class OrderStatus { GRANTED, OPEN, CANCELED }
+enum class OrderStatus { PENDING, DELIVERED, CANCELED }
 ```
 
 | Status | Descrição | Quando Usar |
 |--------|-----------|-------------|
-| `OPEN` | Pedido criado, aguardando processamento | Pedido recém-criado |
-| `GRANTED` | Pedido confirmado/aceito | Pedido aceito pela cozinha |
-| `CANCELED` | Pedido cancelado | Pedido cancelado antes da produção |
+| `PENDING` | Pedido criado, aguardando processamento | Pedido recém-criado |
+| `DELIVERED` | Pedido entregue/finalizado | Pedido completamente entregue |
+| `CANCELED` | Pedido cancelado | Pedido cancelado antes da entrega |
 
 ### Status Flow
 ```
-OPEN → [Aceitar pedido] → GRANTED
+PENDING → [Entregar pedido] → DELIVERED
   ↓
   → [Cancelar pedido] → CANCELED
 ```
@@ -95,37 +95,24 @@ OPEN → [Aceitar pedido] → GRANTED
 ### Definition: `ItemStatus`
 ```kotlin
 enum class ItemStatus { 
-    GRANTED,       // Concluído (mantém compatibilidade)
-    OPEN,          // Pendente (mantém compatibilidade)  
-    CANCELED,      // Cancelado (mantém compatibilidade)
-    IN_PRODUCTION, // Em produção (novo)
-    COMPLETED,     // Finalizado (novo)
-    DELIVERED      // Entregue (novo)
+    PENDING,       // Pendente - item aguardando processamento
+    DELIVERED,     // Entregue - item finalizado e entregue ao cliente
+    CANCELED       // Cancelado - item cancelado
 }
 ```
 
-### Legacy Status (Compatibilidade)
-| Status | Descrição | Status Atual Equivalente |
-|--------|-----------|-------------------------|
-| `OPEN` | Item pendente | Similar a PENDING |
-| `GRANTED` | Item concluído | Similar a COMPLETED |
-| `CANCELED` | Item cancelado | Mantém mesmo significado |
-
-### New Status (Sistema Atual)
+### Simplified Status System
 | Status | Display Name | Descrição | Cor | Quando Usar |
 |--------|-------------|-----------|-----|-------------|
-| `OPEN` | Pendente | Item aguardando processamento | 🔴 Vermelho | Item recém-criado |
-| `IN_PRODUCTION` | Em Produção | Item sendo preparado | 🟡 Amarelo | Item sendo feito na cozinha |
-| `COMPLETED` | Pronto | Item finalizado, aguardando entrega | 🟢 Verde | Item pronto para servir |
-| `DELIVERED` | Entregue | Item entregue ao cliente | 🔵 Azul | Item servido na mesa |
+| `PENDING` | Pendente | Item aguardando processamento/entrega | 🔴 Vermelho | Item recém-criado ou em preparo |
+| `DELIVERED` | Entregue | Item entregue ao cliente | 🟢 Verde | Item servido na mesa |
 | `CANCELED` | Cancelado | Item cancelado | ⚫ Cinza | Item cancelado pelo cliente/cozinha |
-| `GRANTED` | Concluído | Item finalizado (legacy) | 🟢 Verde | Compatibilidade com versões antigas |
 
-### Kitchen Status Flow (Novo Sistema)
+### Simplified Status Flow
 ```
-OPEN → [Iniciar preparo] → IN_PRODUCTION → [Finalizar] → COMPLETED → [Entregar] → DELIVERED
-  ↓                           ↓                           ↓
-  → [Cancelar] → CANCELED ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ←
+PENDING → [Entregar] → DELIVERED
+  ↓
+  → [Cancelar] → CANCELED
 ```
 
 ### Unit Status Tracking
@@ -145,13 +132,13 @@ O sistema suporta controle granular de status por unidade individual:
     },
     {
       "unitIndex": 1,
-      "status": "COMPLETED",
+      "status": "DELIVERED",
       "updatedAt": 1642248060000,
       "updatedBy": "kitchen-user"
     },
     {
       "unitIndex": 2,
-      "status": "IN_PRODUCTION",
+      "status": "PENDING",
       "updatedAt": 1642248120000,
       "updatedBy": "kitchen-user"
     }
@@ -166,12 +153,9 @@ O sistema suporta controle granular de status por unidade individual:
 ### Kitchen Screen Colors
 ```kotlin
 val statusColors = mapOf(
-    ItemStatus.OPEN to Color.Red,           // 🔴 Pendente
-    ItemStatus.IN_PRODUCTION to Color.Yellow, // 🟡 Em Produção  
-    ItemStatus.COMPLETED to Color.Green,    // 🟢 Pronto
-    ItemStatus.DELIVERED to Color.Blue,     // 🔵 Entregue
-    ItemStatus.CANCELED to Color.Gray,      // ⚫ Cancelado
-    ItemStatus.GRANTED to Color.Green       // 🟢 Concluído (Legacy)
+    ItemStatus.PENDING to Color.Red,        // 🔴 Pendente
+    ItemStatus.DELIVERED to Color.Green,    // 🟢 Entregue
+    ItemStatus.CANCELED to Color.Gray       // ⚫ Cancelado
 )
 ```
 

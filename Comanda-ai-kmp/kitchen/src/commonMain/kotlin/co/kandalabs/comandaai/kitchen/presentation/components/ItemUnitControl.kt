@@ -17,9 +17,9 @@ fun ItemUnitControl(
 ) {
     OutlinedButton(
         onClick = {
-            // Toggle between OPEN and DELIVERED
+            // Toggle between PENDING and DELIVERED
             val newStatus = if (currentStatus == ItemStatus.DELIVERED) {
-                ItemStatus.OPEN
+                ItemStatus.PENDING
             } else {
                 ItemStatus.DELIVERED
             }
@@ -57,22 +57,16 @@ private fun StatusIndicator(status: ItemStatus) {
 @Composable
 private fun getStatusColor(status: ItemStatus): androidx.compose.ui.graphics.Color {
     return when (status) {
-        ItemStatus.OPEN -> MaterialTheme.colorScheme.error
-        ItemStatus.IN_PRODUCTION -> MaterialTheme.colorScheme.primary
-        ItemStatus.COMPLETED -> MaterialTheme.colorScheme.secondary
+        ItemStatus.PENDING -> MaterialTheme.colorScheme.error
         ItemStatus.DELIVERED -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
-        ItemStatus.GRANTED -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
         ItemStatus.CANCELED -> androidx.compose.ui.graphics.Color(0xFF757575)
     }
 }
 
 private fun getStatusText(status: ItemStatus): String {
     return when (status) {
-        ItemStatus.OPEN -> "Pendente"
-        ItemStatus.IN_PRODUCTION -> "Produzindo"
-        ItemStatus.COMPLETED -> "Pronto"
+        ItemStatus.PENDING -> "Pendente"
         ItemStatus.DELIVERED -> "Entregue"
-        ItemStatus.GRANTED -> "Concluído"
         ItemStatus.CANCELED -> "Cancelado"
     }
 }

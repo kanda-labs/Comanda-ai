@@ -220,8 +220,8 @@ O sistema possui controle abrangente de status para todos os entities principais
 ### Status Types Overview
 - **🍽️ Table Status**: `FREE` → `OCCUPIED` → `ON_PAYMENT` (3 states)
 - **💰 Bill Status**: `OPEN` → `PAID/CANCELED/SCAM` (4 states)  
-- **📝 Order Status**: `OPEN` → `GRANTED/CANCELED` (3 states)
-- **🍳 Item Status**: `OPEN` → `IN_PRODUCTION` → `COMPLETED` → `DELIVERED` (6 states)
+- **📝 Order Status**: `PENDING` → `DELIVERED/CANCELED` (3 states)
+- **🍳 Item Status**: `PENDING` → `DELIVERED/CANCELED` (3 states)
 
 ### Key Features
 - ✅ **Granular Control**: Status individual por unidade de item

@@ -91,7 +91,7 @@ fun ItemRow(
                     } else {
                         // Toggle status between OPEN and DELIVERED for single item
                         val newStatus = if (item.overallStatus == ItemStatus.DELIVERED) {
-                            ItemStatus.OPEN
+                            ItemStatus.PENDING
                         } else {
                             ItemStatus.DELIVERED
                         }
@@ -161,7 +161,7 @@ fun ItemRow(
                                 FilledTonalButton(
                                     onClick = { 
                                         // Revert first item status to OPEN to move order back to active
-                                        onStatusChange(0, ItemStatus.OPEN)
+                                        onStatusChange(0, ItemStatus.PENDING)
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = ButtonDefaults.filledTonalButtonColors(

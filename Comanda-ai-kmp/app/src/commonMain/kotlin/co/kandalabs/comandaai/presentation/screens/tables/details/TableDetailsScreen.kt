@@ -243,7 +243,7 @@ private fun TableDetailsScreenPreview() {
                                 tableNumber = 1,
                                 userName = "usuario-teste",
                                 items = emptyList(),
-                                status = OrderStatus.OPEN,
+                                status = OrderStatus.PENDING,
                                 createdAt = LocalDateTime(2025, 1, 28, 20, 0, 0),
                             )
                         )

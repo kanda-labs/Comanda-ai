@@ -251,9 +251,8 @@ class OrderControlViewModel(
                             val generalStatus = when {
                                 allIndividualStatuses.all { it == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
                                 allIndividualStatuses.all { it == ItemStatus.CANCELED } -> ItemStatus.CANCELED
-                                allIndividualStatuses.all { it == ItemStatus.OPEN } -> ItemStatus.OPEN
-                                allIndividualStatuses.any { it == ItemStatus.DELIVERED } -> ItemStatus.GRANTED
-                                else -> ItemStatus.OPEN
+                                allIndividualStatuses.any { it == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
+                                else -> ItemStatus.PENDING
                             }
                             
                             orderItem.copy(status = generalStatus)
@@ -415,7 +414,7 @@ class OrderControlViewModel(
                 
                 val finalOrder = if (allItemsDelivered) {
                     // Se todos os itens estão entregues, marcar o pedido como atendido
-                    val orderToUpdate = updatedOrder.copy(status = OrderStatus.GRANTED)
+                    val orderToUpdate = updatedOrder.copy(status = OrderStatus.DELIVERED)
                     
                     // Fazer chamada para o backend para persistir a mudança
                     try {
@@ -475,7 +474,7 @@ class OrderControlViewModel(
                 
                 val finalOrder = if (allIndividualsDelivered) {
                     // Se todos os itens individuais estão entregues, marcar o pedido como atendido
-                    val orderToUpdate = updatedOrder.copy(status = OrderStatus.GRANTED)
+                    val orderToUpdate = updatedOrder.copy(status = OrderStatus.DELIVERED)
                     
                     // Fazer chamada para o backend para persistir a mudança
                     try {

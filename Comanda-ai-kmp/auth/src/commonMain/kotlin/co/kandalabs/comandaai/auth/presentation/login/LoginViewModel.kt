@@ -2,16 +2,15 @@ package co.kandalabs.comandaai.auth.presentation.login
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import co.kandalabs.comandaai.auth.data.LoginRequest
-import co.kandalabs.comandaai.auth.domain.AuthRepository
+import co.kandalabs.comandaai.network.NetworkConfig
 import co.kandalabs.comandaai.auth.navigation.AuthNavigationCallback
+import co.kandalabs.comandaai.core.auth.AuthManager
 import co.kandalabs.comandaai.core.enums.UserRole
 import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.core.session.UserSession
 import kotlinx.coroutines.launch
 
 internal class LoginViewModel(
-    private val authRepository: AuthRepository,
     private val sessionManager: SessionManager
 ) : StateScreenModel<LoginScreenState>(LoginScreenState()) {
 
@@ -46,12 +45,12 @@ internal class LoginViewModel(
             mutableState.emit(state.value.copy(isLoading = true, error = null))
 
             try {
-                val loginRequest = LoginRequest(
+                // Use AuthManager to prevent "Parent job is Completed" errors
+                val response = AuthManager.performLogin(
                     username = state.value.username,
-                    password = state.value.password
+                    password = state.value.password,
+                    baseUrl = NetworkConfig.currentBaseUrl.removeSuffix("/") + "/api/v1"
                 )
-                
-                val response = authRepository.login(loginRequest)
                 
                 val session = UserSession(
                     userId = response.id,
