@@ -7,7 +7,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 ```
 comanda-ai/
 ├── CommanderAPI/        # Backend REST API (Kotlin/Ktor)
-└── Comanda-ai-kmp/     # Mobile app (Kotlin Multiplatform)
+├── Comanda-ai-kmp/     # Mobile app (Kotlin Multiplatform)
+│   ├── app/            # Main mobile application
+│   ├── auth/           # Authentication module
+│   ├── kitchen/        # Kitchen management module (NEW)
+│   ├── core/           # Shared core utilities
+│   ├── designsystem/   # UI components and theming
+│   ├── domain/         # Domain models
+│   └── network/        # Network configuration module (NEW)
+└── claude/             # Documentation and guidance files
 ```
 
 ## 🚀 Quick Start
@@ -38,6 +46,20 @@ cd Comanda-ai-kmp
 ./gradlew cleanAll               # Clean all sub-projects
 ```
 
+### Environment Management (NEW)
+```bash
+# Production environment (port 8081)
+./start-production.sh            # Start production server
+
+# Debug environment (port 8082)
+./start-debug.sh                 # Start debug server
+./start-debug-with-prod-data.sh  # Start debug with production data copy
+
+# Database management
+./manage-databases.sh            # Interactive database management
+./copy-prod-to-debug.sh         # Copy production data to debug environment
+```
+
 ## 🏛️ Architecture
 
 ### CommanderAPI (Backend)
@@ -66,11 +88,14 @@ kandalabs.commander/
 ```
 ├── app/            # Main app (MVVM implementation)
 ├── auth/           # Authentication module (Login, Registration)
+├── kitchen/        # Kitchen management module (Order control, Real-time updates)
 ├── core/           # Utilities, error handling
-└── designsystem/   # UI components, theming
+├── designsystem/   # UI components, theming
+├── domain/         # Shared domain models
+└── network/        # Centralized network configuration
 ```
 
-**Key Screens:** LoginScreen, TablesScreen, TableDetailsScreen, ItemsScreen, OrderScreen
+**Key Screens:** LoginScreen, TablesScreen, TableDetailsScreen, ItemsScreen, OrderScreen, KitchenScreen
 
 ## 🛠️ Development Guidelines
 
@@ -88,6 +113,7 @@ kandalabs.commander/
 - Ktor Client + Ktorfit for API communication
 - SQLDelight for local persistence
 - Kodein for dependency injection
+- **Network Module**: Centralized IP/port configuration for all environments
 
 ### Testing
 - **Backend:** JUnit 5 + MockK, separate test config
@@ -161,10 +187,23 @@ The system comes with these pre-configured menu items:
 ### Environment Variables (Backend)
 | Variable | Default | Description |
 |----------|---------|-------------|
-| PORT | 8081 | Server port |
+| PORT | 8081/8082 | Server port (prod/debug) |
 | HOST | 0.0.0.0 | Server host |
-| DATABASE_URL | jdbc:sqlite:data.db | Database connection |
+| DATABASE_URL | data.db/data-debug.db | Database connection |
+| ENVIRONMENT | production/debug | Environment type |
 | LOG_LEVEL | INFO | Logging level |
+
+### Network Configuration (Mobile)
+**Single configuration point in `network` module:**
+- **Production**: `192.168.0.161:8081` (Release builds)
+- **Debug**: `192.168.0.161:8082` (Debug builds)
+- **Change IP**: Update only `/network/build.gradle.kts` (Android) and `/network/src/iosMain/kotlin/.../NetworkConfig.kt` (iOS)
+
+### Build Variants
+| Build Type | App ID | Server Port | Database |
+|------------|--------|-------------|----------|
+| **Release** | `co.kandalabs.comandaai` | 8081 | `data.db` |
+| **Debug** | `co.kandalabs.comandaai.debug` | 8082 | `data-debug.db` |
 
 ### Requirements
 - **Backend:** JDK 22+
@@ -174,12 +213,39 @@ The system comes with these pre-configured menu items:
 ## 📊 Database Schema
 SQLite with tables: Users, Tables, Items, Orders, Bills (see `SQLTableObjects.kt`)
 
+## 🚦 Status Management System (NEW)
+
+O sistema possui controle abrangente de status para todos os entities principais:
+
+### Status Types Overview
+- **🍽️ Table Status**: `FREE` → `OCCUPIED` → `ON_PAYMENT` (3 states)
+- **💰 Bill Status**: `OPEN` → `PAID/CANCELED/SCAM` (4 states)  
+- **📝 Order Status**: `OPEN` → `GRANTED/CANCELED` (3 states)
+- **🍳 Item Status**: `OPEN` → `IN_PRODUCTION` → `COMPLETED` → `DELIVERED` (6 states)
+
+### Key Features
+- ✅ **Granular Control**: Status individual por unidade de item
+- ✅ **Real-time Updates**: Atualizações automáticas via SSE
+- ✅ **Visual Indicators**: Cores específicas por status na UI
+- ✅ **Legacy Compatibility**: Suporte a status antigos durante migração
+- ✅ **Business Rules**: Regras de transição de estado bem definidas
+
+### Status Documentation
+Consulte `STATUS_DEFINITIONS.md` para documentação completa de:
+- Definições detalhadas de cada status
+- Fluxos de transição de estado
+- Mapping entre frontend/backend  
+- Cores e indicadores visuais
+- Regras de negócio por entity
+- Guia de migração legacy → novo sistema
+
 ## 🔗 Key Files
 - **Backend API:** `CommanderApi.kt`
 - **Database:** `DatabaseConfig.kt`, `SQLTableObjects.kt`
 - **Mobile DI:** Check DI modules for base URL configuration
 - **Platform Code:** `androidMain/`, `iosMain/`, `commonMain/`
 - **API Documentation:** `API_ENDPOINTS.md`
+- **Status Definitions:** `STATUS_DEFINITIONS.md` (NEW)
 
 ## 🍽️ Table Status Management
 
@@ -290,6 +356,62 @@ auth {
 - **auth/presentation/login/LoginViewModel.kt**: Login business logic
 - **auth/presentation/login/LoginScreenState.kt**: UI state management
 
+## 🍳 Kitchen Module (NEW)
+
+The app now includes a dedicated kitchen module for order management and real-time kitchen operations.
+
+### Kitchen Module Structure
+```
+kitchen/
+├── build.gradle.kts
+└── src/
+    └── commonMain/kotlin/co/kandalabs/comandaai/kitchen/
+        ├── KitchenModule.kt              # Public API
+        ├── data/                         # Data layer
+        │   └── api/KitchenSSEClient.kt   # Real-time order updates
+        ├── di/KitchenModule.kt           # Dependency injection
+        ├── domain/                       # Domain models
+        └── presentation/
+            ├── KitchenScreen.kt          # Main kitchen interface
+            ├── KitchenViewModel.kt       # Business logic
+            ├── KitchenScreenState.kt     # UI state
+            └── components/               # Kitchen-specific components
+```
+
+### Kitchen Screen Features
+- ✅ **Real-time Order Updates**: SSE connection for live order status
+- ✅ **Order Control**: View and manage active orders
+- ✅ **Item Status Management**: Mark items as prepared, delivered, etc.
+- ✅ **Order Filtering**: Toggle between active and delivered orders
+- ✅ **Connection Status**: Visual indicator for SSE connection
+- ✅ **User Profile**: Avatar with logout functionality
+- ✅ **Order Overview**: Summary view with category filtering
+- ✅ **Delivered Order Tracking**: Complete order lifecycle management
+
+### Kitchen Module Integration
+```kotlin
+// Access kitchen functionality
+import co.kandalabs.comandaai.kitchen.KitchenModule
+
+// Get kitchen screen
+val kitchenScreen = KitchenModule.getKitchenScreen()
+
+// DI module
+val kitchenDI = KitchenModule.kitchenDI
+```
+
+### Kitchen API Endpoints
+- `GET /api/v1/kitchen/orders` - Get all kitchen orders with real-time updates
+- `PUT /api/v1/kitchen/orders/{id}/items/{itemId}` - Update item status
+- `PUT /api/v1/kitchen/orders/{id}/delivered` - Mark order as delivered
+- `GET /api/v1/kitchen/events` - SSE endpoint for real-time updates
+
+### Key Kitchen Files
+- **kitchen/KitchenModule.kt**: Public API for kitchen integration
+- **kitchen/presentation/KitchenScreen.kt**: Main kitchen management interface
+- **kitchen/presentation/KitchenViewModel.kt**: Kitchen business logic
+- **kitchen/data/api/KitchenSSEClient.kt**: Real-time order updates via SSE
+
 ## 📱 Order Details Modal
 
 The table details screen includes an interactive order details modal for viewing order items and their status.
@@ -328,4 +450,99 @@ state.selectedOrderForDetails?.let { order ->
         onDismiss = { viewModel.hideOrderDetails() }
     )
 }
+```
+
+## 🌐 Network Module (NEW)
+
+Centralized network configuration module that manages all API endpoints and environment settings.
+
+### Network Configuration Features
+- ✅ **Single IP Configuration**: Change IP in one place for entire app
+- ✅ **Environment Separation**: Automatic production/debug URL selection
+- ✅ **Build-Type Aware**: Different URLs for release vs debug builds
+- ✅ **Type-Safe URLs**: Utility functions for building endpoints
+- ✅ **Modular**: Independent module used by all other modules
+
+### Network Module Structure
+```
+network/
+├── build.gradle.kts                    # Android build config with IP
+└── src/
+    ├── commonMain/kotlin/.../network/
+    │   └── NetworkConfig.kt            # Common network interface
+    ├── androidMain/kotlin/.../network/
+    │   └── NetworkConfig.kt            # Android implementation
+    └── iosMain/kotlin/.../network/
+        └── NetworkConfig.kt            # iOS implementation  
+```
+
+### How to Change IP Address
+**Android**: Edit `/network/build.gradle.kts`
+```kotlin
+buildConfigField("String", "BASE_IP", "\"YOUR_IP_HERE\"")
+```
+
+**iOS**: Edit `/network/src/iosMain/kotlin/.../NetworkConfig.kt`  
+```kotlin
+actual val baseIp: String = "YOUR_IP_HERE"
+```
+
+### Network Usage in Modules
+```kotlin
+import co.kandalabs.comandaai.network.NetworkConfig
+import co.kandalabs.comandaai.network.NetworkUtils
+import co.kandalabs.comandaai.network.NetworkEnvironment
+
+// Current environment URL (based on build type)
+val currentUrl = NetworkConfig.currentBaseUrl
+
+// Build API endpoints
+val loginUrl = NetworkUtils.buildApiUrl(
+    environment = NetworkEnvironment.PRODUCTION,
+    endpoint = "auth/login"
+)
+
+// Build SSE endpoints
+val sseUrl = NetworkUtils.buildSseUrl(
+    environment = NetworkEnvironment.DEBUG,
+    endpoint = "orders/sse"
+)
+```
+
+### Migrated Modules
+- ✅ **app**: Uses NetworkConfig.currentBaseUrl
+- ✅ **auth**: Uses NetworkUtils for URL building  
+- ✅ **kitchen**: Uses NetworkConfig for all connections
+- ✅ **network**: Centralizes all configuration
+
+## 🔄 Environment Separation (NEW)
+
+The project now supports complete environment separation for safe development.
+
+### Environment Overview
+| Environment | Server Port | Database | App ID Suffix | Use Case |
+|-------------|-------------|----------|---------------|----------|
+| **PRODUCTION** | 8081 | `data.db` | none | Live restaurant operations |
+| **DEBUG** | 8082 | `data-debug.db` | `.debug` | Development & testing |
+
+### Benefits
+- ✅ **Safe Development**: Debug environment completely isolated from production
+- ✅ **Dual Installation**: Both apps can run simultaneously on same device
+- ✅ **Data Protection**: Production data remains untouched during development
+- ✅ **Flexible Testing**: Copy production data to debug for realistic testing
+- ✅ **Automatic Configuration**: Build system handles environment selection
+
+### Quick Environment Setup
+```bash
+# Start production server
+./start-production.sh
+
+# Start debug server (separate terminal)
+./start-debug.sh
+
+# Or start debug with production data copy
+./start-debug-with-prod-data.sh
+
+# Manage databases interactively
+./manage-databases.sh
 ```
