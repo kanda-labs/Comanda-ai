@@ -336,6 +336,115 @@ class OrderRepositoryImpl(
             Result.failure(e)
         }
     }
+    
+    override suspend fun getOrdersWithDeliveredItems(): Result<List<KitchenOrder>> {
+        logger.debug { "Fetching orders with delivered items for kitchen (today only)" }
+        return try {
+            val orders = transaction {
+                // Calculate start and end of today in milliseconds (with timezone adjustment)
+                val now = System.currentTimeMillis()
+                val timezoneOffset = java.util.TimeZone.getDefault().rawOffset
+                val localNow = now + timezoneOffset
+                val startOfDay = localNow - (localNow % (24 * 60 * 60 * 1000)) - timezoneOffset // Start of today in local time
+                val endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1 // End of today
+                
+                // Get orders from today that are not GRANTED status
+                orderTable.selectAll()
+                    .where { 
+                        (orderTable.status neq OrderStatus.GRANTED.name) and
+                        (orderTable.createdAt greaterEq startOfDay) and
+                        (orderTable.createdAt lessEq endOfDay)
+                    }
+                    .map { orderRow ->
+                        val orderId = orderRow[OrderTable.id]
+                        val orderUserName = orderRow[OrderTable.userName]
+                        
+                        // Get user name from UserTable
+                        val actualUserName = userTable.selectAll()
+                            .where { userTable.userName eq orderUserName }
+                            .singleOrNull()
+                            ?.get(userTable.name) ?: orderUserName // fallback to userName if user not found
+
+                        val items = OrderItemTable.selectAll()
+                            .where { OrderItemTable.orderId eq orderId }
+                            .map { itemRow ->
+                                val itemId = itemRow[OrderItemTable.itemId]
+                                val totalCount = itemRow[OrderItemTable.count]
+                                val itemName = itemRow[OrderItemTable.name]
+                                val observation = itemRow[OrderItemTable.observation]
+                                
+                                // Get item category from ItemTable
+                                val itemCategory = ItemTable.selectAll()
+                                    .where { ItemTable.id eq itemId }
+                                    .singleOrNull()
+                                    ?.get(ItemTable.category)
+                                    ?.let { ItemCategory.valueOf(it) }
+                                    ?: ItemCategory.DRINK // default fallback
+                                
+                                // Get unit statuses from OrderItemStatusTable
+                                val unitStatuses = (0 until totalCount).map { unitIndex ->
+                                    val statusRow = orderItemStatusTable.selectAll()
+                                        .where { 
+                                            (orderItemStatusTable.orderId eq orderId) and 
+                                            (orderItemStatusTable.itemId eq itemId) and 
+                                            (orderItemStatusTable.unitIndex eq unitIndex)
+                                        }
+                                        .singleOrNull()
+                                    
+                                    if (statusRow != null) {
+                                        ItemUnitStatus(
+                                            unitIndex = unitIndex,
+                                            status = ItemStatus.valueOf(statusRow[orderItemStatusTable.status]),
+                                            updatedAt = statusRow[orderItemStatusTable.updatedAt],
+                                            updatedBy = statusRow[orderItemStatusTable.updatedBy]
+                                        )
+                                    } else {
+                                        // Create default status if not exists
+                                        ItemUnitStatus(
+                                            unitIndex = unitIndex,
+                                            status = ItemStatus.OPEN,
+                                            updatedAt = localDateTimeAsLong(),
+                                            updatedBy = null
+                                        )
+                                    }
+                                }
+                                
+                                val overallStatus = calculateOverallStatus(unitStatuses.map { it.status })
+                                
+                                KitchenItemDetail(
+                                    itemId = itemId,
+                                    name = itemName,
+                                    totalCount = totalCount,
+                                    observation = observation,
+                                    unitStatuses = unitStatuses,
+                                    overallStatus = overallStatus,
+                                    category = itemCategory
+                                )
+                            }
+                        
+                        KitchenOrder(
+                            id = orderId,
+                            tableNumber = orderRow[OrderTable.tableId],
+                            userName = actualUserName,
+                            items = items,
+                            createdAt = orderRow[OrderTable.createdAt]
+                        )
+                    }
+                    .filter { order ->
+                        // Only include orders that have all items delivered
+                        order.items.isNotEmpty() && order.items.all { item ->
+                            item.unitStatuses.all { status ->
+                                status.status == ItemStatus.DELIVERED
+                            }
+                        }
+                    }
+            }
+            Result.success(orders)
+        } catch (e: Exception) {
+            logger.error(e) { "Error fetching orders with delivered items" }
+            Result.failure(e)
+        }
+    }
 
     override suspend fun updateItemUnitStatus(
         orderId: Int,

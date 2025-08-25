@@ -5,6 +5,7 @@ import kandalabs.commander.domain.model.KitchenOrder
 
 interface KitchenService {
     suspend fun getActiveOrdersForKitchen(): Result<List<KitchenOrder>>
+    suspend fun getDeliveredOrdersForKitchen(): Result<List<KitchenOrder>>
     suspend fun updateItemUnitStatus(
         orderId: Int,
         itemId: Int,

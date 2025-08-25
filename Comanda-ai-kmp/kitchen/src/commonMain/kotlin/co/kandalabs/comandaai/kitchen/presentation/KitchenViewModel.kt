@@ -56,7 +56,7 @@ class KitchenViewModel(
                 .onSuccess { orders ->
                     _state.update { 
                         it.copy(
-                            orders = orders,
+                            activeOrders = orders,
                             isLoading = false
                         )
                     }
@@ -73,8 +73,57 @@ class KitchenViewModel(
     }
     
     /**
+     * Load delivered orders from the repository.
+     */
+    fun loadDeliveredOrders() {
+        _state.update { it.copy(isLoading = true, error = null) }
+        
+        screenModelScope.launch {
+            repository.getDeliveredOrders()
+                .onSuccess { orders ->
+                    _state.update { 
+                        it.copy(
+                            deliveredOrders = orders,
+                            isLoading = false
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _state.update { 
+                        it.copy(
+                            error = error.message,
+                            isLoading = false
+                        )
+                    }
+                }
+        }
+    }
+    
+    /**
+     * Switch between active and delivered orders filter.
+     */
+    fun switchOrderFilter(filter: OrderFilter) {
+        _state.update { it.copy(currentFilter = filter) }
+        
+        // Load appropriate orders based on filter
+        when (filter) {
+            OrderFilter.ACTIVE -> {
+                if (_state.value.activeOrders.isEmpty()) {
+                    loadActiveOrders()
+                }
+            }
+            OrderFilter.DELIVERED -> {
+                if (_state.value.deliveredOrders.isEmpty()) {
+                    loadDeliveredOrders()
+                }
+            }
+        }
+    }
+    
+    /**
      * Update the status of a specific unit of an item in an order.
      * Uses optimistic updates for better UX.
+     * Handles moving orders between active and delivered lists.
      */
     fun updateItemStatus(
         orderId: Int,
@@ -86,10 +135,16 @@ class KitchenViewModel(
         val currentState = _state.value
         
         // OPTIMISTIC UPDATE: Update UI immediately
-        val optimisticOrders = updateOrdersOptimistically(
-            currentState.orders, orderId, itemId, unitIndex, newStatus
+        val (updatedActiveOrders, updatedDeliveredOrders) = updateOrdersOptimisticallyWithFilter(
+            currentState.activeOrders, currentState.deliveredOrders, orderId, itemId, unitIndex, newStatus
         )
-        _state.update { it.copy(orders = optimisticOrders) }
+        
+        _state.update { 
+            it.copy(
+                activeOrders = updatedActiveOrders,
+                deliveredOrders = updatedDeliveredOrders
+            )
+        }
         
         // Make API call
         screenModelScope.launch {
@@ -100,23 +155,44 @@ class KitchenViewModel(
                 }
                 .onFailure { error ->
                     // ROLLBACK: Revert to previous state on error
-                    _state.update { currentState.copy(error = error.message) }
+                    _state.update { 
+                        currentState.copy(error = error.message) 
+                    }
                 }
         }
     }
     
     /**
      * Mark an entire order as delivered.
-     * Removes the order from the active orders list.
+     * Moves the order from active to delivered list.
      */
     fun markOrderAsDelivered(orderId: Int) {
         screenModelScope.launch {
             repository.markOrderAsDelivered(orderId)
                 .onSuccess {
-                    // Remover pedido do estado local em vez de recarregar tudo
+                    // Move order from active to delivered list
                     _state.update { currentState ->
-                        val updatedOrders = currentState.orders.filter { it.id != orderId }
-                        currentState.copy(orders = updatedOrders)
+                        val orderToMove = currentState.activeOrders.find { it.id == orderId }
+                        if (orderToMove != null) {
+                            // Mark all items as delivered
+                            val deliveredOrder = orderToMove.copy(
+                                items = orderToMove.items.map { item ->
+                                    item.copy(
+                                        overallStatus = ItemStatus.DELIVERED,
+                                        unitStatuses = item.unitStatuses.map { unit ->
+                                            unit.copy(status = ItemStatus.DELIVERED)
+                                        }
+                                    )
+                                }
+                            )
+                            
+                            currentState.copy(
+                                activeOrders = currentState.activeOrders.filter { it.id != orderId },
+                                deliveredOrders = currentState.deliveredOrders + deliveredOrder
+                            )
+                        } else {
+                            currentState
+                        }
                     }
                 }
                 .onFailure { error ->
@@ -128,16 +204,23 @@ class KitchenViewModel(
     /**
      * Mark all units of a specific item as delivered.
      * Uses optimistic updates for better UX.
+     * Handles moving orders between active and delivered lists.
      */
     fun markItemAsDelivered(orderId: Int, itemId: Int) {
         // Store current state for rollback
         val currentState = _state.value
         
         // OPTIMISTIC UPDATE: Update UI immediately
-        val optimisticOrders = markItemAsDeliveredOptimistically(
-            currentState.orders, orderId, itemId
+        val (updatedActiveOrders, updatedDeliveredOrders) = markItemAsDeliveredOptimisticallyWithFilter(
+            currentState.activeOrders, currentState.deliveredOrders, orderId, itemId
         )
-        _state.update { it.copy(orders = optimisticOrders) }
+        
+        _state.update { 
+            it.copy(
+                activeOrders = updatedActiveOrders,
+                deliveredOrders = updatedDeliveredOrders
+            )
+        }
         
         // Make API call
         screenModelScope.launch {
@@ -167,23 +250,47 @@ class KitchenViewModel(
                 reconnectSSE()
             }
             
-            repository.getActiveOrders()
-                .onSuccess { orders ->
-                    _state.update { 
-                        it.copy(
-                            orders = orders,
-                            isRefreshing = false
-                        )
-                    }
+            // Refresh based on current filter
+            when (_state.value.currentFilter) {
+                OrderFilter.ACTIVE -> {
+                    repository.getActiveOrders()
+                        .onSuccess { orders ->
+                            _state.update { 
+                                it.copy(
+                                    activeOrders = orders,
+                                    isRefreshing = false
+                                )
+                            }
+                        }
+                        .onFailure { error ->
+                            _state.update { 
+                                it.copy(
+                                    error = error.message,
+                                    isRefreshing = false
+                                )
+                            }
+                        }
                 }
-                .onFailure { error ->
-                    _state.update { 
-                        it.copy(
-                            error = error.message,
-                            isRefreshing = false
-                        )
-                    }
+                OrderFilter.DELIVERED -> {
+                    repository.getDeliveredOrders()
+                        .onSuccess { orders ->
+                            _state.update { 
+                                it.copy(
+                                    deliveredOrders = orders,
+                                    isRefreshing = false
+                                )
+                            }
+                        }
+                        .onFailure { error ->
+                            _state.update { 
+                                it.copy(
+                                    error = error.message,
+                                    isRefreshing = false
+                                )
+                            }
+                        }
                 }
+            }
         }
     }
     
@@ -248,7 +355,7 @@ class KitchenViewModel(
                         is KitchenEvent.OrdersUpdate -> {
                             _state.update { 
                                 it.copy(
-                                    orders = event.orders,
+                                    activeOrders = event.orders,
                                     isLoading = false,
                                     isRefreshing = false,
                                     isConnected = true
@@ -384,5 +491,223 @@ class KitchenViewModel(
             unitStatuses.all { it.status == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
             else -> ItemStatus.OPEN
         }
+    }
+    
+    /**
+     * Apply optimistic updates to orders with filter support.
+     * Handles moving orders between active and delivered lists.
+     */
+    private fun updateOrdersOptimisticallyWithFilter(
+        activeOrders: List<KitchenOrder>,
+        deliveredOrders: List<KitchenOrder>,
+        orderId: Int,
+        itemId: Int,
+        unitIndex: Int,
+        newStatus: ItemStatus
+    ): Pair<List<KitchenOrder>, List<KitchenOrder>> {
+        
+        // Find order in active list first
+        val orderInActive = activeOrders.find { it.id == orderId }
+        if (orderInActive != null) {
+            return updateOrderInActiveList(activeOrders, deliveredOrders, orderId, itemId, unitIndex, newStatus)
+        }
+        
+        // If not found in active, look in delivered list
+        val orderInDelivered = deliveredOrders.find { it.id == orderId }
+        if (orderInDelivered != null) {
+            return updateOrderInDeliveredList(activeOrders, deliveredOrders, orderId, itemId, unitIndex, newStatus)
+        }
+        
+        // Order not found in either list, return unchanged
+        return Pair(activeOrders, deliveredOrders)
+    }
+    
+    /**
+     * Update an order in the active list, potentially moving it to delivered.
+     */
+    private fun updateOrderInActiveList(
+        activeOrders: List<KitchenOrder>,
+        deliveredOrders: List<KitchenOrder>,
+        orderId: Int,
+        itemId: Int,
+        unitIndex: Int,
+        newStatus: ItemStatus
+    ): Pair<List<KitchenOrder>, List<KitchenOrder>> {
+        var updatedActiveOrders = activeOrders
+        var updatedDeliveredOrders = deliveredOrders
+        
+        updatedActiveOrders = activeOrders.mapNotNull { order ->
+            if (order.id == orderId) {
+                val updatedItems = order.items.map { item ->
+                    if (item.itemId == itemId) {
+                        val updatedUnitStatuses =
+                            item.unitStatuses.mapIndexed { index, unitStatus ->
+                                if (index == unitIndex) {
+                                    unitStatus.copy(status = newStatus)
+                                } else {
+                                    unitStatus
+                                }
+                            }
+
+                        // Calculate new overall status
+                        val newOverallStatus = calculateOverallStatus(updatedUnitStatuses)
+
+                        item.copy(
+                            unitStatuses = updatedUnitStatuses,
+                            overallStatus = newOverallStatus
+                        )
+                    } else {
+                        item
+                    }
+                }
+
+                // Check if all items are delivered and move order if so
+                val allItemsDelivered = updatedItems.all { item ->
+                    item.unitStatuses.all { it.status == ItemStatus.DELIVERED }
+                }
+
+                if (allItemsDelivered) {
+                    // Move to delivered list
+                    val deliveredOrder = order.copy(items = updatedItems)
+                    updatedDeliveredOrders = updatedDeliveredOrders + deliveredOrder
+                    null // Will be filtered out from active
+                } else {
+                    order.copy(items = updatedItems)
+                }
+            } else {
+                order
+            }
+        }
+        
+        return Pair(updatedActiveOrders, updatedDeliveredOrders)
+    }
+    
+    /**
+     * Update an order in the delivered list, potentially moving it back to active.
+     */
+    private fun updateOrderInDeliveredList(
+        activeOrders: List<KitchenOrder>,
+        deliveredOrders: List<KitchenOrder>,
+        orderId: Int,
+        itemId: Int,
+        unitIndex: Int,
+        newStatus: ItemStatus
+    ): Pair<List<KitchenOrder>, List<KitchenOrder>> {
+        var updatedActiveOrders = activeOrders
+        var updatedDeliveredOrders = deliveredOrders
+        
+        updatedDeliveredOrders = deliveredOrders.mapNotNull { order ->
+            if (order.id == orderId) {
+                val updatedItems = order.items.map { item ->
+                    if (item.itemId == itemId) {
+                        val updatedUnitStatuses =
+                            item.unitStatuses.mapIndexed { index, unitStatus ->
+                                if (index == unitIndex) {
+                                    unitStatus.copy(status = newStatus)
+                                } else {
+                                    unitStatus
+                                }
+                            }
+
+                        // Calculate new overall status
+                        val newOverallStatus = calculateOverallStatus(updatedUnitStatuses)
+
+                        item.copy(
+                            unitStatuses = updatedUnitStatuses,
+                            overallStatus = newOverallStatus
+                        )
+                    } else {
+                        item
+                    }
+                }
+
+                // Check if any item is no longer delivered (revert to active)
+                val hasNonDeliveredItems = updatedItems.any { item ->
+                    item.unitStatuses.any { it.status != ItemStatus.DELIVERED }
+                }
+
+                if (hasNonDeliveredItems && newStatus != ItemStatus.DELIVERED) {
+                    // Move back to active list
+                    val activeOrder = order.copy(items = updatedItems)
+                    updatedActiveOrders = updatedActiveOrders + activeOrder
+                    null // Will be filtered out from delivered
+                } else {
+                    order.copy(items = updatedItems)
+                }
+            } else {
+                order
+            }
+        }
+        
+        return Pair(updatedActiveOrders, updatedDeliveredOrders)
+    }
+    
+    /**
+     * Mark all units of an item as delivered with filter support.
+     */
+    private fun markItemAsDeliveredOptimisticallyWithFilter(
+        activeOrders: List<KitchenOrder>,
+        deliveredOrders: List<KitchenOrder>,
+        orderId: Int,
+        itemId: Int
+    ): Pair<List<KitchenOrder>, List<KitchenOrder>> {
+        
+        // Find order in active list first
+        val orderInActive = activeOrders.find { it.id == orderId }
+        if (orderInActive != null) {
+            return markItemAsDeliveredInActiveList(activeOrders, deliveredOrders, orderId, itemId)
+        }
+        
+        // If not found in active, return unchanged
+        return Pair(activeOrders, deliveredOrders)
+    }
+    
+    /**
+     * Mark item as delivered in active list, potentially moving order to delivered.
+     */
+    private fun markItemAsDeliveredInActiveList(
+        activeOrders: List<KitchenOrder>,
+        deliveredOrders: List<KitchenOrder>,
+        orderId: Int,
+        itemId: Int
+    ): Pair<List<KitchenOrder>, List<KitchenOrder>> {
+        var updatedActiveOrders = activeOrders
+        var updatedDeliveredOrders = deliveredOrders
+        
+        updatedActiveOrders = activeOrders.mapNotNull { order ->
+            if (order.id == orderId) {
+                val updatedItems = order.items.map { item ->
+                    if (item.itemId == itemId) {
+                        val updatedUnitStatuses = item.unitStatuses.map { unitStatus ->
+                            unitStatus.copy(status = ItemStatus.DELIVERED)
+                        }
+                        item.copy(
+                            unitStatuses = updatedUnitStatuses,
+                            overallStatus = ItemStatus.DELIVERED
+                        )
+                    } else {
+                        item
+                    }
+                }
+
+                // Check if all items are delivered and move order if so
+                val allItemsDelivered = updatedItems.all { item ->
+                    item.unitStatuses.all { it.status == ItemStatus.DELIVERED }
+                }
+
+                if (allItemsDelivered) {
+                    // Move to delivered list
+                    val deliveredOrder = order.copy(items = updatedItems)
+                    updatedDeliveredOrders = updatedDeliveredOrders + deliveredOrder
+                    null // Will be filtered out from active
+                } else {
+                    order.copy(items = updatedItems)
+                }
+            } else {
+                order
+            }
+        }
+        
+        return Pair(updatedActiveOrders, updatedDeliveredOrders)
     }
 }

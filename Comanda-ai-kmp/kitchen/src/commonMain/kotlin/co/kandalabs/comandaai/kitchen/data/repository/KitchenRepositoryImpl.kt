@@ -22,6 +22,15 @@ class KitchenRepositoryImpl(
         }
     }
     
+    override suspend fun getDeliveredOrders(): Result<List<KitchenOrder>> {
+        return try {
+            val orders = kitchenApi.getDeliveredOrders()
+            Result.success(orders)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     override suspend fun updateItemUnitStatus(
         orderId: Int,
         itemId: Int,

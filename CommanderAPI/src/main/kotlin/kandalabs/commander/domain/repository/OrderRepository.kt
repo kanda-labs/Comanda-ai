@@ -24,6 +24,7 @@ interface OrderRepository {
     
     // Kitchen-specific methods
     suspend fun getOrdersWithIncompleteItems(): Result<List<KitchenOrder>>
+    suspend fun getOrdersWithDeliveredItems(): Result<List<KitchenOrder>>
     suspend fun updateItemUnitStatus(
         orderId: Int,
         itemId: Int,

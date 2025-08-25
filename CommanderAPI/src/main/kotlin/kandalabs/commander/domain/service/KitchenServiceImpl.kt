@@ -12,6 +12,10 @@ class KitchenServiceImpl(
         return orderRepository.getOrdersWithIncompleteItems()
     }
     
+    override suspend fun getDeliveredOrdersForKitchen(): Result<List<KitchenOrder>> {
+        return orderRepository.getOrdersWithDeliveredItems()
+    }
+    
     override suspend fun updateItemUnitStatus(
         orderId: Int,
         itemId: Int,

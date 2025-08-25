@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 
 interface KitchenApi {
     suspend fun getActiveOrders(): List<KitchenOrder>
+    suspend fun getDeliveredOrders(): List<KitchenOrder>
     suspend fun updateItemUnitStatus(
         orderId: Int,
         itemId: Int,
@@ -27,6 +28,10 @@ class KitchenApiImpl(
     
     override suspend fun getActiveOrders(): List<KitchenOrder> {
         return httpClient.get("$baseUrl/api/v1/kitchen/orders").body()
+    }
+    
+    override suspend fun getDeliveredOrders(): List<KitchenOrder> {
+        return httpClient.get("$baseUrl/api/v1/kitchen/orders/delivered").body()
     }
     
     override suspend fun updateItemUnitStatus(

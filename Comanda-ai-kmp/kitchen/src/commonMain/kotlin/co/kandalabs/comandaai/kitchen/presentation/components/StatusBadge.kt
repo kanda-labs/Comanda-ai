@@ -24,6 +24,7 @@ fun StatusBadge(
     status: ItemStatus,
     count: Int,
     isMultipleItems: Boolean = false,
+    isDeliveredView: Boolean = false,
     onClick: () -> Unit = {}
 ) {
     val (backgroundColor, textColor, icon) = when (status) {

@@ -23,7 +23,8 @@ fun OrderCard(
     order: KitchenOrder,
     onItemStatusChange: (Int, Int, ItemStatus) -> Unit,
     onMarkAsDelivered: (Int) -> Unit,
-    onMarkItemAsDelivered: (Int, Int) -> Unit
+    onMarkItemAsDelivered: (Int, Int) -> Unit,
+    isDeliveredView: Boolean = false
 ) {
     val allDelivered = order.items.all { item ->
         item.unitStatuses.all { it.status == ItemStatus.DELIVERED }
@@ -61,7 +62,8 @@ fun OrderCard(
                         },
                         onMarkItemAsDelivered = { itemId ->
                             onMarkItemAsDelivered(order.id, itemId)
-                        }
+                        },
+                        isDeliveredView = isDeliveredView
                     )
                     
                     if (index < order.items.size - 1) {
@@ -74,7 +76,7 @@ fun OrderCard(
             }
             
             // Enhanced action button
-            if (!allDelivered) {
+            if (!isDeliveredView && !allDelivered) {
                 Spacer(modifier = Modifier.height(24.dp))
                 
                 Button(

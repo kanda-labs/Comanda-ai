@@ -44,6 +44,17 @@ fun Route.kitchenRoutes(kitchenService: KitchenService) {
                 }
         }
         
+        get("/orders/delivered") {
+            
+            kitchenService.getDeliveredOrdersForKitchen()
+                .onSuccess { orders ->
+                    call.respond(HttpStatusCode.OK, orders)
+                }
+                .onFailure { error ->
+                    call.respond(HttpStatusCode.InternalServerError, mapOf("error" to error.message))
+                }
+        }
+        
         put("/orders/{orderId}/items/{itemId}/unit/{unitIndex}") {
             val orderId = call.parameters["orderId"]?.toIntOrNull() 
                 ?: throw BadRequestException("Invalid orderId")

@@ -12,7 +12,8 @@ import co.kandalabs.comandaai.domain.ItemStatus
 fun ItemUnitControl(
     unitIndex: Int,
     currentStatus: ItemStatus,
-    onStatusChange: (ItemStatus) -> Unit
+    onStatusChange: (ItemStatus) -> Unit,
+    isDeliveredView: Boolean = false
 ) {
     OutlinedButton(
         onClick = {

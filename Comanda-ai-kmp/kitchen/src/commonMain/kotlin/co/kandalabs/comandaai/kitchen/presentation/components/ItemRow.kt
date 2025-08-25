@@ -30,7 +30,8 @@ import co.kandalabs.comandaai.kitchen.domain.model.KitchenItemDetail
 fun ItemRow(
     item: KitchenItemDetail,
     onStatusChange: (Int, ItemStatus) -> Unit,
-    onMarkItemAsDelivered: (Int) -> Unit
+    onMarkItemAsDelivered: (Int) -> Unit,
+    isDeliveredView: Boolean = false
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val hasUndeliveredItems = item.unitStatuses.any { it.status != ItemStatus.DELIVERED }
@@ -82,6 +83,7 @@ fun ItemRow(
                 status = item.overallStatus,
                 count = item.unitStatuses.count { it.status != ItemStatus.DELIVERED },
                 isMultipleItems = item.totalCount > 1,
+                isDeliveredView = isDeliveredView,
                 onClick = {
                     if (item.totalCount > 1) {
                         // Toggle accordion for multiple items
@@ -144,37 +146,70 @@ fun ItemRow(
                                     currentStatus = unitStatus.status,
                                     onStatusChange = { newStatus ->
                                         onStatusChange(index, newStatus)
-                                    }
+                                    },
+                                    isDeliveredView = isDeliveredView
                                 )
                             }
                         }
                         
                         // Quick action button for all items
-                        if (hasUndeliveredItems) {
+                        if ((!isDeliveredView && hasUndeliveredItems) || (isDeliveredView && !hasUndeliveredItems)) {
                             Spacer(modifier = Modifier.height(16.dp))
                             
-                            FilledTonalButton(
-                                onClick = { onMarkItemAsDelivered(item.itemId) },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                )
-                            ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                            if (isDeliveredView && !hasUndeliveredItems) {
+                                // In delivered view, show "Revert to Pending" button when all items are delivered
+                                FilledTonalButton(
+                                    onClick = { 
+                                        // Revert first item status to OPEN to move order back to active
+                                        onStatusChange(0, ItemStatus.OPEN)
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.filledTonalButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondary,
+                                        contentColor = MaterialTheme.colorScheme.onSecondary
+                                    )
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Schedule,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Text(
+                                            text = "Reverter para Pendente",
+                                            style = MaterialTheme.typography.labelLarge,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            } else {
+                                // Normal "Mark as Delivered" button
+                                FilledTonalButton(
+                                    onClick = { onMarkItemAsDelivered(item.itemId) },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.filledTonalButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
                                     )
-                                    Text(
-                                        text = "Marcar Todos como Entregues",
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
+                                ) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.CheckCircle,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Text(
+                                            text = "Marcar Todos como Entregues",
+                                            style = MaterialTheme.typography.labelLarge,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
                                 }
                             }
                         }

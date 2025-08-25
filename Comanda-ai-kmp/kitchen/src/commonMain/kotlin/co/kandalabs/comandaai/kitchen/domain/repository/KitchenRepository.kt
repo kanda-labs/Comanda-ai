@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 interface KitchenRepository {
     suspend fun getActiveOrders(): Result<List<KitchenOrder>>
     
+    suspend fun getDeliveredOrders(): Result<List<KitchenOrder>>
+    
     suspend fun updateItemUnitStatus(
         orderId: Int,
         itemId: Int,

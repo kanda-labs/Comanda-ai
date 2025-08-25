@@ -66,6 +66,7 @@ class KitchenScreen : Screen {
             onMarkAsDelivered = viewModel::markOrderAsDelivered,
             onMarkItemAsDelivered = viewModel::markItemAsDelivered,
             onErrorDismiss = viewModel::clearError,
+            onFilterChange = viewModel::switchOrderFilter,
             onUserAvatarClick = {
                 scope.launch {
                     userSession = viewModel.getUserSession()
@@ -95,6 +96,7 @@ private fun KitchenScreenContent(
     onMarkAsDelivered: (Int) -> Unit,
     onMarkItemAsDelivered: (Int, Int) -> Unit,
     onErrorDismiss: () -> Unit,
+    onFilterChange: (OrderFilter) -> Unit,
     onUserAvatarClick: () -> Unit,
     onDismissUserModal: () -> Unit,
     onLogout: () -> Unit
@@ -111,9 +113,18 @@ private fun KitchenScreenContent(
                             onClick = onUserAvatarClick
                         )
                         Column(modifier = Modifier.padding(start = 16.dp)) {
-                            Text("Pedidos ativos", style = MaterialTheme.typography.titleLarge)
+                            val titleText = when (state.currentFilter) {
+                                OrderFilter.ACTIVE -> "Pedidos ativos"
+                                OrderFilter.DELIVERED -> "Pedidos entregues"
+                            }
+                            val countText = when (state.currentFilter) {
+                                OrderFilter.ACTIVE -> "${state.activeOrders.size} pedidos ativos"
+                                OrderFilter.DELIVERED -> "${state.deliveredOrders.size} pedidos entregues"
+                            }
+                            
+                            Text(titleText, style = MaterialTheme.typography.titleLarge)
                             Text(
-                                "${state.orders.size} pedidos ativos",
+                                countText,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -166,6 +177,13 @@ private fun KitchenScreenContent(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
+            
+            // Order Filter Toggle
+            OrderFilterToggle(
+                currentFilter = state.currentFilter,
+                onFilterChange = onFilterChange,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
 
             // Erro
             state.error?.let { error ->
@@ -288,7 +306,8 @@ private fun OrderControlTab(
                             onItemStatusChange(order.id, itemId, unitIndex, status)
                         },
                         onMarkAsDelivered = onMarkAsDelivered,
-                        onMarkItemAsDelivered = onMarkItemAsDelivered
+                        onMarkItemAsDelivered = onMarkItemAsDelivered,
+                        isDeliveredView = state.currentFilter == OrderFilter.DELIVERED
                     )
                 }
             }
@@ -495,5 +514,75 @@ private fun ConnectionStatusBullet(
                 color = color
             ) {}
         }
+    }
+}
+
+@Composable
+private fun OrderFilterToggle(
+    currentFilter: OrderFilter,
+    onFilterChange: (OrderFilter) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(0.8f),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Active Orders Button
+                FilterButton(
+                    text = "Pendentes",
+                    isSelected = currentFilter == OrderFilter.ACTIVE,
+                    onClick = { onFilterChange(OrderFilter.ACTIVE) },
+                    modifier = Modifier.weight(1f)
+                )
+                
+                // Delivered Orders Button
+                FilterButton(
+                    text = "Entregues",
+                    isSelected = currentFilter == OrderFilter.DELIVERED,
+                    onClick = { onFilterChange(OrderFilter.DELIVERED) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterButton(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.clickable { onClick() },
+        shape = MaterialTheme.shapes.medium,
+        color = if (isSelected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            androidx.compose.ui.graphics.Color.Transparent
+        }
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(vertical = 12.dp),
+            style = MaterialTheme.typography.labelLarge,
+            color = if (isSelected) {
+                MaterialTheme.colorScheme.onPrimary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
+            textAlign = TextAlign.Center
+        )
     }
 }
