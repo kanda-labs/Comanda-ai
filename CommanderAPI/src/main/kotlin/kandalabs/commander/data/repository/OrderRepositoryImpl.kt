@@ -326,11 +326,16 @@ class OrderRepositoryImpl(
                     }
                     .filter { order ->
                         // Only include orders that have incomplete items
-                        order.items.any { item ->
+                        val hasIncompleteItems = order.items.any { item ->
                             item.unitStatuses.any { status ->
                                 status.status != ItemStatus.DELIVERED && status.status != ItemStatus.CANCELED
                             }
                         }
+                        // Debug log to understand filtering
+                        if (!hasIncompleteItems && order.items.isNotEmpty()) {
+                            println("Filtering out order ${order.id} - all items are complete")
+                        }
+                        hasIncompleteItems
                     }
             }
             Result.success(orders)
@@ -351,11 +356,11 @@ class OrderRepositoryImpl(
                 val startOfDay = localNow - (localNow % (24 * 60 * 60 * 1000)) - timezoneOffset // Start of today in local time
                 val endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1 // End of today
                 
-                // Get orders from today that are not GRANTED status
+                // Get orders from last 2 days (include DELIVERED orders for delivered items view)
+                val twoDaysAgo = startOfDay - (24 * 60 * 60 * 1000) // Include yesterday for testing
                 orderTable.selectAll()
                     .where { 
-                        (orderTable.status neq OrderStatus.DELIVERED.name) and
-                        (orderTable.createdAt greaterEq startOfDay) and
+                        (orderTable.createdAt greaterEq twoDaysAgo) and
                         (orderTable.createdAt lessEq endOfDay)
                     }
                     .map { orderRow ->
