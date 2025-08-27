@@ -2,6 +2,7 @@ package kandalabs.commander.domain.service
 
 import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.BillStatus
+import kandalabs.commander.domain.model.PartialPayment
 import kandalabs.commander.domain.model.PaymentSummaryResponse
 import kandalabs.commander.domain.repository.BillRepository
 
@@ -33,6 +34,14 @@ class BillService(private val billRepository: BillRepository) {
 
     suspend fun processTablePayment(tableId: Int): Boolean {
         return billRepository.processTablePayment(tableId)
+    }
+
+    suspend fun createPartialPayment(partialPayment: PartialPayment): PartialPayment {
+        return billRepository.createPartialPayment(partialPayment)
+    }
+
+    suspend fun getPartialPayments(tableId: Int): List<PartialPayment> {
+        return billRepository.getPartialPayments(tableId)
     }
 
     suspend fun deleteBill(id: Int): Boolean {

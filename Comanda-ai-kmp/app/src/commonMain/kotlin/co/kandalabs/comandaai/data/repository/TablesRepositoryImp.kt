@@ -10,8 +10,10 @@ import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
 import co.kandalabs.comandaai.domain.models.model.Bill
 import co.kandalabs.comandaai.domain.models.model.BillStatus
 import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.PartialPayment
 import co.kandalabs.comandaai.domain.models.model.Table
 import co.kandalabs.comandaai.domain.models.model.TableStatus
+import co.kandalabs.comandaai.domain.models.request.CreatePartialPaymentRequest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -114,6 +116,20 @@ internal class TablesRepositoryImp(
             commanderApi.processTablePayment(tableId)
         }.onFailure { error ->
             println("Error processing table payment: $error")
+        }
+    }
+
+    override suspend fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String?): ComandaAiResult<PartialPayment> {
+        return safeRunCatching {
+            val request = CreatePartialPaymentRequest(
+                paidBy = paidBy,
+                amountInCentavos = amountInCentavos,
+                description = description,
+                paymentMethod = null
+            )
+            commanderApi.createPartialPayment(tableId, request)
+        }.onFailure { error ->
+            println("Error creating partial payment: $error")
         }
     }
 }

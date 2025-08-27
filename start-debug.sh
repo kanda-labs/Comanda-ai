@@ -12,4 +12,4 @@ export PORT=8082
 export HOST="192.168.2.200"
 export DATABASE_URL="jdbc:sqlite:data-debug.db"
 
-./gradlew run --args="--port=8082 --host=192.168.2.200"
+  ./gradlew run --args="--port=8082 --host=192.168.2.200"

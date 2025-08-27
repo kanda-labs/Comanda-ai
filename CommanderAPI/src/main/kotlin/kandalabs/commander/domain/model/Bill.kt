@@ -13,4 +13,4 @@ data class Bill(
     val createdAt: LocalDateTime
 )
 
-enum class BillStatus { PAID, SCAM, OPEN, CANCELED }
+enum class BillStatus { PAID, PARTIALLY_PAID, SCAM, OPEN, CANCELED }

@@ -5,6 +5,7 @@ import co.kandalabs.comandaai.domain.models.model.Bill
 import co.kandalabs.comandaai.domain.Item
 import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.domain.models.model.PartialPayment
 import co.kandalabs.comandaai.domain.models.model.Table
 import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
 
@@ -18,4 +19,5 @@ interface TablesRepository {
     suspend fun getPaymentSummary(tableId: Int): ComandaAiResult<PaymentSummaryResponse>
     suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Long): ComandaAiResult<Unit>
     suspend fun processTablePayment(tableId: Int): ComandaAiResult<Unit>
+    suspend fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String? = null): ComandaAiResult<PartialPayment>
 }

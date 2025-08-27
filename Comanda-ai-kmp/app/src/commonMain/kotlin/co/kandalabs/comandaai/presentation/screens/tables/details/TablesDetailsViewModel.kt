@@ -131,4 +131,46 @@ internal class TablesDetailsViewModel(
             }
         }
     }
+
+    fun showPartialPaymentDialog() {
+        screenModelScope.launch {
+            mutableState.emit(state.value.copy(showPartialPaymentDialog = true))
+        }
+    }
+
+    fun hidePartialPaymentDialog() {
+        screenModelScope.launch {
+            mutableState.emit(state.value.copy(showPartialPaymentDialog = false))
+        }
+    }
+
+    fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String? = null, onSuccess: () -> Unit) {
+        screenModelScope.launch {
+            mutableState.emit(state.value.copy(isProcessingPayment = true))
+            
+            repository.createPartialPayment(tableId, paidBy, amountInCentavos, description).fold(
+                onSuccess = { 
+                    println("Partial payment created successfully for $paidBy")
+                    // Reload table data to show updated status
+                    refreshData()
+                    mutableState.emit(
+                        state.value.copy(
+                            isProcessingPayment = false,
+                            showPartialPaymentDialog = false
+                        )
+                    )
+                    onSuccess()
+                },
+                onFailure = { error ->
+                    println("Error creating partial payment: ${error.message}")
+                    mutableState.emit(
+                        state.value.copy(
+                            isProcessingPayment = false,
+                            error = error as? co.kandalabs.comandaai.core.error.ComandaAiException
+                        )
+                    )
+                }
+            )
+        }
+    }
 }

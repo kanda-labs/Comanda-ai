@@ -353,13 +353,9 @@ class KitchenViewModel(
                             }
                         }
                         is KitchenEvent.OrdersUpdate -> {
-                            _state.update { currentState ->
-                                // Merge SSE orders with local orders to prevent losing partially delivered orders
-                                // This is a workaround for backend not including partially delivered orders in SSE
-                                val mergedOrders = mergeOrdersWithLocal(event.orders, currentState.activeOrders)
-                                
-                                currentState.copy(
-                                    activeOrders = mergedOrders,
+                            _state.update { 
+                                it.copy(
+                                    activeOrders = event.orders,
                                     isLoading = false,
                                     isRefreshing = false,
                                     isConnected = true
@@ -717,30 +713,4 @@ class KitchenViewModel(
         return Pair(updatedActiveOrders, updatedDeliveredOrders)
     }
     
-    /**
-     * Merge SSE orders with local orders to prevent losing partially delivered orders.
-     * This is a workaround for the backend not including partially delivered orders in SSE updates.
-     */
-    private fun mergeOrdersWithLocal(
-        sseOrders: List<KitchenOrder>,
-        localOrders: List<KitchenOrder>
-    ): List<KitchenOrder> {
-        // If SSE has orders, use them as the primary source
-        if (sseOrders.isNotEmpty()) {
-            return sseOrders
-        }
-        
-        // If SSE is empty but we have local orders that are partially delivered, keep them
-        val partiallyDeliveredLocalOrders = localOrders.filter { order ->
-            val hasDeliveredItems = order.items.any { item ->
-                item.unitStatuses.any { unit -> unit.status == ItemStatus.DELIVERED }
-            }
-            val hasNonDeliveredItems = order.items.any { item ->
-                item.unitStatuses.any { unit -> unit.status != ItemStatus.DELIVERED }
-            }
-            hasDeliveredItems && hasNonDeliveredItems
-        }
-        
-        return partiallyDeliveredLocalOrders
-    }
 }

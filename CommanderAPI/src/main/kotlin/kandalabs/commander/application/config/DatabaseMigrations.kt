@@ -19,6 +19,7 @@ object DatabaseMigrations {
         migration001_AddUserNameToOrders()
         migration002_UpdateItemStatusesToSimplified()
         migration003_UpdateOrderStatusesToSimplified()
+        migration004_CreatePartialPaymentsTable()
         
         logger.info { "All database migrations completed successfully" }
     }
@@ -120,6 +121,46 @@ object DatabaseMigrations {
                 logger.info { "Updated OrderStatus values in orders table" }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to update OrderStatus values: ${e.message}" }
+                throw e
+            }
+        }
+    }
+    
+    /**
+     * Migration 004: Create partial_payments table for standalone partial payments
+     */
+    private fun migration004_CreatePartialPaymentsTable() {
+        logger.info { "Running migration 004: Create partial_payments table" }
+        
+        transaction {
+            try {
+                // Check if table exists
+                val tableExists = exec("SELECT name FROM sqlite_master WHERE type='table' AND name='partial_payments'") { rs ->
+                    rs.next()
+                } ?: false
+                
+                if (!tableExists) {
+                    // Create the partial_payments table
+                    exec("""
+                        CREATE TABLE partial_payments (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            bill_id INTEGER NOT NULL,
+                            table_id INTEGER NOT NULL,
+                            paid_by VARCHAR(255) NOT NULL,
+                            amount_in_centavos BIGINT NOT NULL,
+                            description VARCHAR(500),
+                            payment_method VARCHAR(100),
+                            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (bill_id) REFERENCES bills (id),
+                            FOREIGN KEY (table_id) REFERENCES tables (id)
+                        )
+                    """)
+                    logger.info { "Created partial_payments table successfully" }
+                } else {
+                    logger.info { "partial_payments table already exists, skipping migration" }
+                }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to create partial_payments table: ${e.message}" }
                 throw e
             }
         }

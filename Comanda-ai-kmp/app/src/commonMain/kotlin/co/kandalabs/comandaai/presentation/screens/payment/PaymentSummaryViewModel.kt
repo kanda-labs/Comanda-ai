@@ -65,6 +65,48 @@ internal class PaymentSummaryViewModel(
         }
     }
 
+    fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String? = null, onSuccess: () -> Unit) {
+        screenModelScope.launch {
+            updateState { it.copy(isProcessingPayment = true) }
+            
+            repository.createPartialPayment(tableId, paidBy, amountInCentavos, description).fold(
+                onSuccess = { 
+                    println("Partial payment created successfully for $paidBy")
+                    // Reload payment summary to show updated statuses
+                    setupPaymentSummaryById(tableId, state.value.tableNumber.toIntOrNull() ?: 0)
+                    updateState {
+                        it.copy(
+                            isProcessingPayment = false,
+                            showPartialPaymentDialog = false
+                        )
+                    }
+                    onSuccess()
+                },
+                onFailure = { error ->
+                    println("Error creating partial payment: ${error.message}")
+                    updateState {
+                        it.copy(
+                            isProcessingPayment = false,
+                            error = error
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    fun showPartialPaymentDialog() {
+        screenModelScope.launch {
+            updateState { it.copy(showPartialPaymentDialog = true) }
+        }
+    }
+
+    fun hidePartialPaymentDialog() {
+        screenModelScope.launch {
+            updateState { it.copy(showPartialPaymentDialog = false) }
+        }
+    }
+
     private suspend fun updateState(transform: (PaymentSummaryScreenState) -> PaymentSummaryScreenState) {
         mutableState.emit(transform(state.value))
     }

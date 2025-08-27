@@ -13,6 +13,8 @@ import co.kandalabs.comandaai.domain.models.model.Bill
 import co.kandalabs.comandaai.domain.Item
 import co.kandalabs.comandaai.domain.models.model.Order
 import co.kandalabs.comandaai.domain.models.model.OrderWithStatuses
+import co.kandalabs.comandaai.domain.models.model.PartialPayment
+import co.kandalabs.comandaai.domain.models.request.CreatePartialPaymentRequest
 import co.kandalabs.comandaai.domain.models.model.Table
 import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
 
@@ -65,4 +67,10 @@ internal interface CommanderApi {
 
     @POST("api/v1/bills/table/{tableId}/payment")
     suspend fun processTablePayment(@Path("tableId") tableId: Int)
+    
+    @POST("api/v1/bills/table/{tableId}/partial-payment")
+    suspend fun createPartialPayment(@Path("tableId") tableId: Int, @Body request: CreatePartialPaymentRequest): PartialPayment
+    
+    @GET("api/v1/bills/table/{tableId}/partial-payments")
+    suspend fun getPartialPayments(@Path("tableId") tableId: Int): List<PartialPayment>
 }

@@ -16,6 +16,7 @@ import kandalabs.commander.data.model.sqlModels.BillTable
 import kandalabs.commander.data.model.sqlModels.ItemTable
 import kandalabs.commander.data.model.sqlModels.OrderItemTable
 import kandalabs.commander.data.model.sqlModels.OrderItemStatusTable
+import kandalabs.commander.data.model.sqlModels.PartialPaymentTable
 import kandalabs.commander.data.model.sqlModels.OrderTable
 import kandalabs.commander.data.model.sqlModels.TableTable
 import kandalabs.commander.data.model.sqlModels.UserTable
@@ -179,6 +180,7 @@ private fun appModule(healthMonitor: HealthMonitor) = module {
     single<OrderTable> { OrderTable }
     single<OrderItemTable> { OrderItemTable }
     single<OrderItemStatusTable> { OrderItemStatusTable }
+    single<PartialPaymentTable> { PartialPaymentTable }
     single<ItemTable> { ItemTable }
     single<KLogger> { KotlinLogging.logger {} }
     single<Json> { Json { prettyPrint = true; ignoreUnknownKeys = true } }
@@ -191,6 +193,7 @@ private fun appModule(healthMonitor: HealthMonitor) = module {
         orderTable = get(),
         orderItemTable = get(),
         orderItemStatusTable = get(),
+        partialPaymentTable = get(),
         itemTable = get(),
         tableTable = get(),
         logger = get()

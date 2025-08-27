@@ -7,7 +7,12 @@ data class PaymentSummaryResponse(
     val tableNumber: String,
     val totalAmountInCentavos: Long,
     val totalAmountFormatted: String,
-    val orders: List<PaymentOrderSummary>
+    val totalPaidInCentavos: Long,
+    val totalPaidFormatted: String,
+    val remainingAmountInCentavos: Long,
+    val remainingAmountFormatted: String,
+    val orders: List<PaymentOrderSummary>,
+    val partialPayments: List<PartialPayment>
 )
 
 @Serializable
@@ -35,3 +40,4 @@ data class PaymentOrderStatus(
     val text: String,
     val colorHex: String
 )
+

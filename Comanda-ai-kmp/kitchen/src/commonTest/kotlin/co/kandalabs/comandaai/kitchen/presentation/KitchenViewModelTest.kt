@@ -269,6 +269,14 @@ private class FakeKitchenRepository : KitchenRepository {
         }
     }
     
+    override suspend fun getDeliveredOrders(): Result<List<KitchenOrder>> {
+        return if (getOrdersError != null) {
+            Result.failure(getOrdersError!!)
+        } else {
+            Result.success(emptyList()) // Para testes, retorna lista vazia
+        }
+    }
+    
     override suspend fun updateItemUnitStatus(
         orderId: Int,
         itemId: Int,

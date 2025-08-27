@@ -15,7 +15,9 @@ internal data class TableDetailsScreenState(
     private val table: Table? = null,
     val userSession: UserSession? = null,
     val isLoading: Boolean = true,
-    val error: ComandaAiException? = null
+    val error: ComandaAiException? = null,
+    val showPartialPaymentDialog: Boolean = false,
+    val isProcessingPayment: Boolean = false
 ) {
     val currentTable: Table? get() = table
     val appBarTitle = "Detalhes da mesa"
@@ -85,6 +87,14 @@ internal data class TableDetailsScreenState(
             action = TableDetailsAction.BACK
         )
 
+        else -> null
+    }
+
+    val tertiaryButton: TableDetailsScreenButton? = when (table?.status) {
+        TableStatus.OCCUPIED -> TableDetailsScreenButton(
+            text = "Pagamento Parcial",
+            action = TableDetailsAction.SHOW_PARTIAL_PAYMENT_DIALOG
+        )
         else -> null
     }
 

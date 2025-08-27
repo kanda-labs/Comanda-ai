@@ -7,10 +7,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.BillStatus
+import kandalabs.commander.domain.model.PartialPayment
 import kandalabs.commander.domain.model.TableStatus
 import kandalabs.commander.domain.service.BillService
 import kandalabs.commander.domain.service.TableService
 import kandalabs.commander.presentation.models.request.CreateBillRequest
+import kandalabs.commander.presentation.models.request.CreatePartialPaymentRequest
 
 fun Route.billRoutes(billService: BillService, tableService: TableService) {
     route("/bills") {
@@ -97,6 +99,43 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
             } else {
                 call.respond(HttpStatusCode.NotFound, mapOf("error" to "Table or bill not found"))
             }
+        }
+
+        post("/table/{tableId}/partial-payment") {
+            val tableId = call.parameters["tableId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+            
+            runCatching {
+                val request = call.receive<CreatePartialPaymentRequest>()
+                
+                // Get bill for this table
+                val bill = billService.getBillByTableId(tableId.toInt())
+                    ?: return@post call.respond(HttpStatusCode.NotFound, mapOf("error" to "Bill not found for this table"))
+                
+                val partialPayment = PartialPayment(
+                    billId = bill.id!!,
+                    tableId = tableId.toInt(),
+                    paidBy = request.paidBy,
+                    amountInCentavos = request.amountInCentavos,
+                    amountFormatted = "R$ ${request.amountInCentavos / 100},${(request.amountInCentavos % 100).toString().padStart(2, '0')}",
+                    description = request.description,
+                    paymentMethod = request.paymentMethod,
+                    createdAt = localDateTimeNow()
+                )
+                
+                val createdPayment = billService.createPartialPayment(partialPayment)
+                call.respond(HttpStatusCode.Created, createdPayment)
+            }.fold(
+                onSuccess = { },
+                onFailure = { exception ->
+                    call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to create partial payment: ${exception.message}"))
+                }
+            )
+        }
+
+        get("/table/{tableId}/partial-payments") {
+            val tableId = call.parameters["tableId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val partialPayments = billService.getPartialPayments(tableId.toInt())
+            call.respond(partialPayments)
         }
 
         delete("/{id}") {

@@ -124,8 +124,9 @@ tasks.register<JavaExec>("runDebug") {
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set("kandalabs.commander.application.ApplicationKt")
     environment("PORT", "8082")
-    environment("HOST", "0.0.0.0")
+    environment("HOST", "192.168.2.200")
     environment("LOG_LEVEL", "DEBUG")
+    environment("ENVIRONMENT", "debug")
 }
 
 // Fat JAR configuration using standard Gradle jar task

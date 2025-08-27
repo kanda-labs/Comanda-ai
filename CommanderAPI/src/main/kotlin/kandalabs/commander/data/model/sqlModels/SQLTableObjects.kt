@@ -75,4 +75,17 @@ object OrderItemStatusTable : Table("order_item_statuses") {
     override val primaryKey = PrimaryKey(id)
 }
 
+object PartialPaymentTable : SQLTable("partial_payments") {
+    val id = integer("id").autoIncrement()
+    val billId = integer("bill_id").references(BillTable.id)
+    val tableId = integer("table_id").references(TableTable.id)
+    val paidBy = varchar("paid_by", 255) // Nome da pessoa que pagou
+    val amountInCentavos = long("amount_in_centavos")
+    val description = varchar("description", 500).nullable()
+    val paymentMethod = varchar("payment_method", 50).nullable()
+    val createdAt = long("created_at")
+    
+    override val primaryKey = PrimaryKey(id)
+}
+
 
