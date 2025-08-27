@@ -5,7 +5,7 @@ actual object NetworkConfig {
     /**
      * Base IP address - SINGLE PLACE TO CHANGE FOR iOS
      */
-    actual val baseIp: String = "192.168.1.133"
+    actual val baseIp: String = "192.168.2.200"
     
     /**
      * Production API port
