@@ -5,7 +5,7 @@ actual object NetworkConfig {
     /**
      * Base IP address - SINGLE PLACE TO CHANGE FOR iOS
      */
-    actual val baseIp: String = "127.0.0.1"
+    actual val baseIp: String = "192.168.1.133"
     
     /**
      * Production API port
@@ -15,7 +15,7 @@ actual object NetworkConfig {
     /**
      * Debug API port
      */
-    actual val debugPort: Int = 8082
+    actual val debugPort: Int = 8081
     
     /**
      * Production API base URL (with trailing slash)

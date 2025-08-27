@@ -58,9 +58,9 @@ android {
         minSdk = 25
         
         // Network configuration - SINGLE PLACE TO CHANGE IP
-        buildConfigField("String", "BASE_IP", "\"127.0.0.1\"")
+        buildConfigField("String", "BASE_IP", "\"192.168.1.133\"")
         buildConfigField("int", "PRODUCTION_PORT", "8081")
-        buildConfigField("int", "DEBUG_PORT", "8082")
+        buildConfigField("int", "DEBUG_PORT", "8081")
     }
     
     buildTypes {
@@ -68,19 +68,19 @@ android {
             // Para emulador Android - usar 10.0.2.2 (IP especial do emulador que aponta para host)
             buildConfigField("String", "BASE_IP", "\"10.0.2.2\"")
             buildConfigField("int", "PRODUCTION_PORT", "8081") 
-            buildConfigField("int", "DEBUG_PORT", "8082")
+            buildConfigField("int", "DEBUG_PORT", "8081")
         }
         create("sandbox") {
             initWith(getByName("debug"))
             // Sandbox aponta para produção (porta 8081)
-            buildConfigField("String", "BASE_IP", "\"127.0.0.1\"")
+            buildConfigField("String", "BASE_IP", "\"192.168.1.133\"")
             buildConfigField("int", "PRODUCTION_PORT", "8081")
-            buildConfigField("int", "DEBUG_PORT", "8082")
+            buildConfigField("int", "DEBUG_PORT", "8081")
         }
         getByName("release") {
-            buildConfigField("String", "BASE_IP", "\"127.0.0.1\"")
+            buildConfigField("String", "BASE_IP", "\"192.168.1.133\"")
             buildConfigField("int", "PRODUCTION_PORT", "8081")
-            buildConfigField("int", "DEBUG_PORT", "8082")
+            buildConfigField("int", "DEBUG_PORT", "8081")
         }
     }
     

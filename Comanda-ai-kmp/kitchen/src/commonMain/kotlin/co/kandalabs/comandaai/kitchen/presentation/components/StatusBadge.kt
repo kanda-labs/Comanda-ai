@@ -33,18 +33,20 @@ fun StatusBadge(
             MaterialTheme.colorScheme.error,
             Icons.Default.Schedule
         )
+
         ItemStatus.DELIVERED -> Triple(
             androidx.compose.ui.graphics.Color(0xFF4CAF50).copy(alpha = 0.15f),
             androidx.compose.ui.graphics.Color(0xFF4CAF50),
             Icons.Default.CheckCircle
         )
+
         ItemStatus.CANCELED -> Triple(
             androidx.compose.ui.graphics.Color(0xFF757575).copy(alpha = 0.15f),
             androidx.compose.ui.graphics.Color(0xFF757575),
             Icons.Default.Cancel
         )
     }
-    
+
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = backgroundColor,
@@ -62,21 +64,22 @@ fun StatusBadge(
                 modifier = Modifier.size(16.dp),
                 tint = textColor
             )
-            
-            Text(
-                text = count.toString(),
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-                color = textColor
-            )
-            
+
+            if (count > 0)
+                Text(
+                    text = count.toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
+
             Text(
                 text = getStatusText(status),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 color = textColor
             )
-            
+
             // Show dropdown arrow for multiple items
             if (isMultipleItems) {
                 Icon(
