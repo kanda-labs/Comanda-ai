@@ -419,7 +419,6 @@ private fun PaymentSummaryBottom(
 
             Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
 
-            // Mostrar status se a conta está totalmente paga
             if (state.isFullyPaid) {
                 Text(
                     text = "✅ Conta totalmente paga!",

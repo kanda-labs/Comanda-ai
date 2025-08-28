@@ -4,6 +4,7 @@ import kandalabs.commander.data.model.sqlModels.ItemTable
 import kandalabs.commander.data.model.sqlModels.OrderItemStatusTable
 import kandalabs.commander.data.model.sqlModels.OrderItemTable
 import kandalabs.commander.data.model.sqlModels.OrderTable
+import kandalabs.commander.data.model.sqlModels.TableTable
 import kandalabs.commander.data.model.sqlModels.UserTable
 import kandalabs.commander.domain.model.*
 import kandalabs.commander.domain.repository.OrderRepository
@@ -19,6 +20,7 @@ class OrderRepositoryImpl(
     val orderTable: OrderTable,
     val orderItemTable: OrderItemTable,
     val orderItemStatusTable: OrderItemStatusTable,
+    val tableTable: TableTable,
     val userTable: UserTable,
     val logger: KLogger
 ) : OrderRepository {
@@ -86,6 +88,111 @@ class OrderRepositoryImpl(
                 createdAt = order.createdAt,
                 individualStatuses = individualStatuses
             )
+        }
+    }
+
+    override suspend fun getOrdersWithIncompleteItems(): Result<List<KitchenOrder>> {
+        logger.debug { "Fetching orders with incomplete items for active table bills" }
+        return try {
+            val orders = transaction {
+                orderTable.join(tableTable, JoinType.INNER, orderTable.tableId, TableTable.id)
+                    .selectAll()
+                    .where {
+                        TableTable.billId.isNotNull()
+                    }
+                    .map { orderRow ->
+                        val orderId = orderRow[OrderTable.id]
+                        val orderUserName = orderRow[OrderTable.userName]
+
+                        // Get user name from UserTable
+                        val actualUserName = userTable.selectAll()
+                            .where { userTable.userName eq orderUserName }
+                            .singleOrNull()
+                            ?.get(userTable.name) ?: orderUserName
+
+                        val items = OrderItemTable.selectAll()
+                            .where { OrderItemTable.orderId eq orderId }
+                            .map { itemRow ->
+                                val itemId = itemRow[OrderItemTable.itemId]
+                                val totalCount = itemRow[OrderItemTable.count]
+                                val itemName = itemRow[OrderItemTable.name]
+                                val observation = itemRow[OrderItemTable.observation]
+
+                                // Get item category from ItemTable
+                                val itemCategory = ItemTable.selectAll()
+                                    .where { ItemTable.id eq itemId }
+                                    .singleOrNull()
+                                    ?.get(ItemTable.category)
+                                    ?.let { ItemCategory.valueOf(it) }
+                                    ?: ItemCategory.DRINK
+
+                                // Get unit statuses
+                                val unitStatuses = (0 until totalCount).map { unitIndex ->
+                                    val statusRow = orderItemStatusTable.selectAll()
+                                        .where {
+                                            (orderItemStatusTable.orderId eq orderId) and
+                                                    (orderItemStatusTable.itemId eq itemId) and
+                                                    (orderItemStatusTable.unitIndex eq unitIndex)
+                                        }
+                                        .singleOrNull()
+
+                                    if (statusRow != null) {
+                                        ItemUnitStatus(
+                                            unitIndex = unitIndex,
+                                            status = ItemStatus.valueOf(statusRow[orderItemStatusTable.status]),
+                                            updatedAt = statusRow[orderItemStatusTable.updatedAt],
+                                            updatedBy = statusRow[orderItemStatusTable.updatedBy]
+                                        )
+                                    } else {
+                                        ItemUnitStatus(
+                                            unitIndex = unitIndex,
+                                            status = ItemStatus.PENDING,
+                                            updatedAt = localDateTimeAsLong(),
+                                            updatedBy = null
+                                        )
+                                    }
+                                }
+
+                                val overallStatus = calculateOverallStatus(unitStatuses.map { it.status })
+
+                                KitchenItemDetail(
+                                    itemId = itemId,
+                                    name = itemName,
+                                    totalCount = totalCount,
+                                    observation = observation,
+                                    unitStatuses = unitStatuses,
+                                    overallStatus = overallStatus,
+                                    category = itemCategory
+                                )
+                            }
+
+                        KitchenOrder(
+                            id = orderId,
+                            tableNumber = orderRow[OrderTable.tableId],
+                            userName = actualUserName,
+                            items = items,
+                            createdAt = orderRow[OrderTable.createdAt]
+                        )
+                    }
+                    .filter { order ->
+                        val hasIncompleteItems = order.items.any { item ->
+                            item.unitStatuses.any { status ->
+                                status.status != ItemStatus.DELIVERED && status.status != ItemStatus.CANCELED
+                            }
+                        }
+                        logger.debug {
+                            if (!hasIncompleteItems && order.items.isNotEmpty())
+                                "Filtering out order ${order.id} - all items are complete"
+                            else
+                                "Including order ${order.id} - has incomplete items"
+                        }
+                        hasIncompleteItems
+                    }
+            }
+            Result.success(orders)
+        } catch (e: Exception) {
+            logger.error(e) { "Error fetching orders with incomplete items for active table bills" }
+            Result.failure(e)
         }
     }
 
@@ -242,7 +349,7 @@ class OrderRepositoryImpl(
     }
 
     // Kitchen-specific methods
-    override suspend fun getOrdersWithIncompleteItems(): Result<List<KitchenOrder>> {
+    suspend fun getOrdersWithIncompleteItems2(): Result<List<KitchenOrder>> {
         logger.debug { "Fetching orders with incomplete items for kitchen" }
         return try {
             val orders = transaction {
@@ -345,7 +452,7 @@ class OrderRepositoryImpl(
         }
     }
     
-    override suspend fun getOrdersWithDeliveredItems(): Result<List<KitchenOrder>> {
+     override suspend fun getOrdersWithDeliveredItems(): Result<List<KitchenOrder>> {
         logger.debug { "Fetching orders with delivered items for kitchen (today only)" }
         return try {
             val orders = transaction {
