@@ -1,4 +1,4 @@
-package co.kandalabs.comandaai.presentation.screens.itemsSelection.components
+package co.kandalabs.comandaai.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -14,17 +14,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
-import comandaai.app.generated.resources.Res
-import comandaai.app.generated.resources.golden_loading
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun LoadingView(testTag: String? = null) {
+fun ComandaAiLoadingView(
+    loadingImage: Painter,
+    testTag: String? = null,
+    modifier: Modifier = Modifier
+) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .then(if (testTag != null) Modifier.testTag(testTag) else Modifier)
     ) {
@@ -34,7 +36,7 @@ fun LoadingView(testTag: String? = null) {
         ) {
             Spacer(modifier = Modifier.weight(1f))
             Image(
-                painter = painterResource(Res.drawable.golden_loading),
+                painter = loadingImage,
                 contentDescription = "Loading Image",
                 modifier = Modifier
                     .fillMaxWidth()

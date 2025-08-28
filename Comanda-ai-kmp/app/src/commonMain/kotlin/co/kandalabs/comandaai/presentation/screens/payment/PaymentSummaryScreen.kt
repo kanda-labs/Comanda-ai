@@ -42,8 +42,11 @@ import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
+import co.kandalabs.comandaai.components.ComandaAiLoadingView
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
-import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
+import comandaai.app.generated.resources.Res
+import comandaai.app.generated.resources.golden_loading
+import org.jetbrains.compose.resources.painterResource
 import co.kandalabs.comandaai.presentation.screens.payment.components.FinishPaymentConfirmationModal
 import co.kandalabs.comandaai.presentation.screens.payment.components.PartialPaymentModal
 import co.kandalabs.comandaai.theme.ComandaAiTypography
@@ -128,7 +131,9 @@ private fun PaymentSummaryScreenContent(
             color = MaterialTheme.colorScheme.background
         ) {
             when {
-                state.isLoading -> LoadingView()
+                state.isLoading -> ComandaAiLoadingView(
+                    loadingImage = painterResource(Res.drawable.golden_loading)
+                )
                 state.error != null -> ErrorView(
                     error = state.error,
                     onRetry = { action(PaymentSummaryAction.RETRY) } // Add retry action

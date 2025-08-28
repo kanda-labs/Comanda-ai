@@ -1,8 +1,6 @@
-package co.kandalabs.comandaai.presentation.screens.order.components
+package co.kandalabs.comandaai.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,7 +9,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun QuantitySelector(
+fun ComandaAiQuantitySelector(
     count: Int,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,

@@ -1,4 +1,4 @@
-package co.kandalabs.comandaai.presentation.screens.order.components
+package co.kandalabs.comandaai.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -9,12 +9,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import co.kandalabs.comandaai.domain.model.ItemWithCount
+
+data class OrderItemData(
+    val name: String,
+    val value: Int,
+    val description: String? = null,
+    val count: Int
+)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OrderItemCard(
-    itemWithCount: ItemWithCount,
+fun ComandaAiOrderItemCard(
+    item: OrderItemData,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,
     onLongClick: () -> Unit,
@@ -42,7 +48,7 @@ fun OrderItemCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = itemWithCount.item.name,
+                    text = item.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
@@ -51,13 +57,13 @@ fun OrderItemCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = formatPrice(itemWithCount.item.value),
+                    text = formatPrice(item.value),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
                 )
                 
-                itemWithCount.item.description?.let { description ->
+                item.description?.let { description ->
                     if (description.isNotBlank()) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -71,8 +77,8 @@ fun OrderItemCard(
             
             Spacer(modifier = Modifier.width(16.dp))
             
-            QuantitySelector(
-                count = itemWithCount.count,
+            ComandaAiQuantitySelector(
+                count = item.count,
                 onIncrement = onIncrement,
                 onDecrement = onDecrement
             )

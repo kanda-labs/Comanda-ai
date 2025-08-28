@@ -15,11 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.components.ComandaAiButton
+import co.kandalabs.comandaai.components.ComandaAiOrderItemCard
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
+import co.kandalabs.comandaai.components.OrderItemData
 import co.kandalabs.comandaai.presentation.screens.order.components.CategoryTabs
 import co.kandalabs.comandaai.presentation.screens.order.components.ObservationModal
 import co.kandalabs.comandaai.presentation.screens.order.components.OrderConfirmationModal
-import co.kandalabs.comandaai.presentation.screens.order.components.OrderItemCard
 import co.kandalabs.comandaai.domain.ItemCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,8 +141,13 @@ fun OrderScreenContent(
                             contentPadding = PaddingValues(bottom = 16.dp)
                         ) {
                             items(itemsWithCount) { itemWithCount ->
-                                OrderItemCard(
-                                    itemWithCount = itemWithCount,
+                                ComandaAiOrderItemCard(
+                                    item = OrderItemData(
+                                        name = itemWithCount.item.name,
+                                        value = itemWithCount.item.value,
+                                        description = itemWithCount.item.description,
+                                        count = itemWithCount.count
+                                    ),
                                     onIncrement = { 
                                         itemWithCount.item.id?.let { id ->
                                             screenModel.incrementItem(id)

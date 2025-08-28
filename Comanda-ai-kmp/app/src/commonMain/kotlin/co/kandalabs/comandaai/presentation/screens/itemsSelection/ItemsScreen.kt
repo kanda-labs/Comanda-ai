@@ -37,10 +37,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
+import co.kandalabs.comandaai.components.ComandaAiLoadingView
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
-import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
+import comandaai.app.generated.resources.Res
+import comandaai.app.generated.resources.golden_loading
+import org.jetbrains.compose.resources.painterResource
 import coil3.compose.AsyncImage
 import co.kandalabs.comandaai.domain.Item
 import kotlinx.collections.immutable.ImmutableList
@@ -98,7 +101,10 @@ internal fun BreedsListingScreenContent(
     ) {
         ComandaAiTopAppBar(strings.title)
         when {
-            state.isLoading -> LoadingView(testTag = LISTING_LOADING_VIEW_TEST_TAG)
+            state.isLoading -> ComandaAiLoadingView(
+                loadingImage = painterResource(Res.drawable.golden_loading),
+                testTag = LISTING_LOADING_VIEW_TEST_TAG
+            )
             state.error != null -> {
                 ErrorView(error = state.error, retry)
             }

@@ -32,8 +32,11 @@ import co.kandalabs.comandaai.domain.models.model.OrderStatus
 import co.kandalabs.comandaai.domain.models.model.Table
 import co.kandalabs.comandaai.domain.models.model.TableStatus
 import co.kandalabs.comandaai.presentation.designSystem.components.CommandaBadge
+import co.kandalabs.comandaai.components.ComandaAiLoadingView
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
-import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
+import comandaai.app.generated.resources.Res
+import comandaai.app.generated.resources.golden_loading
+import org.jetbrains.compose.resources.painterResource
 import co.kandalabs.comandaai.presentation.screens.order.OrderScreen
 import co.kandalabs.comandaai.presentation.screens.ordercontrol.OrderControlScreen
 import co.kandalabs.comandaai.presentation.screens.payment.PaymentSummaryScreen
@@ -161,7 +164,9 @@ private fun TableDetailsScreenContent(
             color = MaterialTheme.colorScheme.background
         ) {
             if (state.isLoading) {
-                LoadingView()
+                ComandaAiLoadingView(
+                    loadingImage = painterResource(Res.drawable.golden_loading)
+                )
             } else if (state.error != null) {
                 ErrorView(
                     error = state.error,

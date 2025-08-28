@@ -52,8 +52,10 @@ import co.kandalabs.comandaai.components.UserAvatar
 import co.kandalabs.comandaai.core.session.UserSession
 import co.kandalabs.comandaai.presentation.screens.tables.listing.components.UserProfileModal
 import co.kandalabs.comandaai.theme.ComandaAiTypography
-import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
-import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.LoadingView
+import co.kandalabs.comandaai.components.ComandaAiLoadingView
+import comandaai.app.generated.resources.Res
+import comandaai.app.generated.resources.golden_loading
+import org.jetbrains.compose.resources.painterResource
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 
 data class AdminOption(
@@ -125,7 +127,9 @@ private fun AdminScreenContent(
 ) {
     MaterialTheme {
         if (state.isLoading) {
-            LoadingView()
+            ComandaAiLoadingView(
+                loadingImage = painterResource(Res.drawable.golden_loading)
+            )
         } else if (state.error != null) {
             SimpleErrorView(
                 errorMessage = state.error ?: "Erro desconhecido",
