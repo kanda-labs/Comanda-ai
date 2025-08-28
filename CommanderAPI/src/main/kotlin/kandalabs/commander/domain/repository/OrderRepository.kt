@@ -38,4 +38,5 @@ interface OrderRepository {
     ): Result<List<ItemUnitStatus>>
     suspend fun markOrderAsDelivered(orderId: Int, updatedBy: String): Result<Boolean>
     suspend fun markItemAsDelivered(orderId: Int, itemId: Int, updatedBy: String): Result<Boolean>
+    suspend fun markItemAsPending(orderId: Int, itemId: Int, updatedBy: String): Result<Boolean>
 }
