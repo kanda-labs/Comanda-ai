@@ -17,7 +17,8 @@ internal data class TableDetailsScreenState(
     val isLoading: Boolean = true,
     val error: ComandaAiException? = null,
     val showPartialPaymentDialog: Boolean = false,
-    val isProcessingPayment: Boolean = false
+    val isProcessingPayment: Boolean = false,
+    val showCloseTableConfirmation: Boolean = false
 ) {
     val currentTable: Table? get() = table
     val appBarTitle = "Detalhes da mesa"
@@ -58,20 +59,25 @@ internal data class TableDetailsScreenState(
             action = TableDetailsAction.OPEN_TABLE
         )
 
+        TableStatus.ON_PAYMENT -> TableDetailsScreenButton(
+            text = "Reabrir mesa",
+            action = TableDetailsAction.REOPEN_TABLE
+        )
+
         else -> null
     }
 
     val secondaryButton: TableDetailsScreenButton? = when (table?.status) {
         TableStatus.OCCUPIED -> TableDetailsScreenButton(
             text = "Fechar conta",
-            action = TableDetailsAction.CLOSE_TABLE
+            action = TableDetailsAction.SHOW_CLOSE_TABLE_CONFIRMATION
         )
 
         TableStatus.ON_PAYMENT -> {
             // Only manager can close table (finalize payment) when ON_PAYMENT
             if (userSession?.role == UserRole.MANAGER) {
                 TableDetailsScreenButton(
-                    text = "Fechar mesa",
+                    text = "Ir para pagamento",
                     action = TableDetailsAction.CLOSE_TABLE_MANAGER
                 )
             } else {
@@ -125,7 +131,7 @@ internal data class OrdersDetailsState(
                 ComandaAiColors.OnSurface
             )
             OrderStatus.PENDING -> Pair(
-                ComandaAiColors.Blue500,
+                ComandaAiColors.Yellow500,
                 ComandaAiColors.OnSurface
             )
             OrderStatus.CANCELED -> Pair(

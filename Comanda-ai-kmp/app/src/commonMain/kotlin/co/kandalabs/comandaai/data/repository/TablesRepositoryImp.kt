@@ -132,4 +132,21 @@ internal class TablesRepositoryImp(
             println("Error creating partial payment: $error")
         }
     }
+
+    override suspend fun reopenTable(tableId: Int): ComandaAiResult<Unit> {
+        return safeRunCatching {
+            // Get current table to preserve billId
+            val currentTable = commanderApi.getTable(tableId)
+            commanderApi.updateTable(
+                id = tableId,
+                request = UpdateTableRequest(
+                    billId = currentTable.billId, // Preserve current billId
+                    status = TableStatus.OCCUPIED
+                )
+            )
+            Unit
+        }.onFailure { error ->
+            println("Error reopening table: $error")
+        }
+    }
 }

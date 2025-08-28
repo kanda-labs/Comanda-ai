@@ -20,4 +20,5 @@ interface TablesRepository {
     suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Long): ComandaAiResult<Unit>
     suspend fun processTablePayment(tableId: Int): ComandaAiResult<Unit>
     suspend fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String? = null): ComandaAiResult<PartialPayment>
+    suspend fun reopenTable(tableId: Int): ComandaAiResult<Unit>
 }

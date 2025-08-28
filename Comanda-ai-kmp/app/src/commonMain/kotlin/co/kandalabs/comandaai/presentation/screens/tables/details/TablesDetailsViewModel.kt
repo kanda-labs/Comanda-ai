@@ -85,12 +85,16 @@ internal class TablesDetailsViewModel(
                 repository.closeTable(tableId)
             }.fold(
                 onSuccess = {
-                    // Fetch updated table data from server to reflect status change
+                    // Hide confirmation dialog and fetch updated table data
+                    mutableState.emit(state.value.copy(showCloseTableConfirmation = false))
                     refreshTableData(tableId)
                 },
                 onFailure = { error ->
                     mutableState.emit(
-                        state.value.copy(error = error as? co.kandalabs.comandaai.core.error.ComandaAiException)
+                        state.value.copy(
+                            error = error as? co.kandalabs.comandaai.core.error.ComandaAiException,
+                            showCloseTableConfirmation = false
+                        )
                     )
                 }
             )
@@ -171,6 +175,37 @@ internal class TablesDetailsViewModel(
                     )
                 }
             )
+        }
+    }
+
+    fun reopenTable(table: Table) {
+        screenModelScope.launch {
+            val tableId = table.id ?: return@launch
+            safeRunCatching {
+                repository.reopenTable(tableId)
+            }.fold(
+                onSuccess = {
+                    // Fetch updated table data from server to reflect status change
+                    refreshTableData(tableId)
+                },
+                onFailure = { error ->
+                    mutableState.emit(
+                        state.value.copy(error = error as? co.kandalabs.comandaai.core.error.ComandaAiException)
+                    )
+                }
+            )
+        }
+    }
+
+    fun showCloseTableConfirmation() {
+        screenModelScope.launch {
+            mutableState.emit(state.value.copy(showCloseTableConfirmation = true))
+        }
+    }
+
+    fun hideCloseTableConfirmation() {
+        screenModelScope.launch {
+            mutableState.emit(state.value.copy(showCloseTableConfirmation = false))
         }
     }
 }

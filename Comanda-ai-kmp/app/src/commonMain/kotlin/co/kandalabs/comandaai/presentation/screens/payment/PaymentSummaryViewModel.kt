@@ -49,7 +49,10 @@ internal class PaymentSummaryViewModel(
                     println("Payment processed successfully for table $tableId")
                     updateState {
                         onFinish()
-                        it.copy(isProcessingPayment = false)
+                        it.copy(
+                            isProcessingPayment = false,
+                            showFinishPaymentConfirmation = false
+                        )
                     }
                 },
                 onFailure = { error ->
@@ -57,6 +60,7 @@ internal class PaymentSummaryViewModel(
                     updateState {
                         it.copy(
                             isProcessingPayment = false,
+                            showFinishPaymentConfirmation = false,
                             error = error
                         )
                     }
@@ -104,6 +108,18 @@ internal class PaymentSummaryViewModel(
     fun hidePartialPaymentDialog() {
         screenModelScope.launch {
             updateState { it.copy(showPartialPaymentDialog = false) }
+        }
+    }
+
+    fun showFinishPaymentConfirmation() {
+        screenModelScope.launch {
+            updateState { it.copy(showFinishPaymentConfirmation = true) }
+        }
+    }
+
+    fun hideFinishPaymentConfirmation() {
+        screenModelScope.launch {
+            updateState { it.copy(showFinishPaymentConfirmation = false) }
         }
     }
 

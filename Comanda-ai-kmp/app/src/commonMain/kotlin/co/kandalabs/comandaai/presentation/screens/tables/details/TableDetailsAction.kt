@@ -15,4 +15,9 @@ sealed class TableDetailsAction {
         val amountInCentavos: Long,
         val description: String?
     ) : TableDetailsAction()
+    
+    object REOPEN_TABLE : TableDetailsAction()
+    object SHOW_CLOSE_TABLE_CONFIRMATION : TableDetailsAction()
+    object HIDE_CLOSE_TABLE_CONFIRMATION : TableDetailsAction()
+    object CONFIRM_CLOSE_TABLE : TableDetailsAction()
 }
