@@ -126,16 +126,7 @@ private fun TablesScreenContent(
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
 
-                ComandaAiTopAppBar(
-                    title = state.title,
-                    actions = {
-                        UserAvatar(
-                            userName = userSession?.userName,
-                            onClick = onUserAvatarClick
-                        )
-                    }
-                )
-
+                ComandaAiTopAppBar(title = state.title)
                 // Welcome message
                 if (userSession?.userName != null) {
                     Row(
@@ -149,8 +140,13 @@ private fun TablesScreenContent(
                             ),
                         horizontalArrangement = Arrangement.Start
                     ) {
+                        UserAvatar(
+                            userName = userSession?.userName,
+                            onClick = onUserAvatarClick
+                        )
+
                         Text(
-                            text = "Bem-vindo, ${userSession.userName}!",
+                            text = "Olá, ${userSession.userName}!",
                             style = ComandaAiTypography.titleMedium,
                             color = MaterialTheme.colorScheme.onBackground,
                             fontWeight = FontWeight.Medium

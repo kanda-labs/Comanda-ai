@@ -9,6 +9,7 @@ import co.kandalabs.comandaai.domain.repository.CreateOrderItemRequest
 import co.kandalabs.comandaai.domain.repository.ItemsRepository
 import co.kandalabs.comandaai.domain.repository.OrderRepository
 import co.kandalabs.comandaai.domain.usecase.ProcessPromotionalItemsUseCase
+import co.kandalabs.comandaai.domain.usecase.ProcessDrinksUseCase
 import co.kandalabs.comandaai.domain.Item
 import co.kandalabs.comandaai.domain.ItemCategory
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,7 @@ class OrderScreenModel(
     private val orderRepository: OrderRepository,
     private val sessionManager: SessionManager,
     private val processPromotionalItemsUseCase: ProcessPromotionalItemsUseCase,
+    private val processDrinksUseCase: ProcessDrinksUseCase,
 ) : ScreenModel {
     
     private val _allItems = MutableStateFlow<List<Item>>(emptyList())
@@ -138,34 +140,72 @@ class OrderScreenModel(
                 val userSession = sessionManager.getSession()
                 val userName = userSession?.userName ?: ""
                 
-                val result = orderRepository.createOrder(
+                // Processar bebidas separadamente
+                val drinksResult = processDrinksUseCase.processDrinks(
+                    selectedItems = promotionalResult.processedItems,
                     tableId = tableId,
                     billId = billId,
-                    userName = userName,
-                    items = promotionalResult.processedItems
+                    userName = userName
                 )
                 
-                when (result) {
+                when (drinksResult) {
+                    is ComandaAiResult.Failure -> {
+                        _error.value = "Erro ao processar bebidas: ${drinksResult.exception.message}"
+                        _showConfirmationModal.value = false
+                        return@launch
+                    }
                     is ComandaAiResult.Success -> {
-                        val createdOrder = result.data
+                        val drinksProcessResult = drinksResult.data
                         
-                        // Marcar itens promocionais como DELIVERED se existirem
-                        if (promotionalResult.promotionalItemIds.isNotEmpty()) {
-                            processPromotionalItemsUseCase.markPromotionalItemsAsDelivered(
-                                order = createdOrder,
-                                promotionalItemIds = promotionalResult.promotionalItemIds,
-                                updatedBy = userName
-                            )
+                        // Se não há itens para a cozinha, não criar pedido da cozinha
+                        if (drinksProcessResult.kitchenItems.isEmpty()) {
+                            // Processar apenas itens promocionais se houver
+                            if (promotionalResult.promotionalItemIds.isNotEmpty() && drinksProcessResult.drinkOrder != null) {
+                                processPromotionalItemsUseCase.markPromotionalItemsAsDelivered(
+                                    order = drinksProcessResult.drinkOrder,
+                                    promotionalItemIds = promotionalResult.promotionalItemIds,
+                                    updatedBy = userName
+                                )
+                            }
+                            
+                            _selectedItems.value = emptyMap()
+                            _itemObservations.value = emptyMap()
+                            _orderSubmitted.value = true
+                            _showConfirmationModal.value = false
+                            return@launch
                         }
                         
-                        _selectedItems.value = emptyMap()
-                        _itemObservations.value = emptyMap()
-                        _orderSubmitted.value = true
-                        _showConfirmationModal.value = false
-                    }
-                    is ComandaAiResult.Failure -> {
-                        _error.value = "Erro ao criar pedido: ${result.exception.message}"
-                        _showConfirmationModal.value = false
+                        // Criar pedido da cozinha apenas com os itens que não são bebidas
+                        val result = orderRepository.createOrder(
+                            tableId = tableId,
+                            billId = billId,
+                            userName = userName,
+                            items = drinksProcessResult.kitchenItems
+                        )
+                
+                        when (result) {
+                            is ComandaAiResult.Success -> {
+                                val createdOrder = result.data
+                                
+                                // Marcar itens promocionais como DELIVERED se existirem
+                                if (promotionalResult.promotionalItemIds.isNotEmpty()) {
+                                    processPromotionalItemsUseCase.markPromotionalItemsAsDelivered(
+                                        order = createdOrder,
+                                        promotionalItemIds = promotionalResult.promotionalItemIds,
+                                        updatedBy = userName
+                                    )
+                                }
+                                
+                                _selectedItems.value = emptyMap()
+                                _itemObservations.value = emptyMap()
+                                _orderSubmitted.value = true
+                                _showConfirmationModal.value = false
+                            }
+                            is ComandaAiResult.Failure -> {
+                                _error.value = "Erro ao criar pedido: ${result.exception.message}"
+                                _showConfirmationModal.value = false
+                            }
+                        }
                     }
                 }
             } catch (e: Exception) {

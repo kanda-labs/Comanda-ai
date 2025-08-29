@@ -20,6 +20,8 @@ import co.kandalabs.comandaai.domain.repository.OrderRepository
 import co.kandalabs.comandaai.domain.repository.TablesRepository
 import co.kandalabs.comandaai.domain.usecase.ProcessPromotionalItemsUseCase
 import co.kandalabs.comandaai.domain.usecase.ProcessPromotionalItemsUseCaseImpl
+import co.kandalabs.comandaai.domain.usecase.ProcessDrinksUseCase
+import co.kandalabs.comandaai.domain.usecase.ProcessDrinksUseCaseImpl
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.BreedsListingViewModel
 import co.kandalabs.comandaai.presentation.screens.order.OrderScreenModel
 import co.kandalabs.comandaai.presentation.screens.ordercontrol.OrderControlViewModel
@@ -166,7 +168,8 @@ internal val commonModule = DI.Module("commonModule") {
             itemsRepository = instance(),
             orderRepository = instance(),
             sessionManager = instance(),
-            processPromotionalItemsUseCase = instance()
+            processPromotionalItemsUseCase = instance(),
+            processDrinksUseCase = instance()
         )
     }
 
@@ -174,6 +177,13 @@ internal val commonModule = DI.Module("commonModule") {
         ProcessPromotionalItemsUseCaseImpl(
             itemsRepository = instance(),
             orderRepository = instance(),
+        )
+    }
+
+    bindProvider<ProcessDrinksUseCase> {
+        ProcessDrinksUseCaseImpl(
+            itemsRepository = instance(),
+            orderRepository = instance()
         )
     }
 
