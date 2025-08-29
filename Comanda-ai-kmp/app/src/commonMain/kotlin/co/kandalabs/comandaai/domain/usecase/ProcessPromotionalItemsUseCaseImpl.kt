@@ -82,8 +82,11 @@ class ProcessPromotionalItemsUseCaseImpl(
         
         order.items?.forEach { item ->
             if (promotionalItemIds.contains(item.itemId)) {
-                // Marcar item promocional como DELIVERED
-                individualStatuses["${item.itemId}_${item.orderId}"] = ItemStatus.DELIVERED
+                // Marcar cada unidade do item do combo original como DELIVERED
+                // (apenas os IDs 19, 20, 27 - os itens gerados ficam PENDING para a cozinha)
+                (0 until item.count).forEach { unitIndex ->
+                    individualStatuses["${item.itemId}_${unitIndex}"] = ItemStatus.DELIVERED
+                }
             }
         }
         
