@@ -27,6 +27,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
 import co.kandalabs.comandaai.presentation.designSystem.components.CommandaBadge
 import co.kandalabs.comandaai.components.ComandaAiLoadingView
+import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
 import comandaai.app.generated.resources.Res
 import comandaai.app.generated.resources.golden_loading
@@ -55,6 +56,10 @@ public data class OrderControlScreen(val orderId: Int) : Screen {
             state = state,
             onBack = { navigator.pop() },
             onItemClick = { itemOrder ->
+                if (itemOrder.status == ItemStatus.CANCELED) {
+                    // Items cancelados não podem ser alterados
+                    return@OrderControlScreenContent
+                }
                 if (itemOrder.count > 1) {
                     viewModel.toggleItemExpansion("${itemOrder.itemId}")
                 } else if (state.userRole == "MANAGER") {
@@ -64,6 +69,10 @@ public data class OrderControlScreen(val orderId: Int) : Screen {
                 }
             },
             onItemBadgeClick = { itemOrder ->
+                if (itemOrder.status == ItemStatus.CANCELED) {
+                    // Items cancelados não podem ser alterados
+                    return@OrderControlScreenContent
+                }
                 if (itemOrder.count > 1) {
                     viewModel.toggleItemExpansion("${itemOrder.itemId}")
                 } else if (state.userRole == "MANAGER") {
@@ -82,20 +91,33 @@ public data class OrderControlScreen(val orderId: Int) : Screen {
                 viewModel.toggleItemExpansion(itemId)
             },
             onIndividualItemClick = { itemOrder, index ->
+                val key = "${itemOrder.itemId}_$index"
+                val individualStatus = state.individualItemStatuses[key] ?: itemOrder.status
+                if (individualStatus == ItemStatus.CANCELED) {
+                    // Items cancelados não podem ser alterados
+                    return@OrderControlScreenContent
+                }
                 if (state.userRole == "MANAGER") {
                     viewModel.showIndividualItemStatusModal(itemOrder, index)
                 } else {
                     viewModel.updateIndividualItemStatus(
                         itemOrder,
                         index,
-                        getNextStatus(itemOrder.status)
+                        getNextStatus(individualStatus)
                     )
                 }
             },
             onDeliverAllItems = { itemOrder ->
                 viewModel.deliverAllItems(itemOrder)
             },
-            onDismissModal = { viewModel.hideStatusModal() }
+            onDeliverAllOrderItems = {
+                viewModel.showDeliverAllConfirmationModal()
+            },
+            onConfirmDeliverAllItems = {
+                viewModel.deliverAllOrderItems()
+            },
+            onDismissModal = { viewModel.hideStatusModal() },
+            onDismissDeliverAllModal = { viewModel.hideDeliverAllConfirmationModal() }
         )
     }
 }
@@ -111,7 +133,10 @@ private fun OrderControlScreenContent(
     onToggleExpansion: (String) -> Unit,
     onIndividualItemClick: (ItemOrder, Int) -> Unit,
     onDeliverAllItems: (ItemOrder) -> Unit,
-    onDismissModal: () -> Unit
+    onDeliverAllOrderItems: () -> Unit,
+    onConfirmDeliverAllItems: () -> Unit,
+    onDismissModal: () -> Unit,
+    onDismissDeliverAllModal: () -> Unit
 ) {
     MaterialTheme {
         Surface(
@@ -127,106 +152,169 @@ private fun OrderControlScreenContent(
                     error = state.error,
                 )
             } else {
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.safeDrawing)
                 ) {
-                    ComandaAiTopAppBar(
-                        "Pedido Nº ${state.order?.id ?: ""}",
-                        onBackOrClose = onBack,
-                        icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        ComandaAiTopAppBar(
+                            "Pedido Nº ${state.order?.id ?: ""}",
+                            onBackOrClose = onBack,
+                            icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft
+                        )
 
-                    Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
+                        Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
 
-                    // Status do pedido
-                    state.order?.let { order ->
-                        val (statusContainerColor, statusContentColor) = when (order.status) {
-                            OrderStatus.DELIVERED -> Pair(
-                                ComandaAiColors.Green500.value,
-                                ComandaAiColors.OnSurface.value
-                            )
-                            OrderStatus.PENDING -> Pair(
-                                ComandaAiColors.Yellow500.value,
-                                ComandaAiColors.OnSurface.value
-                            )
-                            OrderStatus.CANCELED -> Pair(
-                                ComandaAiColors.Error.value,
-                                ComandaAiColors.OnError.value
-                            )
-                        }
-
-                        val statusText = when (order.status) {
-                            OrderStatus.DELIVERED -> "Entregue"
-                            OrderStatus.PENDING -> "Pendente"
-                            OrderStatus.CANCELED -> "Cancelado"
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = ComandaAiSpacing.Medium.value),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CommandaBadge(
-                                text = statusText,
-                                containerColor = statusContainerColor,
-                                contentColor = statusContentColor
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
-
-                    Text(
-                        "Itens do pedido:",
-                        modifier = Modifier
-                            .padding(horizontal = ComandaAiSpacing.Medium.value),
-                        color = ComandaAiColors.Gray700.value,
-                        style = ComandaAiTypography.titleMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
-
-                    state.order?.let { order ->
-                        if (order.items.isEmpty()) {
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Nenhum item neste pedido",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
+                        // Status do pedido
+                        state.order?.let { order ->
+                            val (statusContainerColor, statusContentColor) = when (order.status) {
+                                OrderStatus.DELIVERED -> Pair(
+                                    ComandaAiColors.Green500.value,
+                                    ComandaAiColors.OnSurface.value
+                                )
+                                OrderStatus.PENDING -> Pair(
+                                    ComandaAiColors.Yellow500.value,
+                                    ComandaAiColors.OnSurface.value
+                                )
+                                OrderStatus.CANCELED -> Pair(
+                                    ComandaAiColors.Error.value,
+                                    ComandaAiColors.OnError.value
                                 )
                             }
-                        } else {
-                            LazyColumn(
+
+                            val statusText = when (order.status) {
+                                OrderStatus.DELIVERED -> "Entregue"
+                                OrderStatus.PENDING -> "Pendente"
+                                OrderStatus.CANCELED -> "Cancelado"
+                            }
+
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .weight(1f),
-                                contentPadding = PaddingValues(horizontal = ComandaAiSpacing.Medium.value),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    .padding(horizontal = ComandaAiSpacing.Medium.value),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                items(order.items) { item ->
-                                    OrderControlItemAccordion(
-                                        item = item,
-                                        userRole = state.userRole,
-                                        isExpanded = state.expandedItems.contains("${item.itemId}"),
-                                        individualItemStatuses = state.individualItemStatuses,
-                                        onToggleExpansion = { onToggleExpansion("${item.itemId}") },
-                                        onItemClick = onItemClick,
-                                        onBadgeClick = onItemBadgeClick,
-                                        onIndividualItemClick = onIndividualItemClick,
-                                        onDeliverAllItems = onDeliverAllItems
+
+                                Text(
+                                    "Criado por: ${state.createdBy}",
+                                    color = ComandaAiColors.Surface.value,
+                                    style = ComandaAiTypography.titleMedium
+                                )
+
+                                Spacer(Modifier.weight(1F))
+
+                                CommandaBadge(
+                                    text = statusText,
+                                    containerColor = statusContainerColor,
+                                    contentColor = statusContentColor
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
+
+                        Text(
+                            "Itens do pedido:",
+                            modifier = Modifier
+                                .padding(horizontal = ComandaAiSpacing.Medium.value),
+                            color = ComandaAiColors.Gray700.value,
+                            style = ComandaAiTypography.titleMedium
+                        )
+
+                        Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
+
+                        state.order?.let { order ->
+                            if (order.items.isEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "Nenhum item neste pedido",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
+                                    contentPadding = PaddingValues(
+                                        start = ComandaAiSpacing.Medium.value,
+                                        end = ComandaAiSpacing.Medium.value,
+                                        bottom = 100.dp // Espaço para os botões fixos
+                                    ),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    items(order.items) { item ->
+                                        OrderControlItemAccordion(
+                                            item = item,
+                                            userRole = state.userRole,
+                                            isExpanded = state.expandedItems.contains("${item.itemId}"),
+                                            individualItemStatuses = state.individualItemStatuses,
+                                            onToggleExpansion = { onToggleExpansion("${item.itemId}") },
+                                            onItemClick = onItemClick,
+                                            onBadgeClick = onItemBadgeClick,
+                                            onIndividualItemClick = onIndividualItemClick,
+                                            onDeliverAllItems = onDeliverAllItems
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Botões fixos na parte inferior da tela
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(ComandaAiSpacing.Medium.value),
+                        verticalArrangement = Arrangement.spacedBy(ComandaAiSpacing.Small.value)
+                    ) {
+                        state.order?.let { order ->
+                            if (order.items.any { it.status != ItemStatus.DELIVERED && it.status != ItemStatus.CANCELED }) {
+                                Button(
+                                    onClick = onDeliverAllOrderItems,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = ComandaAiColors.Green500.value,
+                                        contentColor = ComandaAiColors.OnSurface.value
+                                    ),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text(
+                                        text = "Entregar Todos os Itens",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Medium
                                     )
                                 }
                             }
+                        }
+                        
+                        Button(
+                            onClick = onBack,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = ComandaAiColors.Gray200.value,
+                                contentColor = ComandaAiColors.OnSurface.value
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "Voltar",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }
@@ -261,6 +349,57 @@ private fun OrderControlScreenContent(
                     )
                 }
             }
+        }
+
+        // Deliver All Items Confirmation Modal
+        ComandaAiBottomSheetModal(
+            isVisible = state.showDeliverAllConfirmationModal,
+            title = "Confirmar Entrega",
+            onDismiss = onDismissDeliverAllModal,
+            actions = {
+                Button(
+                    onClick = onConfirmDeliverAllItems,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ComandaAiColors.Green500.value,
+                        contentColor = ComandaAiColors.OnSurface.value
+                    )
+                ) {
+                    Text("Confirmar")
+                }
+                
+                Button(
+                    onClick = onDismissDeliverAllModal,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ComandaAiColors.Gray200.value,
+                        contentColor = ComandaAiColors.OnSurface.value
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            Text(
+                text = "Tem certeza que deseja entregar todos os itens deste pedido?",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Esta ação não pode ser desfeita.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            )
         }
     }
 }
@@ -304,7 +443,7 @@ private fun OrderControlItemAccordion(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onItemClick(item) },
+            .clickable(enabled = item.status != ItemStatus.CANCELED) { onItemClick(item) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -350,7 +489,9 @@ private fun OrderControlItemAccordion(
                         text = statusText,
                         containerColor = containerColor,
                         contentColor = contentColor,
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.clickable(
+                            enabled = item.status != ItemStatus.CANCELED
+                        ) {
                             onBadgeClick(item)
                         }
                     )
@@ -469,7 +610,7 @@ private fun IndividualItemRow(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onItemClick() },
+            .clickable(enabled = individualStatus != ItemStatus.CANCELED) { onItemClick() },
         colors = CardDefaults.cardColors(
             containerColor = containerColor
         )
@@ -571,7 +712,9 @@ private fun OrderControlItem(
                 text = statusText,
                 containerColor = containerColor,
                 contentColor = contentColor,
-                modifier = Modifier.clickable {
+                modifier = Modifier.clickable(
+                    enabled = item.status != ItemStatus.CANCELED
+                ) {
                     onBadgeClick(item)
                 }
             )
@@ -848,6 +991,7 @@ private fun IndividualItemStatusModal(
         }
     }
 }
+
 
 private fun getNextStatus(currentStatus: ItemStatus): ItemStatus {
     return when (currentStatus) {

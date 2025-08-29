@@ -12,5 +12,6 @@ data class OrderWithStatusesResponse(
     val items: List<ItemOrder>,
     val status: OrderStatus,
     val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime? = null,
     val individualStatuses: Map<String, ItemStatus>
 )

@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kandalabs.commander.data.repository.toLocalDateTime
 import kandalabs.commander.domain.model.OrderResponse
 import kandalabs.commander.domain.service.OrderService
 import kandalabs.commander.presentation.models.request.CreateOrderRequest
@@ -62,7 +63,9 @@ fun Route.orderRoutes(orderService: OrderService) {
             val request = call.receive<UpdateOrderWithStatusesRequest>()
             val updatedOrder = orderService.updateOrderWithIndividualStatuses(
                 id, 
-                request.order,
+                request.order.copy(
+                    updatedAt = localDateTimeNow()
+                ),
                 request.individualStatuses,
                 request.updatedBy
             )

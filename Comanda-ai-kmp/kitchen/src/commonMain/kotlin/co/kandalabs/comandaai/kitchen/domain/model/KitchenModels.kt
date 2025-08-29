@@ -10,7 +10,8 @@ data class KitchenOrder(
     val tableNumber: Int,
     val userName: String,
     val items: List<KitchenItemDetail>,
-    val createdAt: Long
+    val createdAt: Long,
+    val updatedAt: Long? = null
 )
 
 @Serializable

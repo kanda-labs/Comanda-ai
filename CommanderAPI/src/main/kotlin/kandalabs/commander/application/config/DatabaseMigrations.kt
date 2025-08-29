@@ -20,6 +20,7 @@ object DatabaseMigrations {
         migration002_UpdateItemStatusesToSimplified()
         migration003_UpdateOrderStatusesToSimplified()
         migration004_CreatePartialPaymentsTable()
+        migration005_AddUpdatedAtToOrders()
         
         logger.info { "All database migrations completed successfully" }
     }
@@ -162,6 +163,35 @@ object DatabaseMigrations {
             } catch (e: Exception) {
                 logger.error(e) { "Failed to create partial_payments table: ${e.message}" }
                 throw e
+            }
+        }
+    }
+    
+    /**
+     * Migration 005: Add updated_at column to orders table
+     */
+    private fun migration005_AddUpdatedAtToOrders() {
+        logger.info { "Running migration 005: Add updated_at column to orders table" }
+        
+        transaction {
+            try {
+                // Try to select with updated_at column to check if it exists
+                exec("SELECT updated_at FROM orders LIMIT 1")
+                logger.info { "updated_at column already exists in orders table, skipping migration" }
+            } catch (e: Exception) {
+                // Column doesn't exist, add it
+                try {
+                    // Add the column with a default value equal to created_at for existing records
+                    exec("ALTER TABLE orders ADD COLUMN updated_at BIGINT NOT NULL DEFAULT 0")
+                    
+                    // Update existing records to set updated_at = created_at
+                    exec("UPDATE orders SET updated_at = created_at WHERE updated_at = 0")
+                    
+                    logger.info { "Added updated_at column to orders table and initialized with created_at values" }
+                } catch (migrationError: Exception) {
+                    logger.error(migrationError) { "Failed to add updated_at column: ${migrationError.message}" }
+                    throw migrationError
+                }
             }
         }
     }

@@ -12,7 +12,8 @@ data class Order(
     val userName: String,
     val items: List<ItemOrder>,
     val status: OrderStatus,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime? = null
 )
 
 enum class OrderStatus(val presentationName: String) {

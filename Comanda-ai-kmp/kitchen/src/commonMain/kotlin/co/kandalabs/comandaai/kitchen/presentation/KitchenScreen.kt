@@ -168,13 +168,6 @@ private fun KitchenScreenContent(
                 .padding(horizontal = 16.dp)
         ) {
             
-            // Order Filter Toggle
-            OrderFilterToggle(
-                currentFilter = state.currentFilter,
-                onFilterChange = onFilterChange,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
             // Erro
             state.error?.let { error ->
                 Snackbar(
@@ -186,13 +179,22 @@ private fun KitchenScreenContent(
             }
 
             when (selectedTab) {
-                0 -> OrderControlTab(
-                    state = state,
-                    listState = listState,
-                    onItemStatusChange = onItemStatusChange,
-                    onMarkAsDelivered = onMarkAsDelivered,
-                    onMarkItemAsDelivered = onMarkItemAsDelivered
-                )
+                0 -> {
+                    // Order Filter Toggle - apenas na aba Controle
+                    OrderFilterToggle(
+                        currentFilter = state.currentFilter,
+                        onFilterChange = onFilterChange,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    
+                    OrderControlTab(
+                        state = state,
+                        listState = listState,
+                        onItemStatusChange = onItemStatusChange,
+                        onMarkAsDelivered = onMarkAsDelivered,
+                        onMarkItemAsDelivered = onMarkItemAsDelivered
+                    )
+                }
 
                 1 -> OrderOverviewTab(state = state)
             }

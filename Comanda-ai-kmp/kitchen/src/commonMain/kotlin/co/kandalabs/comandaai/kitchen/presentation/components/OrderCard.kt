@@ -181,9 +181,10 @@ private fun OrderHeader(order: KitchenOrder) {
                 )
             }
             
-            val time = Instant.fromEpochMilliseconds(order.createdAt)
+            val createdTime = Instant.fromEpochMilliseconds(order.createdAt)
                 .toLocalDateTime(TimeZone.currentSystemDefault())
             
+            // Show creation time
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -195,11 +196,28 @@ private fun OrderHeader(order: KitchenOrder) {
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}",
+                    text = "${createdTime.hour.toString().padStart(2, '0')}:${createdTime.minute.toString().padStart(2, '0')}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
+            }
+            
+            // Show update time if available and different from creation time
+            order.updatedAt?.let { updatedAtTimestamp ->
+                if (updatedAtTimestamp != order.createdAt) {
+                    val updatedTime = Instant.fromEpochMilliseconds(updatedAtTimestamp)
+                        .toLocalDateTime(TimeZone.currentSystemDefault())
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
+                    Text(
+                        text = "Atualizado em: ${updatedTime.hour.toString().padStart(2, '0')}:${updatedTime.minute.toString().padStart(2, '0')}",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
             }
         }
     }

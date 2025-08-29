@@ -87,6 +87,7 @@ class OrderRepositoryImpl(
                 items = order.items,
                 status = orderStatus,
                 createdAt = order.createdAt,
+                updatedAt = order.updatedAt,
                 individualStatuses = individualStatuses
             )
         }
@@ -173,7 +174,8 @@ class OrderRepositoryImpl(
                             tableNumber = orderRow[OrderTable.tableId],
                             userName = actualUserName,
                             items = items,
-                            createdAt = orderRow[OrderTable.createdAt]
+                            createdAt = orderRow[OrderTable.createdAt],
+                            updatedAt = orderRow[OrderTable.updatedAt]
                         )
                     }
                     .filter { order ->
@@ -210,12 +212,14 @@ class OrderRepositoryImpl(
         logger.debug { "Creating new order: $createOrderRequest" }
         return transaction {
             runCatching {
+                val currentTime = localDateTimeAsLong()
                 val orderId = orderTable.insert {
                     it[status] = OrderStatus.PENDING.name
                     it[tableId] = createOrderRequest.tableId
                     it[billId] = createOrderRequest.billId
                     it[userName] = createOrderRequest.userName
-                    it[createdAt] = localDateTimeAsLong()
+                    it[createdAt] = currentTime
+                    it[updatedAt] = currentTime
                 } get orderTable.id
 
                 createOrderRequest.items.map { item ->
@@ -255,6 +259,7 @@ class OrderRepositoryImpl(
         return transaction {
             val rowsUpdated = orderTable.update({ orderTable.id eq id }) {
                 it[status] = orderResponse.status.name
+                it[updatedAt] = localDateTimeAsLong()
             }
             if (rowsUpdated > 0) {
                 orderTable.selectAll().where { orderTable.id eq id }
@@ -278,6 +283,7 @@ class OrderRepositoryImpl(
                 // Update order status
                 val rowsUpdated = orderTable.update({ orderTable.id eq id }) {
                     it[status] = orderResponse.status.name
+                    it[updatedAt] = localDateTimeAsLong()
                 }
 
                 if (rowsUpdated == 0) {
@@ -432,7 +438,8 @@ class OrderRepositoryImpl(
                             tableNumber = orderRow[OrderTable.tableId],
                             userName = actualUserName,
                             items = items,
-                            createdAt = orderRow[OrderTable.createdAt]
+                            createdAt = orderRow[OrderTable.createdAt],
+                            updatedAt = orderRow[OrderTable.updatedAt]
                         )
                     }
                     .filter { order ->
@@ -475,6 +482,7 @@ class OrderRepositoryImpl(
                         (orderTable.createdAt greaterEq twoDaysAgo) and
                                 (orderTable.createdAt lessEq endOfDay)
                     }
+                    .orderBy(orderTable.updatedAt to SortOrder.DESC)
                     .map { orderRow ->
                         val orderId = orderRow[OrderTable.id]
                         val orderUserName = orderRow[OrderTable.userName]
@@ -549,7 +557,8 @@ class OrderRepositoryImpl(
                             tableNumber = orderRow[OrderTable.tableId],
                             userName = actualUserName,
                             items = items,
-                            createdAt = orderRow[OrderTable.createdAt]
+                            createdAt = orderRow[OrderTable.createdAt],
+                            updatedAt = orderRow[OrderTable.updatedAt]
                         )
                     }
                     .filter { order ->
@@ -898,6 +907,7 @@ class OrderRepositoryImpl(
             logger.warn { "No items found for orderId=$orderId" }
             OrderTable.update({ OrderTable.id eq orderId }) {
                 it[OrderTable.status] = OrderStatus.PENDING.name
+                it[OrderTable.updatedAt] = localDateTimeAsLong()
             }
             return
         }
@@ -928,6 +938,7 @@ class OrderRepositoryImpl(
 
         OrderTable.update({ OrderTable.id eq orderId }) {
             it[OrderTable.status] = newOrderStatus.name
+            it[OrderTable.updatedAt] = localDateTimeAsLong()
         }
         logger.debug { "Order $orderId updated to status $newOrderStatus" }
     }
@@ -1011,6 +1022,7 @@ class OrderRepositoryImpl(
                     OrderTable.update({ OrderTable.id eq orderId }) {
                         it[OrderTable.status] =
                             OrderStatus.PENDING.name // Ou outro status apropriado
+                        it[OrderTable.updatedAt] = localDateTimeAsLong()
                     }
                     logger.debug { "Order $orderId reverted to PENDING due to incomplete items" }
                 } else {
@@ -1039,6 +1051,7 @@ public fun ResultRow.toOrder(): OrderResponse {
                 .map { it.toItemOrder() }
         },
         createdAt = this[OrderTable.createdAt].toLocalDateTime(),
+        updatedAt = this[OrderTable.updatedAt].toLocalDateTime(),
         tableNumber = this[OrderTable.tableId],
     )
 }

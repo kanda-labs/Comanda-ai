@@ -14,5 +14,7 @@ data class OrderControlState(
     val selectedItem: ItemOrder? = null,
     val expandedItems: Set<String> = emptySet(),
     val selectedIndividualItem: Pair<ItemOrder, Int>? = null, // ItemOrder + index of individual item
-    val individualItemStatuses: Map<String, ItemStatus> = emptyMap() // "itemId_index" -> status
+    val individualItemStatuses: Map<String, ItemStatus> = emptyMap(), // "itemId_index" -> status
+    val showDeliverAllConfirmationModal: Boolean = false,
+    val createdBy: String = ""
 )

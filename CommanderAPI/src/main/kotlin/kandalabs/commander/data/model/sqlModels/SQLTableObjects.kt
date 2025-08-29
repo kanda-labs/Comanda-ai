@@ -40,6 +40,7 @@ object OrderTable : SQLTable("orders") {
     val status = varchar("status", 32)
     val userName = varchar("user_name", 255).default("")
     val createdAt = long("created_at")
+    val updatedAt = long("updated_at")
     override val primaryKey = PrimaryKey(id)
 }
 

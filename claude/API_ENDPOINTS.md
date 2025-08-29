@@ -4,7 +4,7 @@ Este documento documenta os endpoints da API REST do CommanderAPI utilizados pel
 
 ## Base URL
 ```
-http://10.0.2.2:8081/api/v1
+http://192.168.1.4:8081/api/v1
 ```
 
 ## 📋 Tables Endpoints

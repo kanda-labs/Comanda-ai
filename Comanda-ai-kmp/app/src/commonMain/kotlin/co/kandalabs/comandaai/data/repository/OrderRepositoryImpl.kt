@@ -74,16 +74,27 @@ internal class OrderRepositoryImpl(
         updatedBy: String
     ): ComandaAiResult<Order> =
         safeRunCatching {
-            commanderApi.updateOrderWithIndividualStatuses(
-                orderId,
-                UpdateOrderWithStatusesRequest(
-                    order = order,
-                    individualStatuses = individualStatuses,
-                    updatedBy = updatedBy
-                )
+            println("[OrderRepository] Chamando API updateOrderWithIndividualStatuses...")
+            println("[OrderRepository] Order ID: $orderId")
+            println("[OrderRepository] Individual statuses: $individualStatuses")
+            println("[OrderRepository] Updated by: $updatedBy")
+            
+            val request = UpdateOrderWithStatusesRequest(
+                order = order,
+                individualStatuses = individualStatuses,
+                updatedBy = updatedBy
             )
+            
+            println("[OrderRepository] Request payload: $request")
+            
+            val response = commanderApi.updateOrderWithIndividualStatuses(orderId, request)
+            
+            println("[OrderRepository] Response received: $response")
+            
+            response
         }.onFailure { error ->
-            println("Error updating order with individual statuses: $error")
+            println("[OrderRepository] Error updating order with individual statuses: $error")
+            println("[OrderRepository] Error stacktrace: ${error.stackTraceToString()}")
         }
 }
 
