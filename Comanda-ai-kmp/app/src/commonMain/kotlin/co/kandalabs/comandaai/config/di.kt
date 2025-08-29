@@ -18,6 +18,8 @@ import co.kandalabs.comandaai.data.repository.TablesRepositoryImp
 import co.kandalabs.comandaai.domain.repository.ItemsRepository
 import co.kandalabs.comandaai.domain.repository.OrderRepository
 import co.kandalabs.comandaai.domain.repository.TablesRepository
+import co.kandalabs.comandaai.domain.usecase.ProcessPromotionalItemsUseCase
+import co.kandalabs.comandaai.domain.usecase.ProcessPromotionalItemsUseCaseImpl
 import co.kandalabs.comandaai.presentation.screens.itemsSelection.BreedsListingViewModel
 import co.kandalabs.comandaai.presentation.screens.order.OrderScreenModel
 import co.kandalabs.comandaai.presentation.screens.ordercontrol.OrderControlViewModel
@@ -163,7 +165,15 @@ internal val commonModule = DI.Module("commonModule") {
         OrderScreenModel(
             itemsRepository = instance(),
             orderRepository = instance(),
-            sessionManager = instance()
+            sessionManager = instance(),
+            processPromotionalItemsUseCase = instance()
+        )
+    }
+
+    bindProvider<ProcessPromotionalItemsUseCase> {
+        ProcessPromotionalItemsUseCaseImpl(
+            itemsRepository = instance(),
+            orderRepository = instance(),
         )
     }
 

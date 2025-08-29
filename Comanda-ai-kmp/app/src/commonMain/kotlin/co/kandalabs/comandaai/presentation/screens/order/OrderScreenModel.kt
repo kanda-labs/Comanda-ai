@@ -8,6 +8,7 @@ import co.kandalabs.comandaai.domain.model.ItemWithCount
 import co.kandalabs.comandaai.domain.repository.CreateOrderItemRequest
 import co.kandalabs.comandaai.domain.repository.ItemsRepository
 import co.kandalabs.comandaai.domain.repository.OrderRepository
+import co.kandalabs.comandaai.domain.usecase.ProcessPromotionalItemsUseCase
 import co.kandalabs.comandaai.domain.Item
 import co.kandalabs.comandaai.domain.ItemCategory
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,7 @@ class OrderScreenModel(
     private val itemsRepository: ItemsRepository,
     private val orderRepository: OrderRepository,
     private val sessionManager: SessionManager,
+    private val processPromotionalItemsUseCase: ProcessPromotionalItemsUseCase,
 ) : ScreenModel {
     
     private val _allItems = MutableStateFlow<List<Item>>(emptyList())
@@ -62,7 +64,7 @@ class OrderScreenModel(
     }.stateIn(screenModelScope, SharingStarted.WhileSubscribed(), false)
     
     val filteredItems = combine(_allItems, _selectedCategory) { items, category ->
-        items.filter { it.category == category }
+        items.filter { it.category == category && it.value > 0 }
     }.stateIn(screenModelScope, SharingStarted.WhileSubscribed(), emptyList())
     
     val itemsWithCount = combine(filteredItems, _selectedItems) { items, selected ->
@@ -130,6 +132,9 @@ class OrderScreenModel(
                     }
                 }
 
+                // Processar itens promocionais automaticamente
+                val promotionalResult = processPromotionalItemsUseCase.processPromotionalItems(orderItems)
+
                 val userSession = sessionManager.getSession()
                 val userName = userSession?.userName ?: ""
                 
@@ -137,11 +142,22 @@ class OrderScreenModel(
                     tableId = tableId,
                     billId = billId,
                     userName = userName,
-                    items = orderItems
+                    items = promotionalResult.processedItems
                 )
                 
                 when (result) {
                     is ComandaAiResult.Success -> {
+                        val createdOrder = result.data
+                        
+                        // Marcar itens promocionais como DELIVERED se existirem
+                        if (promotionalResult.promotionalItemIds.isNotEmpty()) {
+                            processPromotionalItemsUseCase.markPromotionalItemsAsDelivered(
+                                order = createdOrder,
+                                promotionalItemIds = promotionalResult.promotionalItemIds,
+                                updatedBy = userName
+                            )
+                        }
+                        
                         _selectedItems.value = emptyMap()
                         _itemObservations.value = emptyMap()
                         _orderSubmitted.value = true
