@@ -1,22 +1,46 @@
 package co.kandalabs.comandaai.presentation.screens.ordercontrol
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,21 +48,22 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.kandalabs.comandaai.components.ComandaAiTopAppBar
-import co.kandalabs.comandaai.presentation.designSystem.components.CommandaBadge
-import co.kandalabs.comandaai.components.ComandaAiLoadingView
 import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
-import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
-import comandaai.app.generated.resources.Res
-import comandaai.app.generated.resources.golden_loading
-import org.jetbrains.compose.resources.painterResource
-import co.kandalabs.comandaai.theme.ComandaAiTypography
-import co.kandalabs.comandaai.tokens.ComandaAiColors
-import co.kandalabs.comandaai.tokens.ComandaAiSpacing
-import co.kandalabs.comandaai.domain.models.model.Order
+import co.kandalabs.comandaai.components.ComandaAiButton
+import co.kandalabs.comandaai.components.ComandaAiButtonVariant
+import co.kandalabs.comandaai.components.ComandaAiLoadingView
+import co.kandalabs.comandaai.components.ComandaAiTopAppBar
 import co.kandalabs.comandaai.domain.ItemOrder
 import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.domain.models.model.OrderStatus
+import co.kandalabs.comandaai.presentation.designSystem.components.CommandaBadge
+import co.kandalabs.comandaai.presentation.screens.itemsSelection.components.ErrorView
+import co.kandalabs.comandaai.theme.ComandaAiTypography
+import co.kandalabs.comandaai.tokens.ComandaAiColors
+import co.kandalabs.comandaai.tokens.ComandaAiSpacing
+import comandaai.app.generated.resources.Res
+import comandaai.app.generated.resources.golden_loading
+import org.jetbrains.compose.resources.painterResource
 
 public data class OrderControlScreen(val orderId: Int) : Screen {
 
@@ -283,39 +308,19 @@ private fun OrderControlScreenContent(
                     ) {
                         state.order?.let { order ->
                             if (order.items.any { it.status != ItemStatus.DELIVERED && it.status != ItemStatus.CANCELED }) {
-                                Button(
+                                ComandaAiButton(
+                                    text = "Entregar Todos os Itens",
                                     onClick = onDeliverAllOrderItems,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = ComandaAiColors.Green500.value,
-                                        contentColor = ComandaAiColors.OnSurface.value
-                                    ),
-                                    shape = RoundedCornerShape(8.dp)
-                                ) {
-                                    Text(
-                                        text = "Entregar Todos os Itens",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
+                                    variant = ComandaAiButtonVariant.Primary
+                                )
                             }
                         }
                         
-                        Button(
+                        ComandaAiButton(
+                            text = "Voltar",
                             onClick = onBack,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = ComandaAiColors.Gray200.value,
-                                contentColor = ComandaAiColors.OnSurface.value
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = "Voltar",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                            variant = ComandaAiButtonVariant.Secondary
+                        )
                     }
                 }
             }
@@ -357,27 +362,17 @@ private fun OrderControlScreenContent(
             title = "Confirmar Entrega",
             onDismiss = onDismissDeliverAllModal,
             actions = {
-                Button(
+                ComandaAiButton(
+                    text = "Confirmar",
                     onClick = onConfirmDeliverAllItems,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ComandaAiColors.Green500.value,
-                        contentColor = ComandaAiColors.OnSurface.value
-                    )
-                ) {
-                    Text("Confirmar")
-                }
+                    variant = ComandaAiButtonVariant.Primary
+                )
                 
-                Button(
+                ComandaAiButton(
+                    text = "Cancelar",
                     onClick = onDismissDeliverAllModal,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ComandaAiColors.Gray200.value,
-                        contentColor = ComandaAiColors.OnSurface.value
-                    )
-                ) {
-                    Text("Cancelar")
-                }
+                    variant = ComandaAiButtonVariant.Secondary
+                )
             }
         ) {
             Text(
@@ -554,21 +549,11 @@ private fun OrderControlItemAccordion(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        Button(
+                        ComandaAiButton(
+                            text = "Entregar todos os itens",
                             onClick = { onDeliverAllItems(item) },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = ComandaAiColors.Green500.value,
-                                contentColor = ComandaAiColors.OnSurface.value
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = "Entregar todos os itens",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                            variant = ComandaAiButtonVariant.Primary
+                        )
                     }
                 }
             }
@@ -731,62 +716,53 @@ private fun StatusSelectionModal(
     // Filtra os status disponíveis excluindo o status atual
     val availableStatuses = ItemStatus.values().filter { it != item.status }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f))
-            .clickable { onDismiss() },
-        contentAlignment = Alignment.BottomCenter
+    val currentStatusText = when (item.status) {
+        ItemStatus.DELIVERED -> "Entregue"
+        ItemStatus.PENDING -> "Pendente"
+        ItemStatus.CANCELED -> "Cancelado"
+    }
+
+    ComandaAiBottomSheetModal(
+        isVisible = true,
+        title = "Alterar Status",
+        onDismiss = onDismiss,
+        actions = {
+            ComandaAiButton(
+                text = "Cancelar",
+                onClick = onDismiss,
+                variant = ComandaAiButtonVariant.Secondary
+            )
+        }
     ) {
-        Card(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(ComandaAiSpacing.Medium.value)
-                .clickable { },
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text(
+                text = "Item: ${item.name}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = "Status atual: $currentStatusText",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = "Selecione o novo status:",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
             Column(
-                modifier = Modifier.padding(ComandaAiSpacing.Medium.value)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "Alterar Status",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = ComandaAiSpacing.Medium.value)
-                )
-                
-                Text(
-                    text = "Item: ${item.name}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-
-                val currentStatusText = when (item.status) {
-                    ItemStatus.DELIVERED -> "Entregue"
-                    ItemStatus.PENDING -> "Pendente"
-                    ItemStatus.CANCELED -> "Cancelado"
-                }
-
-                Text(
-                    text = "Status atual: $currentStatusText",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Selecione o novo status:",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 availableStatuses.forEach { status ->
                     val statusText = when (status) {
                         ItemStatus.DELIVERED -> "Entregue"
@@ -797,29 +773,23 @@ private fun StatusSelectionModal(
                     val (bgColor, textColor) = when (status) {
                         ItemStatus.DELIVERED -> Pair(
                             ComandaAiColors.Green500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
+                            ComandaAiColors.Green500.value
                         )
 
                         ItemStatus.PENDING -> Pair(
                             ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
+                            ComandaAiColors.Yellow500.value
                         )
 
                         ItemStatus.CANCELED -> Pair(
                             ComandaAiColors.Error.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
-                        )
-                        
-                        else -> Pair(
-                            ComandaAiColors.Gray200.value,
-                            ComandaAiColors.OnSurface.value
+                            ComandaAiColors.Error.value
                         )
                     }
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 2.dp)
                             .clickable {
                                 onStatusSelected(status)
                             },
@@ -831,25 +801,13 @@ private fun StatusSelectionModal(
                             text = statusText,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
+                                .padding(16.dp),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = ComandaAiColors.OnSurface.value,
-                            fontWeight = FontWeight.Medium
+                            color = textColor,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
                         )
                     }
-                }
-                
-                Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
-                
-                Button(
-                    onClick = onDismiss,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ComandaAiColors.Gray200.value,
-                        contentColor = ComandaAiColors.OnSurface.value
-                    )
-                ) {
-                    Text("Cancelar")
                 }
             }
         }
@@ -867,62 +825,53 @@ private fun IndividualItemStatusModal(
     // Filtra os status disponíveis excluindo o status atual individual
     val availableStatuses = ItemStatus.values().filter { it != currentIndividualStatus }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f))
-            .clickable { onDismiss() },
-        contentAlignment = Alignment.BottomCenter
+    val currentStatusText = when (currentIndividualStatus) {
+        ItemStatus.DELIVERED -> "Entregue"
+        ItemStatus.PENDING -> "Pendente"
+        ItemStatus.CANCELED -> "Cancelado"
+    }
+
+    ComandaAiBottomSheetModal(
+        isVisible = true,
+        title = "Alterar Status Individual",
+        onDismiss = onDismiss,
+        actions = {
+            ComandaAiButton(
+                text = "Cancelar",
+                onClick = onDismiss,
+                variant = ComandaAiButtonVariant.Secondary
+            )
+        }
     ) {
-        Card(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(ComandaAiSpacing.Medium.value)
-                .clickable { },
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text(
+                text = "Item: ${item.name} #${individualIndex + 1}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = "Status atual: $currentStatusText",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = "Selecione o novo status:",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
             Column(
-                modifier = Modifier.padding(ComandaAiSpacing.Medium.value)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "Alterar Status Individual",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = ComandaAiSpacing.Medium.value)
-                )
-                
-                Text(
-                    text = "Item: ${item.name} #${individualIndex + 1}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-
-                val currentStatusText = when (currentIndividualStatus) {
-                    ItemStatus.DELIVERED -> "Entregue"
-                    ItemStatus.PENDING -> "Pendente"
-                    ItemStatus.CANCELED -> "Cancelado"
-                }
-
-                Text(
-                    text = "Status atual: $currentStatusText",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Selecione o novo status:",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 availableStatuses.forEach { status ->
                     val statusText = when (status) {
                         ItemStatus.DELIVERED -> "Entregue"
@@ -933,29 +882,23 @@ private fun IndividualItemStatusModal(
                     val (bgColor, textColor) = when (status) {
                         ItemStatus.DELIVERED -> Pair(
                             ComandaAiColors.Green500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
+                            ComandaAiColors.Green500.value
                         )
 
                         ItemStatus.PENDING -> Pair(
                             ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
+                            ComandaAiColors.Yellow500.value
                         )
 
                         ItemStatus.CANCELED -> Pair(
                             ComandaAiColors.Error.value.copy(alpha = 0.1f),
-                            ComandaAiColors.OnSurface.value
-                        )
-                        
-                        else -> Pair(
-                            ComandaAiColors.Gray200.value,
-                            ComandaAiColors.OnSurface.value
+                            ComandaAiColors.Error.value
                         )
                     }
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 2.dp)
                             .clickable {
                                 onStatusSelected(status)
                             },
@@ -967,25 +910,13 @@ private fun IndividualItemStatusModal(
                             text = statusText,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
+                                .padding(16.dp),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = ComandaAiColors.OnSurface.value,
-                            fontWeight = FontWeight.Medium
+                            color = textColor,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
                         )
                     }
-                }
-                
-                Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
-                
-                Button(
-                    onClick = onDismiss,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ComandaAiColors.Gray200.value,
-                        contentColor = ComandaAiColors.OnSurface.value
-                    )
-                ) {
-                    Text("Cancelar")
                 }
             }
         }
