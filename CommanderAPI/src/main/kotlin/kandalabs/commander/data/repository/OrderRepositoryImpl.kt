@@ -15,7 +15,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import kotlin.text.set
 
 class OrderRepositoryImpl(
     val orderTable: OrderTable,
@@ -97,10 +96,10 @@ class OrderRepositoryImpl(
         logger.debug { "Fetching orders with incomplete items for active table bills" }
         return try {
             val orders = transaction {
-                orderTable.join(tableTable, JoinType.INNER, orderTable.tableId, TableTable.id)
+                orderTable.join(tableTable, JoinType.INNER, orderTable.tableId, tableTable.id)
                     .selectAll()
                     .where {
-                        TableTable.billId.isNotNull()
+                        tableTable.billId.isNotNull() and (orderTable.billId eq tableTable.billId)
                     }
                     .map { orderRow ->
                         val orderId = orderRow[OrderTable.id]
@@ -171,7 +170,7 @@ class OrderRepositoryImpl(
 
                         KitchenOrder(
                             id = orderId,
-                            tableNumber = orderRow[OrderTable.tableId],
+                            tableNumber = orderRow[tableTable.number],
                             userName = actualUserName,
                             items = items,
                             createdAt = orderRow[OrderTable.createdAt],
