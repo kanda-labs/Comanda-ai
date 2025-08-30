@@ -96,20 +96,21 @@ internal data class TableDetailsScreenState(
         else -> null
     }
 
-    val tertiaryButton: TableDetailsScreenButton? = when (table?.status) {
-        TableStatus.OCCUPIED -> TableDetailsScreenButton(
-            text = "Pagamento Parcial",
-            action = TableDetailsAction.SHOW_PARTIAL_PAYMENT_DIALOG
-        )
-        else -> null
-    }
+    //only manager can receive early payments
+    val tertiaryButton: TableDetailsScreenButton? =
+        if (table?.status == TableStatus.OCCUPIED && userSession?.role == UserRole.MANAGER)
+            TableDetailsScreenButton(
+                text = "Pagamento Parcial",
+                action = TableDetailsAction.SHOW_PARTIAL_PAYMENT_DIALOG
+            )
+        else null
+
 
     val orders: OrdersDetailsState = OrdersDetailsState(
         orders = table?.orders ?: emptyList(),
         isLoading = isLoading,
         error = error
     )
-
 }
 
 internal data class OrdersDetailsItemState(
@@ -123,17 +124,19 @@ internal data class OrdersDetailsState(
     private val orders: List<Order> = emptyList(),
     val isLoading: Boolean = false,
     val error: ComandaAiException? = null
-){
+) {
     val ordersPresentation: List<OrdersDetailsItemState> = orders.map {
         val (color, textColor) = when (it.status) {
             OrderStatus.DELIVERED -> Pair(
                 ComandaAiColors.Green500,
                 ComandaAiColors.OnSurface
             )
+
             OrderStatus.PENDING -> Pair(
                 ComandaAiColors.Yellow500,
                 ComandaAiColors.OnSurface
             )
+
             OrderStatus.CANCELED -> Pair(
                 ComandaAiColors.Error,
                 ComandaAiColors.OnError
