@@ -81,7 +81,7 @@ class ProcessDrinksUseCaseImpl(
                         orderRepository.updateOrderWithIndividualStatuses(
                             orderId = createdDrinkOrder.id!!,
                             order = createdDrinkOrder,
-                            individualStatuses = drinkIndividualStatuses,
+                            individualStatuses = drinkIndividualStatuses, 
                             updatedBy = userName
                         )
                     }
