@@ -81,7 +81,7 @@ fun ItemRow(
             
             StatusBadge(
                 status = item.overallStatus,
-                count = item.unitStatuses.count { it.status != ItemStatus.DELIVERED },
+                count = item.unitStatuses.count { it.status == ItemStatus.PENDING },
                 isMultipleItems = item.totalCount > 1,
                 isDeliveredView = isDeliveredView,
                 onClick = {

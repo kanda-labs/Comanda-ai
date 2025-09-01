@@ -175,13 +175,13 @@ class KitchenViewModel(
                     _state.update { currentState ->
                         val orderToMove = currentState.activeOrders.find { it.id == orderId }
                         if (orderToMove != null) {
-                            // Mark all items as delivered
+                            // Mark all non-canceled items as delivered
                             val deliveredOrder = orderToMove.copy(
                                 items = orderToMove.items.map { item ->
                                     item.copy(
-                                        overallStatus = ItemStatus.DELIVERED,
+                                        overallStatus = if (item.overallStatus == ItemStatus.CANCELED) ItemStatus.CANCELED else ItemStatus.DELIVERED,
                                         unitStatuses = item.unitStatuses.map { unit ->
-                                            unit.copy(status = ItemStatus.DELIVERED)
+                                            unit.copy(status = if (unit.status == ItemStatus.CANCELED) ItemStatus.CANCELED else ItemStatus.DELIVERED)
                                         }
                                     )
                                 }
@@ -455,11 +455,13 @@ class KitchenViewModel(
                 val updatedItems = order.items.map { item ->
                     if (item.itemId == itemId) {
                         val updatedUnitStatuses = item.unitStatuses.map { unitStatus ->
-                            unitStatus.copy(status = ItemStatus.DELIVERED)
+                            unitStatus.copy(status = if (unitStatus.status == ItemStatus.CANCELED) ItemStatus.CANCELED else ItemStatus.DELIVERED)
                         }
+                        // Calculate overall status considering canceled items
+                        val newOverallStatus = calculateOverallStatus(updatedUnitStatuses)
                         item.copy(
                             unitStatuses = updatedUnitStatuses,
-                            overallStatus = ItemStatus.DELIVERED
+                            overallStatus = newOverallStatus
                         )
                     } else {
                         item
@@ -484,11 +486,12 @@ class KitchenViewModel(
     
     /**
      * Calculate the overall status of an item based on its unit statuses.
-     * Returns DELIVERED if all units are delivered, otherwise OPEN.
+     * Returns CANCELED if all units are canceled, DELIVERED if all non-canceled units are delivered, otherwise PENDING.
      */
     private fun calculateOverallStatus(unitStatuses: List<ItemUnitStatus>): ItemStatus {
         return when {
-            unitStatuses.all { it.status == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
+            unitStatuses.all { it.status == ItemStatus.CANCELED } -> ItemStatus.CANCELED
+            unitStatuses.all { it.status == ItemStatus.DELIVERED || it.status == ItemStatus.CANCELED } -> ItemStatus.DELIVERED
             else -> ItemStatus.PENDING
         }
     }
@@ -680,11 +683,13 @@ class KitchenViewModel(
                 val updatedItems = order.items.map { item ->
                     if (item.itemId == itemId) {
                         val updatedUnitStatuses = item.unitStatuses.map { unitStatus ->
-                            unitStatus.copy(status = ItemStatus.DELIVERED)
+                            unitStatus.copy(status = if (unitStatus.status == ItemStatus.CANCELED) ItemStatus.CANCELED else ItemStatus.DELIVERED)
                         }
+                        // Calculate overall status considering canceled items
+                        val newOverallStatus = calculateOverallStatus(updatedUnitStatuses)
                         item.copy(
                             unitStatuses = updatedUnitStatuses,
-                            overallStatus = ItemStatus.DELIVERED
+                            overallStatus = newOverallStatus
                         )
                     } else {
                         item
