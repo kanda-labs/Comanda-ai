@@ -21,4 +21,6 @@ interface TablesRepository {
     suspend fun processTablePayment(tableId: Int): ComandaAiResult<Unit>
     suspend fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String? = null): ComandaAiResult<PartialPayment>
     suspend fun reopenTable(tableId: Int): ComandaAiResult<Unit>
+    suspend fun migrateTable(originTableId: Int, destinationTableId: Int): ComandaAiResult<Pair<Table, Table>>
+    suspend fun getFreeTables(): ComandaAiResult<List<Table>>
 }

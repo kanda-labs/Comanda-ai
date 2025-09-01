@@ -149,4 +149,21 @@ internal class TablesRepositoryImp(
             println("Error reopening table: $error")
         }
     }
+
+    override suspend fun migrateTable(originTableId: Int, destinationTableId: Int): ComandaAiResult<Pair<Table, Table>> {
+        return safeRunCatching {
+            val response = commanderApi.migrateTable(originTableId, destinationTableId)
+            Pair(response.originTable, response.destinationTable)
+        }.onFailure { error ->
+            println("Error migrating table: $error")
+        }
+    }
+
+    override suspend fun getFreeTables(): ComandaAiResult<List<Table>> {
+        return safeRunCatching {
+            commanderApi.getTables().filter { it.status == TableStatus.FREE }
+        }.onFailure { error ->
+            println("Error fetching free tables: $error")
+        }
+    }
 }

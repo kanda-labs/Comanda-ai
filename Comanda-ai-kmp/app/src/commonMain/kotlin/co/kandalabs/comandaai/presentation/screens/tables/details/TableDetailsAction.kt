@@ -20,4 +20,5 @@ sealed class TableDetailsAction {
     object SHOW_CLOSE_TABLE_CONFIRMATION : TableDetailsAction()
     object HIDE_CLOSE_TABLE_CONFIRMATION : TableDetailsAction()
     object CONFIRM_CLOSE_TABLE : TableDetailsAction()
+    object SHOW_TABLE_MIGRATION : TableDetailsAction()
 }

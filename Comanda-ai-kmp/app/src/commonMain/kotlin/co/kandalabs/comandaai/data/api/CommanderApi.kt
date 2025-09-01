@@ -17,6 +17,7 @@ import co.kandalabs.comandaai.domain.models.model.PartialPayment
 import co.kandalabs.comandaai.domain.models.request.CreatePartialPaymentRequest
 import co.kandalabs.comandaai.domain.models.model.Table
 import co.kandalabs.comandaai.domain.models.model.PaymentSummaryResponse
+import co.kandalabs.comandaai.data.api.MigrationResponse
 
 internal interface CommanderApi {
     companion object {
@@ -73,4 +74,7 @@ internal interface CommanderApi {
     
     @GET("api/v1/bills/table/{tableId}/partial-payments")
     suspend fun getPartialPayments(@Path("tableId") tableId: Int): List<PartialPayment>
+    
+    @POST("api/v1/tables/{originId}/migrate/{destinationId}")
+    suspend fun migrateTable(@Path("originId") originId: Int, @Path("destinationId") destinationId: Int): MigrationResponse
 }

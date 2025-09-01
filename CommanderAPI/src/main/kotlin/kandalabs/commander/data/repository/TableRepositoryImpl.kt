@@ -6,6 +6,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import kandalabs.commander.domain.model.TableStatus
 import kandalabs.commander.domain.repository.TableRepository
 import kandalabs.commander.data.model.sqlModels.TableTable
+import kandalabs.commander.data.model.sqlModels.OrderTable
+import kandalabs.commander.data.model.sqlModels.PartialPaymentTable
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -77,6 +79,68 @@ class TableRepositoryImpl(
         logger.debug { "Deleting table with id: $id" }
         return transaction {
             tableTable.deleteWhere { tableTable.id eq id } > 0
+        }
+    }
+
+    override suspend fun migrateTable(originId: Int, destinationId: Int, billId: Int): Boolean {
+        logger.debug { "=== TableRepositoryImpl.migrateTable START ===" }
+        logger.debug { "Parameters: originId=$originId, destinationId=$destinationId, billId=$billId" }
+        
+        return try {
+            transaction {
+                logger.debug { "Starting database transaction for table migration" }
+                
+                // Update origin table: set status to CLOSED and billId to null
+                logger.debug { "Step 1: Updating origin table $originId - setting status to CLOSED and billId to null" }
+                val originUpdated = tableTable.update({ tableTable.id eq originId }) {
+                    it[tableTable.status] = TableStatus.CLOSED.name
+                    it[tableTable.billId] = null
+                } > 0
+                
+                logger.debug { "Origin table update result: $originUpdated (rows affected: ${if (originUpdated) "1" else "0"})" }
+
+                // Update destination table: set status to OPEN and assign billId
+                logger.debug { "Step 2: Updating destination table $destinationId - setting status to OPEN and billId to $billId" }
+                val destinationUpdated = tableTable.update({ tableTable.id eq destinationId }) {
+                    it[tableTable.status] = TableStatus.OPEN.name
+                    it[tableTable.billId] = billId
+                } > 0
+                
+                logger.debug { "Destination table update result: $destinationUpdated (rows affected: ${if (destinationUpdated) "1" else "0"})" }
+
+                // Update orders: change tableId from origin to destination for this billId
+                logger.debug { "Step 3: Updating orders with billId $billId - changing tableId from $originId to $destinationId" }
+                val ordersUpdated = OrderTable.update({ OrderTable.billId eq billId }) {
+                    it[OrderTable.tableId] = destinationId
+                }
+                
+                logger.debug { "Orders update result: $ordersUpdated rows affected" }
+
+                // Update partial payments: change tableId from origin to destination for this billId
+                logger.debug { "Step 4: Updating partial payments with billId $billId - changing tableId from $originId to $destinationId" }
+                val partialPaymentsUpdated = PartialPaymentTable.update({ PartialPaymentTable.billId eq billId }) {
+                    it[PartialPaymentTable.tableId] = destinationId
+                }
+                
+                logger.debug { "Partial payments update result: $partialPaymentsUpdated rows affected" }
+
+                // All table updates must succeed
+                val result = originUpdated && destinationUpdated
+                logger.debug { "Final migration result: $result (originUpdated=$originUpdated && destinationUpdated=$destinationUpdated, ordersUpdated=$ordersUpdated, partialPaymentsUpdated=$partialPaymentsUpdated)" }
+                
+                if (result) {
+                    logger.debug { "=== TableRepositoryImpl.migrateTable SUCCESS ===" }
+                } else {
+                    logger.error { "=== TableRepositoryImpl.migrateTable FAILED - one or both updates failed ===" }
+                }
+                
+                result
+            }
+        } catch (e: Exception) {
+            logger.error { "EXCEPTION in TableRepositoryImpl.migrateTable: ${e.message}" }
+            logger.error { "Exception type: ${e::class.simpleName}" }
+            logger.error(e) { "Full exception stack trace" }
+            throw e
         }
     }
 

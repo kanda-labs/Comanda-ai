@@ -61,6 +61,7 @@ fun Route.authRoutes(userService: UserService) {
                     "admin" -> request.password == "123456"
                     "lueny" -> request.password == "123456"
                     "leonardo" -> request.password == "123456"
+                    "leila" -> request.password == "123456"
                     "rennan" -> request.password == "123456"
                     "maykon" -> request.password == "123456"
                     "cacau" -> request.password == "123456"

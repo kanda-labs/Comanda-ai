@@ -12,9 +12,14 @@ import kandalabs.commander.presentation.models.request.CreateTableRequest
 import kandalabs.commander.domain.model.ErrorResponse
 import kandalabs.commander.domain.model.toResponse
 import kandalabs.commander.presentation.models.request.UpdateTableRequest
+import kandalabs.commander.presentation.models.response.MigrationResponse
+import kandalabs.commander.presentation.models.response.toDto
 import kandalabs.commander.domain.service.OrderService
 import mu.KotlinLogging
 import kotlin.fold
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 private val logger = KotlinLogging.logger {}
 
@@ -107,7 +112,7 @@ fun Route.tableRoutes(tableService: TableService, orderService: OrderService) {
                         id = null,
                         number = request.number,
                         status = TableStatus.CLOSED,
-                        createdAt =localDateTimeNow(),
+                        createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
                     )
                     tableService.createTable(table)
                         .fold(
@@ -181,6 +186,95 @@ fun Route.tableRoutes(tableService: TableService, orderService: OrderService) {
                         path = call.request.path()
                     )
                     call.respond(HttpStatusCode.BadRequest, errorResponse)
+                }
+            }
+            
+            // Migrate table endpoint (must come before delete to avoid route conflicts)
+            post("{originId}/migrate/{destinationId}") {
+                
+                var originId: Int? = null
+                var destinationId: Int? = null
+                
+                try {
+                    
+                    originId = call.parameters["originId"]?.toIntOrNull()
+                    destinationId = call.parameters["destinationId"]?.toIntOrNull()
+                    
+                    if (originId == null) {
+                        throw IllegalArgumentException("Invalid origin table ID")
+                    }
+                    
+                    if (destinationId == null) {
+                        throw IllegalArgumentException("Invalid destination table ID")
+                    }
+                    
+                    logger.info { "Starting migration from table $originId to table $destinationId" }
+                    val result = tableService.migrateTable(originId, destinationId)
+                    
+                    result.fold(
+                        onSuccess = { (originTable, destinationTable) ->
+                            logger.info { "Migration successful from table $originId to table $destinationId" }
+                            
+                            val response = MigrationResponse(
+                                success = true,
+                                message = "Table migrated successfully",
+                                originTable = originTable.toDto(),
+                                destinationTable = destinationTable.toDto()
+                            )
+                            
+                            call.respond(HttpStatusCode.OK, response)
+                        },
+                        onFailure = { error ->
+                            logger.error(error) { "Migration failed from table $originId to table $destinationId: ${error.message}" }
+                            
+                            val statusCode = when (error.message) {
+                                "Origin table not found" -> HttpStatusCode.NotFound
+                                "Destination table not found" -> HttpStatusCode.NotFound
+                                "Origin table is not occupied" -> HttpStatusCode.BadRequest
+                                "Destination table is not free" -> HttpStatusCode.Conflict
+                                "Origin table has no active bill" -> HttpStatusCode.BadRequest
+                                else -> HttpStatusCode.InternalServerError
+                            }
+                            
+                            val errorResponse = ErrorResponse(
+                                status = statusCode.value,
+                                message = error.message ?: "Error migrating table",
+                                path = call.request.path()
+                            )
+                            
+                            call.respond(statusCode, errorResponse)
+                        }
+                    )
+                    
+                } catch (e: IllegalArgumentException) {
+                    logger.warn { "Invalid migration parameters: ${e.message}" }
+                    
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.BadRequest.value,
+                        message = e.message ?: "Invalid table IDs",
+                        path = call.request.path()
+                    )
+                    call.respond(HttpStatusCode.BadRequest, errorResponse)
+                    
+                } catch (e: NumberFormatException) {
+                    logger.warn { "Invalid number format for table IDs: ${e.message}" }
+                    
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.BadRequest.value,
+                        message = "Invalid number format for table IDs",
+                        path = call.request.path()
+                    )
+                    call.respond(HttpStatusCode.BadRequest, errorResponse)
+                    
+                } catch (e: Exception) {
+                    logger.error(e) { "Unexpected error in migration endpoint" }
+                    
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.InternalServerError.value,
+                        message = "Unexpected error: ${e.message}",
+                        path = call.request.path()
+                    )
+                    call.respond(HttpStatusCode.InternalServerError, errorResponse)
                 }
             }
 

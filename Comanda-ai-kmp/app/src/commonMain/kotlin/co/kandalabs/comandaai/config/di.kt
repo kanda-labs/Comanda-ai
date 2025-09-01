@@ -30,6 +30,7 @@ import co.kandalabs.comandaai.presentation.screens.payment.PaymentSummaryViewMod
 import co.kandalabs.comandaai.presentation.screens.tables.details.TablesDetailsViewModel
 import co.kandalabs.comandaai.presentation.screens.tables.listing.TablesViewModel
 import co.kandalabs.comandaai.presentation.screens.admin.AdminViewModel
+import co.kandalabs.comandaai.presentation.screens.tables.migration.TableMigrationViewModel
 import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClient
@@ -143,6 +144,12 @@ internal val commonModule = DI.Module("commonModule") {
         TablesViewModel(
             repository = instance(),
             sessionManager = instance()
+        )
+    }
+
+    bindProvider {
+        TableMigrationViewModel(
+            tablesRepository = instance()
         )
     }
 

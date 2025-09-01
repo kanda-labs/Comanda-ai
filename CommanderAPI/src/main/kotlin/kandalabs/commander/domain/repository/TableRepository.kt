@@ -9,5 +9,6 @@ interface TableRepository {
     suspend fun createTable(table: Table): Table
     suspend fun updateTable(tableId: Int, newBillId: Int?, newStatus: TableStatus?): Table?
     suspend fun deleteTable(id: Int): Boolean
+    suspend fun migrateTable(originId: Int, destinationId: Int, billId: Int): Boolean
 }
 

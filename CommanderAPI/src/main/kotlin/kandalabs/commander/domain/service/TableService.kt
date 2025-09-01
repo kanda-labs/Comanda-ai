@@ -45,4 +45,46 @@ class TableService(private val tableRepository: TableRepository) {
             Result.failure(e)
         }
     }
+
+    suspend fun migrateTable(originId: Int, destinationId: Int): Result<Pair<Table, Table>> {
+        return try {
+            // Validate origin table exists and is occupied
+            val originTable = tableRepository.getTableById(originId)
+            if (originTable == null) {
+                return Result.failure(IllegalArgumentException("Origin table not found"))
+            }
+
+            if (originTable.status != TableStatus.OPEN) {
+                return Result.failure(IllegalArgumentException("Origin table is not occupied"))
+            }
+
+            if (originTable.billId == null) {
+                return Result.failure(IllegalArgumentException("Origin table has no active bill"))
+            }
+
+            // Validate destination table exists and is free
+            val destinationTable = tableRepository.getTableById(destinationId)
+            if (destinationTable == null) {
+                return Result.failure(IllegalArgumentException("Destination table not found"))
+            }
+
+            if (destinationTable.status != TableStatus.CLOSED) {
+                return Result.failure(IllegalArgumentException("Destination table is not free"))
+            }
+
+            // Perform migration
+            val result = tableRepository.migrateTable(originId, destinationId, originTable.billId)
+            
+            if (result) {
+                // Return updated tables
+                val updatedOriginTable = tableRepository.getTableById(originId)!!
+                val updatedDestinationTable = tableRepository.getTableById(destinationId)!!
+                Result.success(Pair(updatedOriginTable, updatedDestinationTable))
+            } else {
+                Result.failure(RuntimeException("Failed to migrate table"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

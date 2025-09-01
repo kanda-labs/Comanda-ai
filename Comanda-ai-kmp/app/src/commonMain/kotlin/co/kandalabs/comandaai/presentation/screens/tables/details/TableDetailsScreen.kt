@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,6 +28,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import co.kandalabs.comandaai.domain.models.model.Order
 import co.kandalabs.comandaai.domain.models.model.OrderStatus
 import co.kandalabs.comandaai.domain.models.model.Table
@@ -43,6 +46,7 @@ import co.kandalabs.comandaai.presentation.screens.payment.PaymentSummaryScreen
 import co.kandalabs.comandaai.presentation.screens.tables.details.component.CloseTableConfirmationModal
 import co.kandalabs.comandaai.presentation.screens.tables.details.component.PartialPaymentModal
 import co.kandalabs.comandaai.presentation.screens.tables.details.component.TableDetailsOrders
+import co.kandalabs.comandaai.presentation.screens.tables.migration.TableMigrationSelection
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
@@ -127,6 +131,12 @@ public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : S
                         viewModel.closeTable(currentTable)
                     }
                 }
+                TableDetailsAction.SHOW_TABLE_MIGRATION -> {
+                    val currentTable = state.currentTable
+                    if (currentTable != null) {
+                        navigator.push(TableMigrationSelection(originTable = currentTable))
+                    }
+                }
             }
 
         }
@@ -181,7 +191,20 @@ private fun TableDetailsScreenContent(
                     ComandaAiTopAppBar(
                         state.appBarTitle,
                         onBackOrClose = { action(TableDetailsAction.BACK) },
-                        icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft
+                        icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        actions = {
+                            if (state.currentTable?.status == TableStatus.OCCUPIED) {
+                                IconButton(
+                                    onClick = { action(TableDetailsAction.SHOW_TABLE_MIGRATION) }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.SwapHoriz,
+                                        contentDescription = "Migrar mesa",
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                        }
                     )
 
                     Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
