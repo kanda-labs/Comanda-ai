@@ -719,17 +719,21 @@ class OrderRepositoryImpl(
                             .singleOrNull()
 
                         if (existingStatus != null) {
-                            // Update existing record
-                            orderItemStatusTable.update(
-                                {
-                                    (orderItemStatusTable.orderId eq orderId) and
-                                            (orderItemStatusTable.itemId eq itemId) and
-                                            (orderItemStatusTable.unitIndex eq unitIndex)
+                            // Check if existing status is CANCELED - if so, don't change it
+                            val currentStatus = ItemStatus.valueOf(existingStatus[orderItemStatusTable.status])
+                            if (currentStatus != ItemStatus.CANCELED) {
+                                // Update existing record only if not canceled
+                                orderItemStatusTable.update(
+                                    {
+                                        (orderItemStatusTable.orderId eq orderId) and
+                                                (orderItemStatusTable.itemId eq itemId) and
+                                                (orderItemStatusTable.unitIndex eq unitIndex)
+                                    }
+                                ) {
+                                    it[orderItemStatusTable.status] = ItemStatus.DELIVERED.name
+                                    it[orderItemStatusTable.updatedAt] = localDateTimeAsLong()
+                                    it[orderItemStatusTable.updatedBy] = updatedBy
                                 }
-                            ) {
-                                it[orderItemStatusTable.status] = ItemStatus.DELIVERED.name
-                                it[orderItemStatusTable.updatedAt] = localDateTimeAsLong()
-                                it[orderItemStatusTable.updatedBy] = updatedBy
                             }
                         } else {
                             // Insert new record
@@ -746,6 +750,15 @@ class OrderRepositoryImpl(
                     }
                 }
 
+                // Update order status directly to DELIVERED
+                OrderTable.update({ OrderTable.id eq orderId }) {
+                    it[OrderTable.status] = OrderStatus.DELIVERED.name
+                    it[OrderTable.updatedAt] = localDateTimeAsLong()
+                }
+                
+                // Also update overall order status after marking all items as delivered
+                updateOverallOrderStatus(orderId)
+                
                 true
             }.let { success ->
                 Result.success(success)
@@ -785,17 +798,21 @@ class OrderRepositoryImpl(
                         .singleOrNull()
 
                     if (existingStatus != null) {
-                        // Update existing record
-                        orderItemStatusTable.update(
-                            {
-                                (orderItemStatusTable.orderId eq orderId) and
-                                        (orderItemStatusTable.itemId eq itemId) and
-                                        (orderItemStatusTable.unitIndex eq unitIndex)
+                        // Check if existing status is CANCELED - if so, don't change it
+                        val currentStatus = ItemStatus.valueOf(existingStatus[orderItemStatusTable.status])
+                        if (currentStatus != ItemStatus.CANCELED) {
+                            // Update existing record only if not canceled
+                            orderItemStatusTable.update(
+                                {
+                                    (orderItemStatusTable.orderId eq orderId) and
+                                            (orderItemStatusTable.itemId eq itemId) and
+                                            (orderItemStatusTable.unitIndex eq unitIndex)
+                                }
+                            ) {
+                                it[orderItemStatusTable.status] = ItemStatus.DELIVERED.name
+                                it[orderItemStatusTable.updatedAt] = localDateTimeAsLong()
+                                it[orderItemStatusTable.updatedBy] = updatedBy
                             }
-                        ) {
-                            it[orderItemStatusTable.status] = ItemStatus.DELIVERED.name
-                            it[orderItemStatusTable.updatedAt] = localDateTimeAsLong()
-                            it[orderItemStatusTable.updatedBy] = updatedBy
                         }
                     } else {
                         // Insert new record
@@ -828,8 +845,8 @@ class OrderRepositoryImpl(
      */
     private fun calculateOverallStatus(unitStatuses: List<ItemStatus>): ItemStatus {
         return when {
-            unitStatuses.all { it == ItemStatus.DELIVERED } -> ItemStatus.DELIVERED
             unitStatuses.all { it == ItemStatus.CANCELED } -> ItemStatus.CANCELED
+            unitStatuses.all { it == ItemStatus.DELIVERED || it == ItemStatus.CANCELED } -> ItemStatus.DELIVERED
             unitStatuses.any { it == ItemStatus.PENDING } -> ItemStatus.PENDING
             else -> ItemStatus.PENDING
         }

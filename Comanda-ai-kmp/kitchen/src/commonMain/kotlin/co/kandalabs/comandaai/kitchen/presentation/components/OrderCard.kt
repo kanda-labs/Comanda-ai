@@ -27,7 +27,7 @@ fun OrderCard(
     isDeliveredView: Boolean = false
 ) {
     val allDelivered = order.items.all { item ->
-        item.unitStatuses.all { it.status == ItemStatus.DELIVERED }
+        item.unitStatuses.all { it.status == ItemStatus.DELIVERED || it.status == ItemStatus.CANCELED }
     }
     
     Card(
