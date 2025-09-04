@@ -49,6 +49,13 @@ sandbox-keystore.properties
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
 
+# Desktop distribution files
+dist/
+*.dmg
+*.msi
+*.deb
+app/build/compose/binaries/
+
 # Freeline
 freeline.py
 freeline/

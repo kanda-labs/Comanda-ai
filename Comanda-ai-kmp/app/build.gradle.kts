@@ -39,6 +39,8 @@ kotlin {
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
     }
 
+    jvm("desktop")
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -101,6 +103,15 @@ kotlin {
             implementation(compose.uiTest)
             implementation(compose.desktop.uiTestJUnit4)
 
+        }
+
+        val desktopMain by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(libs.ktor.client.okhttp)
+                implementation(libs.sqlite.driver)
+                implementation(libs.kotlinx.coroutines.swing)
+            }
         }
 
         iosMain.dependencies {
@@ -176,4 +187,106 @@ android {
         androidTestImplementation(libs.androidx.ui.test.junit4)
         debugImplementation(libs.androidx.ui.test.manifest)
     }
+}
+
+compose.desktop {
+    application {
+        mainClass = "co.kandalabs.comandaai.MainKt"
+        
+        // Detecta o build variant atual
+        val currentVariant = System.getProperty("buildVariant") ?: "debug"
+        
+        val variantSuffix = when(currentVariant) {
+            "debug" -> "-debug"
+            "sandbox" -> "-sandbox"
+            "release" -> ""
+            else -> "-debug"
+        }
+        
+        val displayName = when(currentVariant) {
+            "debug" -> "ComandaAI Debug"
+            "sandbox" -> "ComandaAI Sandbox"
+            "release" -> "ComandaAI"
+            else -> "ComandaAI Debug"
+        }
+        
+        nativeDistributions {
+            targetFormats(
+                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg,
+                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
+                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb
+            )
+            packageName = "ComandaAi$variantSuffix"
+            packageVersion = "1.0.0"
+            description = displayName
+            vendor = "Kanda Labs"
+            
+            macOS {
+                val bundleSuffix = when(currentVariant) {
+                    "debug" -> ".debug"
+                    "sandbox" -> ".sandbox"
+                    "release" -> ""
+                    else -> ".debug"
+                }
+                bundleID = "co.kandalabs.comandaai.desktop$bundleSuffix"
+                appCategory = "public.app-category.productivity"
+            }
+            
+            windows {
+                dirChooser = true
+                perUserInstall = true
+            }
+            
+            linux {
+                packageName = "comandaai$variantSuffix"
+                debMaintainer = "contato@kandalabs.co"
+            }
+        }
+        
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("compose-desktop.pro"))
+        }
+        
+        jvmArgs("-DbuildVariant=$currentVariant")
+    }
+}
+
+// Tarefas customizadas para cada ambiente
+tasks.register("createDistributableDebug") {
+    group = "distribution"
+    description = "Cria distribuição desktop para ambiente DEBUG (porta 8082)"
+    
+    doFirst {
+        System.setProperty("buildVariant", "debug")
+    }
+    
+    finalizedBy("createDistributable")
+}
+
+tasks.register("createDistributableSandbox") {
+    group = "distribution"
+    description = "Cria distribuição desktop para ambiente SANDBOX (porta 8081)"
+    
+    doFirst {
+        System.setProperty("buildVariant", "sandbox")
+    }
+    
+    finalizedBy("createDistributable")
+}
+
+tasks.register("createDistributableRelease") {
+    group = "distribution"
+    description = "Cria distribuição desktop para ambiente RELEASE/PRODUCTION (porta 8081)"
+    
+    doFirst {
+        System.setProperty("buildVariant", "release")
+    }
+    
+    finalizedBy("createDistributable")
+}
+
+tasks.register("createDistributableAll") {
+    group = "distribution"
+    description = "Cria todas as distribuições desktop (debug, sandbox, release)"
+    dependsOn("createDistributableDebug", "createDistributableSandbox", "createDistributableRelease")
 }

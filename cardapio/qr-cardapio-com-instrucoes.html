@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code - Cardápio com Instruções</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+        }
+        .wifi-instructions {
+            background: #e8f4fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .wifi-name {
+            font-family: monospace;
+            background: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+        }
+        .steps {
+            text-align: left;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .steps li {
+            margin: 5px 0;
+        }
+        .qr-image {
+            margin: 20px 0;
+        }
+        .url {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+            font-size: 12px;
+        }
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Acesse Nosso Cardápio Digital</h1>
+        
+        <div class="wifi-instructions">
+            <div style="font-size: 18px; margin-bottom: 10px;">Conecte-se ao WiFi</div>
+            <div class="wifi-name">trailer_uça_cliente</div>
+        </div>
+
+        <div class="qr-image">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=http://192.168.2.200:8003/cardapio/" 
+                 alt="QR Code para o cardápio" 
+                 style="border: 2px solid #2196f3; border-radius: 8px;">
+        </div>
+
+        <div class="url">http://192.168.2.200:8003/cardapio/</div>
+        
+    </div>
+</body>
+</html>

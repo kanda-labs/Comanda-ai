@@ -1,6 +1,6 @@
 [versions]
 androidBuildTools = "8.9.1"
-compose-plugin = "1.6.11"
+compose-plugin = "1.7.1"
 coroutinesExtensions = "2.0.2"
 kotlinMultiplatform = "2.1.10"
 jetbrainsKotlinJvm = "2.0.21"
@@ -27,6 +27,8 @@ dataTime = "0.5.0"
 [libraries]
 date-time = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "dataTime" }
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "coroutinesExtensions" }
+sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "coroutinesExtensions" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4Android" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestJunit4Android" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilNetworkOkhttp" }

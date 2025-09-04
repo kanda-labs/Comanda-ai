@@ -194,6 +194,7 @@ internal val commonModule = DI.Module("commonModule") {
         )
     }
 
+
     bindProvider {
         SplashViewModel(sessionManager = instance())
     }

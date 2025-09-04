@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code - Cardápio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .url {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .qr-image {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QR Code - Cardápio</h1>
+        <div class="url">Nosso Cardápio</div>
+        <div class="qr-image">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=http://192.168.2.200:8003/cardapio/" 
+                 alt="QR Code para o cardápio" 
+                 style="border: 1px solid #ddd;">
+        </div>
+        <p>Escaneie o QR code para acessar o cardápio</p>
+    </div>
+</body>
+</html>

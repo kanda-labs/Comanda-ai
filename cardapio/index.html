@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trailer Uça - Cardápio Premium</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #1a5f3f;
+            --secondary: #f4a020;
+            --accent: #ff6b35;
+            --dark: #0d2818;
+            --light: #fef9f3;
+            --gradient1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient3: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #fef9f3 0%, #f5e6d3 100%);
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(244, 160, 32, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(26, 95, 63, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 107, 53, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            animation: floatBackground 20s ease-in-out infinite;
+        }
+        
+        @keyframes floatBackground {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(1deg); }
+            66% { transform: translate(20px, -10px) rotate(-1deg); }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        /* Hero Header */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '🍖';
+            position: absolute;
+            font-size: 300px;
+            opacity: 0.03;
+            top: -50px;
+            right: -100px;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .hero::after {
+            content: '🍺';
+            position: absolute;
+            font-size: 250px;
+            opacity: 0.03;
+            bottom: -50px;
+            left: -80px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(10deg); }
+        }
+        
+        .hero-content {
+            text-align: center;
+            color: white;
+            z-index: 10;
+            padding: 40px;
+            animation: heroEntrance 1s ease-out;
+        }
+        
+        @keyframes heroEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 5em;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+        
+        .tagline {
+            font-size: 1.5em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(244, 160, 32, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(244, 160, 32, 0.4);
+        }
+        
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+        
+        .scroll-indicator::after {
+            content: '↓';
+            font-size: 2em;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* Category Sections */
+        .category {
+            padding: 80px 20px;
+            position: relative;
+        }
+        
+        .category:nth-child(even) {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .category-header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .category-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 4em;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+            border-radius: 2px;
+        }
+        
+        .category-subtitle {
+            color: #666;
+            font-size: 1.2em;
+            font-weight: 300;
+        }
+        
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .menu-item {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+        
+        .menu-item:hover::before {
+            width: 100%;
+            opacity: 0.1;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .item-name {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+            transition: color 0.3s ease;
+        }
+        
+        .menu-item:hover .item-name {
+            color: var(--primary);
+        }
+        
+        .item-price {
+            font-size: 1.6em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+        }
+        
+        .item-description {
+            font-size: 0.95em;
+            color: #777;
+            line-height: 1.5;
+            font-style: italic;
+        }
+        
+        /* Special Items */
+        .menu-item.special {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-item.special::after {
+            content: '⭐';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5em;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+        
+        .menu-item.special .item-name {
+            color: white;
+        }
+        
+        .menu-item.special:hover .item-name {
+            color: var(--secondary);
+        }
+        
+        .menu-item.special .item-description {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        /* Promo Section */
+        .promo-section {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            padding: 100px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .promo-section::before,
+        .promo-section::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .promo-section::before {
+            top: -150px;
+            left: -150px;
+            animation: float 10s ease-in-out infinite;
+        }
+        
+        .promo-section::after {
+            bottom: -150px;
+            right: -150px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+        
+        .promo-section .category-title {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .promo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .promo-item {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .promo-item::before {
+            content: '🎉';
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-size: 3em;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+        }
+        
+        .promo-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        
+        .promo-day {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.8em;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .promo-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .promo-price {
+            font-size: 2em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .promo-details {
+            color: #666;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 20px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 30%, rgba(244, 160, 32, 0.1) 100%);
+            pointer-events: none;
+        }
+        
+        .footer-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-logo {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .footer-info {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .social-link:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+        
+        .copyright {
+            opacity: 0.5;
+            font-size: 0.9em;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 3.5em;
+            }
+            
+            .category-title {
+                font-size: 3em;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .promo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tagline {
+                font-size: 1.2em;
+            }
+        }
+        
+        /* Loading Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .menu-item {
+            animation: fadeIn 0.6s ease-out backwards;
+        }
+        
+        .menu-item:nth-child(1) { animation-delay: 0.1s; }
+        .menu-item:nth-child(2) { animation-delay: 0.2s; }
+        .menu-item:nth-child(3) { animation-delay: 0.3s; }
+        .menu-item:nth-child(4) { animation-delay: 0.4s; }
+        .menu-item:nth-child(5) { animation-delay: 0.5s; }
+        .menu-item:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero" style="background-image: url('header.png'); background-size: cover; background-position: center;">
+            <div class="hero-content">
+                <h1 class="logo">TRAILER UÇA</h1>
+                <p class="tagline">Sabor que conquista, tradição que encanta</p>
+                <a href="#espetinhos" class="cta-button">Ver Cardápio Completo</a>
+            </div>
+            <div class="scroll-indicator"></div>
+        </section>
+        
+        <!-- Espetinhos -->
+        <section id="espetinhos" class="category">
+            <div class="category-header">
+                <h2 class="category-title">ESPETINHOS</h2>
+                <p class="category-subtitle">Grelhados na perfeição, temperados com paixão</p>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Pão de Alho</div>
+                        <div class="item-price">R$ 7,00</div>
+                    </div>
+                    <div class="item-description">Receita exclusiva da casa</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Coração</div>
+                        <div class="item-price">R$ 7,00</div>
+                    </div>
+                    <div class="item-description">Macio e temperado na medida</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Toscana</div>
+                        <div class="item-price">R$ 7,00</div>
+                    </div>
+                    <div class="item-description">Linguiça toscana defumada</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Queijo Coalho</div>
+                        <div class="item-price">R$ 7,00</div>
+                    </div>
+                    <div class="item-description">Dourado e crocante por fora</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Frango</div>
+                        <div class="item-price">R$ 7,00</div>
+                    </div>
+                    <div class="item-description">Suculento e grelhado na perfeição</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Alcatra</div>
+                        <div class="item-price">R$ 8,00</div>
+                    </div>
+                    <div class="item-description">Corte nobre, macio e suculento</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Mamilo</div>
+                        <div class="item-price">R$ 8,00</div>
+                    </div>
+                    <div class="item-description">Corte especial e suculento</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Filé com Alho</div>
+                        <div class="item-price">R$ 9,00</div>
+                    </div>
+                    <div class="item-description">Alcatra com delicioso molho de alho artesanal</div>
+                </div>
+                <div class="menu-item special">
+                    <div class="item-header">
+                        <div class="item-name">Medalhão de Frango</div>
+                        <div class="item-price">R$ 10,00</div>
+                    </div>
+                    <div class="item-description">Frango envolvido em bacon crocante</div>
+                </div>
+                <div class="menu-item special">
+                    <div class="item-header">
+                        <div class="item-name">Medalhão de Queijo</div>
+                        <div class="item-price">R$ 10,00</div>
+                    </div>
+                    <div class="item-description">Queijo coalho envolto em bacon</div>
+                </div>
+                <div class="menu-item special">
+                    <div class="item-header">
+                        <div class="item-name">Medalhão de Alcatra</div>
+                        <div class="item-price">R$ 12,00</div>
+                    </div>
+                    <div class="item-description">Alcatra premium com bacon defumado</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Porções -->
+        <section class="category" style="background-image: url('image-acompanhamentos.png'); background-size: cover; background-position: center; background-attachment: fixed;">
+            <div style="background: rgba(254, 249, 243, 0.95); padding: 80px 20px;">
+                <div class="category-header">
+                    <h2 class="category-title">PORÇÕES</h2>
+                    <p class="category-subtitle">Para compartilhar momentos especiais</p>
+                </div>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Bolinho de Queijo</div>
+                        <div class="item-price">R$ 14,00</div>
+                    </div>
+                    <div class="item-description">8 unidades - Crocante por fora, cremoso por dentro</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Coxinha</div>
+                        <div class="item-price">R$ 14,00</div>
+                    </div>
+                    <div class="item-description">8 unidades - Receita tradicional, massa sequinha</div>
+                </div>
+                    <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Batata Frita</div>
+                        <div class="item-price">R$ 15,00</div>
+                    </div>
+                    <div class="item-description">Perfeita para acompanhar uma bebida gelada</div>
+                </div>
+                <div class="menu-item special">
+                    <div class="item-header">
+                        <div class="item-name">Bolinho de Charque</div>
+                        <div class="item-price">R$ 16,00</div>
+                    </div>
+                    <div class="item-description">8 unidades - Especialidade nordestina autêntica</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Chopps -->
+        <section class="category" style="background: linear-gradient(135deg, rgba(244, 160, 32, 0.1) 0%, rgba(26, 95, 63, 0.1) 100%);">
+            <div class="category-header">
+                <h2 class="category-title">CHOPPS UÇÁ</h2>
+                <p class="category-subtitle">🍺 Sempre na temperatura perfeita</p>
+            </div>
+            <div class="menu-grid"> 
+                <div class="menu-item special">
+                    <div class="item-header">
+                        <div class="item-name">Goré</div>
+                        <div class="item-price">R$ 10,00</div>
+                    </div>
+                    <div class="item-description">Copo 330ml - Chopp Premium Lager cremoso e na temperatura perfeita</div>
+                </div>
+                <div class="menu-item special">
+                    <div class="item-header">
+                        <div class="item-name">Radler Lemonade</div>
+                        <div class="item-price">R$ 10,00</div>
+                    </div>
+                    <div class="item-description">Copo 330ml - Refrescante com toque cítrico de limão</div>
+                </div>
+                <div class="menu-item special">
+                    <div class="item-header">
+                        <div class="item-name">Vinho</div>
+                        <div class="item-price">R$ 12,00</div>
+                    </div>
+                    <div class="item-description">Copo 330ml - Combinação única e saborosa</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bebidas -->
+        <section class="category">
+            <div class="category-header">
+                <h2 class="category-title">BEBIDAS</h2>
+                <p class="category-subtitle">Geladas na temperatura ideal</p>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Água Mineral</div>
+                        <div class="item-price">R$ 3,00</div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Água com Gás</div>
+                        <div class="item-price">R$ 4,00</div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Refrigerante</div>
+                        <div class="item-price">R$ 5,00</div>
+                    </div>
+                    <div class="item-description">Coca, Guaraná, Fanta</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Água de Côco</div>
+                        <div class="item-price">R$ 5,00</div>
+                    </div>
+                    <div class="item-description">Copo 330ml - Natural e refrescante</div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-header">
+                        <div class="item-name">Energético</div>
+                        <div class="item-price">R$ 12,00</div>
+                    </div>
+                    <div class="item-description">Red Bull ou Monster</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Promoções -->
+        <section class="promo-section">
+            <div class="category-header">
+                <h2 class="category-title">PROMOÇÕES IMPERDÍVEIS</h2>
+                <p class="category-subtitle" style="color: white; opacity: 0.9;">Aproveite nossas ofertas especiais</p>
+            </div>
+            <div class="promo-grid">
+                <div class="promo-item">
+                    <div class="promo-day">TERÇA-FEIRA</div>
+                    <div class="promo-name">Chopp Promocional</div>
+                    <div class="promo-price">R$ 8,00</div>
+                    <div class="promo-details">O chopp mais gelado da cidade</div>
+                </div>
+                <div class="promo-item">
+                    <div class="promo-day">QUARTA-FEIRA</div>
+                    <div class="promo-name">Combo com Fritas</div>
+                    <div class="promo-price">R$ 30,00</div>
+                    <div class="promo-details">2 Chopps + Batata frita crocante</div>
+                </div>
+                <div class="promo-item">
+                    <div class="promo-day">QUINTA-FEIRA</div>
+                    <div class="promo-name">Combo com Bolinho de Queijo ou Coxinha</div>
+                    <div class="promo-price">R$ 30,00</div>
+                    <div class="promo-details">2 Chopps + Bolinhos de queijo ou Coxinha</div>
+                </div>
+                
