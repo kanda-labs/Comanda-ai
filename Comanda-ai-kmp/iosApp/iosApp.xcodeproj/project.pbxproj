@@ -11,6 +11,7 @@
 		1F0F4F7F2D78DDC80069DD9D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F0F4F7E2D78DDC80069DD9D /* ContentView.swift */; };
 		1F0F4F812D78DDCA0069DD9D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F0F4F802D78DDCA0069DD9D /* Assets.xcassets */; };
 		1F0F4F852D78DDCA0069DD9D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F0F4F842D78DDCA0069DD9D /* Preview Assets.xcassets */; };
+		1F0F4FA02D78DDC80069DD9D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F0F4F9F2D78DDC80069DD9D /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +38,7 @@
 		1F0F4F802D78DDCA0069DD9D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1F0F4F822D78DDCA0069DD9D /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		1F0F4F842D78DDCA0069DD9D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1F0F4F9F2D78DDC80069DD9D /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1F0F4F8A2D78DDCA0069DD9D /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F0F4F942D78DDCA0069DD9D /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -91,6 +93,7 @@
 			children = (
 				1F0F4F7C2D78DDC80069DD9D /* iosApp.swift */,
 				1F0F4F7E2D78DDC80069DD9D /* ContentView.swift */,
+				1F0F4F9F2D78DDC80069DD9D /* LaunchScreen.storyboard */,
 				1F0F4F802D78DDCA0069DD9D /* Assets.xcassets */,
 				1F0F4F822D78DDCA0069DD9D /* iosApp.entitlements */,
 				1F0F4F832D78DDCA0069DD9D /* Preview Content */,
@@ -227,6 +230,7 @@
 			files = (
 				1F0F4F852D78DDCA0069DD9D /* Preview Assets.xcassets in Resources */,
 				1F0F4F812D78DDCA0069DD9D /* Assets.xcassets in Resources */,
+				1F0F4FA02D78DDC80069DD9D /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -444,8 +448,8 @@
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = NO;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = NO;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -485,8 +489,8 @@
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = NO;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = NO;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
