@@ -138,7 +138,8 @@ private fun TablesScreenContent(
                                 end = ComandaAiSpacing.Large.value,
                                 bottom = ComandaAiSpacing.Small.value
                             ),
-                        horizontalArrangement = Arrangement.Start
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         UserAvatar(
                             userName = userSession?.userName,
@@ -146,10 +147,11 @@ private fun TablesScreenContent(
                         )
 
                         Text(
-                            text = "Olá, ${userSession.userName}!",
+                            text = "Olá, ${userSession.name}!",
                             style = ComandaAiTypography.titleMedium,
                             color = MaterialTheme.colorScheme.onBackground,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(start = 6.dp)
                         )
                     }
                 }
