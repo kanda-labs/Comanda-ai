@@ -1,9 +1,9 @@
 package co.kandalabs.comandaai.network
 
 actual object NetworkConfig {
-    actual val baseIp: String = "192.168.2.200"
-    actual val productionPort: Int = 8081
-    actual val debugPort: Int = 8082
+    actual val baseIp: String = GeneratedNetworkConfig.BASE_IP
+    actual val productionPort: Int = GeneratedNetworkConfig.PRODUCTION_PORT
+    actual val debugPort: Int = GeneratedNetworkConfig.DEBUG_PORT
     
     actual val productionBaseUrl: String = NetworkUtils.formatBaseUrl(baseIp, productionPort)
     actual val debugBaseUrl: String = NetworkUtils.formatBaseUrl(baseIp, debugPort)

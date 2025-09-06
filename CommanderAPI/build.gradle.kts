@@ -5,6 +5,9 @@ plugins {
     java // Explicitly apply the Java plugin
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
 group = "kandalabs.commander"
 version = "1.0-SNAPSHOT"
 
@@ -117,16 +120,42 @@ application {
     mainClass.set("kandalabs.commander.application.ApplicationKt")
 }
 
-// Task para rodar em modo debug na porta 8082
+// Read network configuration from local.properties  
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
+val baseIp = localProperties.getProperty("base.ip") ?: "192.168.2.200"
+val productionPort = localProperties.getProperty("production.port") ?: "8081" 
+val debugPort = localProperties.getProperty("debug.port") ?: "8082"
+
+// Se o IP for 10.0.2.2 (emulador), a API deve usar 0.0.0.0 para aceitar conexões
+val apiHost = if (baseIp == "10.0.2.2") "0.0.0.0" else baseIp
+
+// Task para rodar em modo debug
 tasks.register<JavaExec>("runDebug") {
     group = "application"
-    description = "Runs the application in debug mode on port 8082"
+    description = "Runs the application in debug mode using local.properties configuration"
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set("kandalabs.commander.application.ApplicationKt")
-    environment("PORT", "8082")
-    environment("HOST", "192.168.2.200")
+    environment("PORT", debugPort)
+    environment("HOST", apiHost)
     environment("LOG_LEVEL", "DEBUG")
     environment("ENVIRONMENT", "debug")
+}
+
+// Task para rodar em modo production
+tasks.register<JavaExec>("runProduction") {
+    group = "application"
+    description = "Runs the application in production mode using local.properties configuration"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("kandalabs.commander.application.ApplicationKt")
+    environment("PORT", productionPort)
+    environment("HOST", apiHost)
+    environment("LOG_LEVEL", "INFO")
+    environment("ENVIRONMENT", "production")
 }
 
 // Fat JAR configuration using standard Gradle jar task

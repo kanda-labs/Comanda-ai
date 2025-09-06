@@ -3,19 +3,19 @@ package co.kandalabs.comandaai.network
 actual object NetworkConfig {
     
     /**
-     * Base IP address - SINGLE PLACE TO CHANGE FOR iOS
+     * Base IP address from generated config (local.properties)
      */
-    actual val baseIp: String = "192.168.2.200"
+    actual val baseIp: String = GeneratedNetworkConfig.BASE_IP
     
     /**
-     * Production API port
+     * Production API port from generated config (local.properties)
      */
-    actual val productionPort: Int = 8081
+    actual val productionPort: Int = GeneratedNetworkConfig.PRODUCTION_PORT
     
     /**
-     * Debug API port
+     * Debug API port from generated config (local.properties)
      */
-    actual val debugPort: Int = 8081
+    actual val debugPort: Int = GeneratedNetworkConfig.DEBUG_PORT
     
     /**
      * Production API base URL (with trailing slash)

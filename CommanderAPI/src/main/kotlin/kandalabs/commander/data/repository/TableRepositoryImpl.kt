@@ -8,6 +8,7 @@ import kandalabs.commander.domain.repository.TableRepository
 import kandalabs.commander.data.model.sqlModels.TableTable
 import kandalabs.commander.data.model.sqlModels.OrderTable
 import kandalabs.commander.data.model.sqlModels.PartialPaymentTable
+import kandalabs.commander.data.model.sqlModels.BillTable
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -123,6 +124,24 @@ class TableRepositoryImpl(
                 }
                 
                 logger.debug { "Partial payments update result: $partialPaymentsUpdated rows affected" }
+
+                // Update bills table: change tableId and tableNumber for this billId
+                logger.debug { "Step 5: Updating bills with billId $billId - changing tableId from $originId to $destinationId" }
+                
+                // Get destination table number first
+                val destinationTableNumber = tableTable.selectAll().where { tableTable.id eq destinationId }
+                    .singleOrNull()?.let { it[tableTable.number] }
+                
+                if (destinationTableNumber != null) {
+                    val billsUpdated = BillTable.update({ BillTable.id eq billId }) {
+                        it[BillTable.tableId] = destinationId
+                        it[BillTable.tableNumber] = destinationTableNumber
+                    }
+                    
+                    logger.debug { "Bills update result: $billsUpdated rows affected (tableId=$destinationId, tableNumber=$destinationTableNumber)" }
+                } else {
+                    logger.error { "Could not find destination table number for tableId $destinationId" }
+                }
 
                 // All table updates must succeed
                 val result = originUpdated && destinationUpdated

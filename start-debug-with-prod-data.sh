@@ -1,8 +1,12 @@
 #!/bin/bash
 
-echo "🔧 Iniciando CommanderAPI em modo DEBUG (porta 8082)"
+# Ler configurações do local.properties
+source "$(dirname "$0")/read-config.sh"
+read_local_properties
+
+echo "🔧 Iniciando CommanderAPI em modo DEBUG (porta $DEBUG_PORT)"
 echo "📦 Database: data-debug.db (DESENVOLVIMENTO - não afeta produção)"
-echo "🌐 Host: localhost (192.168.2.200)"
+echo "🌐 Host: $BASE_IP"
 echo ""
 
 # Perguntar se quer copiar dados de produção
@@ -54,8 +58,8 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 cd CommanderAPI
 
 export ENVIRONMENT=debug
-export PORT=8082
-export HOST="192.168.2.200"
+export PORT=$DEBUG_PORT
+export HOST="$BASE_IP"
 export DATABASE_URL="jdbc:sqlite:data-debug.db"
 
-./gradlew run --args="--port=8082 --host=192.168.2.200"
+./gradlew run --args="--port=$DEBUG_PORT --host=$BASE_IP"
