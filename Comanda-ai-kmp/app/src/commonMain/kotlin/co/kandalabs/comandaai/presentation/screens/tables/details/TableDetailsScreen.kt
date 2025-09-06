@@ -145,7 +145,8 @@ public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : S
         }
         
         LaunchedEffect(navigator.size) {
-            if (navigator.size == 1 && navigator.lastItem == this@TableDetailsScreen) {
+            // Refresh data whenever we return to this screen (navigation stack changes)
+            if (navigator.lastItem == this@TableDetailsScreen) {
                 viewModel.refreshData()
             }
         }

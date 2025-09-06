@@ -81,29 +81,27 @@ public data class OrderControlScreen(val orderId: Int) : Screen {
             state = state,
             onBack = { navigator.pop() },
             onItemClick = { itemOrder ->
-                if (itemOrder.status == ItemStatus.CANCELED) {
-                    // Items cancelados não podem ser alterados
-                    return@OrderControlScreenContent
-                }
                 if (itemOrder.count > 1) {
                     viewModel.toggleItemExpansion("${itemOrder.itemId}")
                 } else if (state.userRole == "MANAGER") {
                     viewModel.showStatusModal(itemOrder)
                 } else {
-                    viewModel.updateItemStatus(itemOrder, getNextStatus(itemOrder.status))
+                    // Para usuários não-gerentes, permitir ciclar status apenas se não estiver cancelado
+                    if (itemOrder.status != ItemStatus.CANCELED) {
+                        viewModel.updateItemStatus(itemOrder, getNextStatus(itemOrder.status))
+                    }
                 }
             },
             onItemBadgeClick = { itemOrder ->
-                if (itemOrder.status == ItemStatus.CANCELED) {
-                    // Items cancelados não podem ser alterados
-                    return@OrderControlScreenContent
-                }
                 if (itemOrder.count > 1) {
                     viewModel.toggleItemExpansion("${itemOrder.itemId}")
                 } else if (state.userRole == "MANAGER") {
                     viewModel.showStatusModal(itemOrder)
                 } else {
-                    viewModel.updateItemStatus(itemOrder, getNextStatus(itemOrder.status))
+                    // Para usuários não-gerentes, permitir ciclar status apenas se não estiver cancelado
+                    if (itemOrder.status != ItemStatus.CANCELED) {
+                        viewModel.updateItemStatus(itemOrder, getNextStatus(itemOrder.status))
+                    }
                 }
             },
             onStatusSelected = { itemOrder, newStatus ->
@@ -118,18 +116,17 @@ public data class OrderControlScreen(val orderId: Int) : Screen {
             onIndividualItemClick = { itemOrder, index ->
                 val key = "${itemOrder.itemId}_$index"
                 val individualStatus = state.individualItemStatuses[key] ?: itemOrder.status
-                if (individualStatus == ItemStatus.CANCELED) {
-                    // Items cancelados não podem ser alterados
-                    return@OrderControlScreenContent
-                }
                 if (state.userRole == "MANAGER") {
                     viewModel.showIndividualItemStatusModal(itemOrder, index)
                 } else {
-                    viewModel.updateIndividualItemStatus(
-                        itemOrder,
-                        index,
-                        getNextStatus(individualStatus)
-                    )
+                    // Para usuários não-gerentes, permitir ciclar status apenas se não estiver cancelado
+                    if (individualStatus != ItemStatus.CANCELED) {
+                        viewModel.updateIndividualItemStatus(
+                            itemOrder,
+                            index,
+                            getNextStatus(individualStatus)
+                        )
+                    }
                 }
             },
             onDeliverAllItems = { itemOrder ->
@@ -141,8 +138,15 @@ public data class OrderControlScreen(val orderId: Int) : Screen {
             onConfirmDeliverAllItems = {
                 viewModel.deliverAllOrderItems()
             },
+            onCancelOrder = {
+                viewModel.showCancelOrderConfirmationModal()
+            },
+            onConfirmCancelOrder = {
+                viewModel.cancelOrder()
+            },
             onDismissModal = { viewModel.hideStatusModal() },
-            onDismissDeliverAllModal = { viewModel.hideDeliverAllConfirmationModal() }
+            onDismissDeliverAllModal = { viewModel.hideDeliverAllConfirmationModal() },
+            onDismissCancelOrderModal = { viewModel.hideCancelOrderConfirmationModal() }
         )
     }
 }
@@ -160,8 +164,11 @@ private fun OrderControlScreenContent(
     onDeliverAllItems: (ItemOrder) -> Unit,
     onDeliverAllOrderItems: () -> Unit,
     onConfirmDeliverAllItems: () -> Unit,
+    onCancelOrder: () -> Unit,
+    onConfirmCancelOrder: () -> Unit,
     onDismissModal: () -> Unit,
-    onDismissDeliverAllModal: () -> Unit
+    onDismissDeliverAllModal: () -> Unit,
+    onDismissCancelOrderModal: () -> Unit
 ) {
     MaterialTheme {
         Surface(
@@ -307,11 +314,20 @@ private fun OrderControlScreenContent(
                         verticalArrangement = Arrangement.spacedBy(ComandaAiSpacing.Small.value)
                     ) {
                         state.order?.let { order ->
-                            if (order.items.any { it.status != ItemStatus.DELIVERED && it.status != ItemStatus.CANCELED }) {
+                            if (order.status != OrderStatus.CANCELED) {
+                                // Mostrar botão "Entregar Todos os Itens" se há itens que não estão entregues e não estão cancelados
+                                if (order.items.any { it.status != ItemStatus.DELIVERED && it.status != ItemStatus.CANCELED }) {
+                                    ComandaAiButton(
+                                        text = "Entregar Todos os Itens",
+                                        onClick = onDeliverAllOrderItems,
+                                        variant = ComandaAiButtonVariant.Primary
+                                    )
+                                }
+                                
                                 ComandaAiButton(
-                                    text = "Entregar Todos os Itens",
-                                    onClick = onDeliverAllOrderItems,
-                                    variant = ComandaAiButtonVariant.Primary
+                                    text = "Cancelar Pedido",
+                                    onClick = onCancelOrder,
+                                    variant = ComandaAiButtonVariant.Destructive
                                 )
                             }
                         }
@@ -396,6 +412,47 @@ private fun OrderControlScreenContent(
                     .padding(horizontal = 24.dp)
             )
         }
+
+        // Cancel Order Confirmation Modal
+        ComandaAiBottomSheetModal(
+            isVisible = state.showCancelOrderConfirmationModal,
+            title = "Cancelar Pedido",
+            onDismiss = onDismissCancelOrderModal,
+            actions = {
+                ComandaAiButton(
+                    text = "Sim, Cancelar",
+                    onClick = onConfirmCancelOrder,
+                    variant = ComandaAiButtonVariant.Destructive
+                )
+                
+                ComandaAiButton(
+                    text = "Não Cancelar",
+                    onClick = onDismissCancelOrderModal,
+                    variant = ComandaAiButtonVariant.Secondary
+                )
+            }
+        ) {
+            Text(
+                text = "Tem certeza que deseja cancelar este pedido?",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Todos os itens serão cancelados e esta ação não pode ser desfeita.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            )
+        }
     }
 }
 
@@ -438,7 +495,7 @@ private fun OrderControlItemAccordion(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(enabled = item.status != ItemStatus.CANCELED) { onItemClick(item) },
+            .clickable { onItemClick(item) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -484,9 +541,7 @@ private fun OrderControlItemAccordion(
                         text = statusText,
                         containerColor = containerColor,
                         contentColor = contentColor,
-                        modifier = Modifier.clickable(
-                            enabled = item.status != ItemStatus.CANCELED
-                        ) {
+                        modifier = Modifier.clickable {
                             onBadgeClick(item)
                         }
                     )
@@ -595,7 +650,7 @@ private fun IndividualItemRow(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(enabled = individualStatus != ItemStatus.CANCELED) { onItemClick() },
+            .clickable { onItemClick() },
         colors = CardDefaults.cardColors(
             containerColor = containerColor
         )
@@ -697,9 +752,7 @@ private fun OrderControlItem(
                 text = statusText,
                 containerColor = containerColor,
                 contentColor = contentColor,
-                modifier = Modifier.clickable(
-                    enabled = item.status != ItemStatus.CANCELED
-                ) {
+                modifier = Modifier.clickable {
                     onBadgeClick(item)
                 }
             )

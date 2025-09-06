@@ -131,8 +131,13 @@ internal class TablesDetailsViewModel(
         if (currentTable != null) {
             val tableId = currentTable.id
             if (tableId != null) {
+                println("🔄 TableDetailsViewModel: Refreshing data for table $tableId")
                 setupDetailsById(tableId)
+            } else {
+                println("⚠️ TableDetailsViewModel: Table ID is null, cannot refresh")
             }
+        } else {
+            println("⚠️ TableDetailsViewModel: Current table is null, cannot refresh")
         }
     }
 

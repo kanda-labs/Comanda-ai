@@ -177,6 +177,18 @@ class OrderControlViewModel(
             showDeliverAllConfirmationModal = false
         )
     }
+
+    fun showCancelOrderConfirmationModal() {
+        _state.value = _state.value.copy(
+            showCancelOrderConfirmationModal = true
+        )
+    }
+    
+    fun hideCancelOrderConfirmationModal() {
+        _state.value = _state.value.copy(
+            showCancelOrderConfirmationModal = false
+        )
+    }
     
     fun deliverAllOrderItems() {
         screenModelScope.launch {
@@ -254,6 +266,80 @@ class OrderControlViewModel(
                     error = ComandaAiException.UnknownException(e.message ?: "Erro ao entregar todos os itens do pedido"),
                     isLoading = false,
                     showDeliverAllConfirmationModal = false
+                )
+            }
+        }
+    }
+
+    fun cancelOrder() {
+        screenModelScope.launch {
+            try {
+                _state.value = _state.value.copy(isLoading = true)
+                
+                val currentOrder = _state.value.order
+                if (currentOrder != null) {
+                    // Cancelar todos os itens e o pedido
+                    val currentStatuses = _state.value.individualItemStatuses.toMutableMap()
+                    val canceledItems = currentOrder.items.map { item ->
+                        // Cancelar todos os itens individuais
+                        for (index in 0 until item.count) {
+                            val key = "${item.itemId}_$index"
+                            currentStatuses[key] = ItemStatus.CANCELED
+                        }
+                        item.copy(status = ItemStatus.CANCELED)
+                    }
+                    
+                    val canceledOrder = currentOrder.copy(
+                        items = canceledItems,
+                        status = OrderStatus.CANCELED
+                    )
+                    
+                    // Persistir as mudanças no backend
+                    try {
+                        val currentUserSession = sessionManager.getSession()
+                        val updatedBy = currentUserSession?.userName ?: "system"
+                        
+                        val result = orderRepository.updateOrderWithIndividualStatuses(
+                            canceledOrder.id!!,
+                            canceledOrder,
+                            currentStatuses,
+                            updatedBy
+                        )
+                        
+                        when (result) {
+                            is ComandaAiResult.Success -> {
+                                _state.value = _state.value.copy(
+                                    order = result.data,
+                                    individualItemStatuses = currentStatuses,
+                                    isLoading = false,
+                                    showCancelOrderConfirmationModal = false
+                                )
+                            }
+                            is ComandaAiResult.Failure -> {
+                                println("Erro ao persistir cancelamento do pedido no backend: ${result.exception.message}")
+                                _state.value = _state.value.copy(
+                                    order = canceledOrder,
+                                    individualItemStatuses = currentStatuses,
+                                    isLoading = false,
+                                    showCancelOrderConfirmationModal = false
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        println("Erro ao chamar API para persistir cancelamento do pedido: ${e.message}")
+                        _state.value = _state.value.copy(
+                            order = canceledOrder,
+                            individualItemStatuses = currentStatuses,
+                            isLoading = false,
+                            showCancelOrderConfirmationModal = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    error = ComandaAiException.UnknownException(e.message ?: "Erro ao cancelar pedido"),
+                    isLoading = false,
+                    showCancelOrderConfirmationModal = false
                 )
             }
         }
@@ -532,7 +618,44 @@ class OrderControlViewModel(
                     }
                 }
                 
-                val finalOrder = if (allIndividualsDelivered) {
+                // Verificar se todos os itens individuais estão cancelados
+                val allIndividualsCanceled = updatedOrder.items.all { item ->
+                    (0 until item.count).all { index ->
+                        val key = "${item.itemId}_$index"
+                        individualStatuses[key] == ItemStatus.CANCELED
+                    }
+                }
+                
+                val finalOrder = if (allIndividualsCanceled) {
+                    // Se todos os itens individuais estão cancelados, marcar o pedido como cancelado
+                    val orderToUpdate = updatedOrder.copy(status = OrderStatus.CANCELED)
+                    
+                    // Fazer chamada para o backend para persistir a mudança
+                    try {
+                        val currentUserSession = sessionManager.getSession()
+                        val updatedBy = currentUserSession?.userName ?: "system"
+                        
+                        val result = orderRepository.updateOrderWithIndividualStatuses(
+                            orderToUpdate.id!!,
+                            orderToUpdate,
+                            individualStatuses,
+                            updatedBy
+                        )
+                        when (result) {
+                            is ComandaAiResult.Success -> {
+                                result.data
+                            }
+                            is ComandaAiResult.Failure -> {
+                                println("Erro ao atualizar status do pedido cancelado no backend: ${result.exception.message}")
+                                orderToUpdate
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Em caso de erro na API, manter a atualização local
+                        println("Erro ao atualizar status do pedido cancelado no backend: ${e.message}")
+                        orderToUpdate
+                    }
+                } else if (allIndividualsDelivered) {
                     // Se todos os itens individuais estão entregues, marcar o pedido como atendido
                     val orderToUpdate = updatedOrder.copy(status = OrderStatus.DELIVERED)
                     
@@ -558,7 +681,6 @@ class OrderControlViewModel(
                         }
                     } catch (e: Exception) {
                         // Em caso de erro na API, manter a atualização local
-                        // mas você pode decidir tratar isso de forma diferente
                         println("Erro ao atualizar status do pedido no backend: ${e.message}")
                         orderToUpdate
                     }

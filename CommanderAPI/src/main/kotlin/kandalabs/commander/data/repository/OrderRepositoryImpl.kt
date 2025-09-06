@@ -54,6 +54,7 @@ class OrderRepositoryImpl(
             order.items.forEach { item ->
                 val itemId = item.itemId
                 val totalCount = item.count
+                logger.debug { "Processing item $itemId with count $totalCount" }
 
                 // Get unit statuses for each unit of this item
                 (0 until totalCount).forEach { unitIndex ->
@@ -66,14 +67,19 @@ class OrderRepositoryImpl(
                         .singleOrNull()
 
                     val status = if (statusRow != null) {
-                        ItemStatus.valueOf(statusRow[orderItemStatusTable.status])
+                        val statusValue = ItemStatus.valueOf(statusRow[orderItemStatusTable.status])
+                        logger.debug { "Found status record for item $itemId unit $unitIndex: $statusValue" }
+                        statusValue
                     } else {
+                        logger.debug { "No status record for item $itemId unit $unitIndex, defaulting to PENDING" }
                         ItemStatus.PENDING // Default status
                     }
 
                     individualStatuses["${itemId}_${unitIndex}"] = status
                 }
             }
+            
+            logger.debug { "Final individual statuses map: $individualStatuses" }
 
             // Calculate overall order status based on individual item statuses
             val orderStatus = calculateOrderStatus(individualStatuses.values.toList())
@@ -201,9 +207,37 @@ class OrderRepositoryImpl(
 
     override suspend fun getOrdersByBillId(billId: Int): List<OrderResponse> {
         logger.debug { "Fetching orders by billId: $billId" }
-        return transaction {
+        val orderIds = transaction {
             orderTable.selectAll().where { orderTable.billId eq billId }
-                .map { it.toOrder() }
+                .map { it[orderTable.id] }
+        }
+        
+        // Get each order with dynamic status calculation outside transaction
+        return orderIds.mapNotNull { orderId ->
+            getOrderByIdWithStatuses(orderId)?.let { orderWithStatuses ->
+                OrderResponse(
+                    id = orderWithStatuses.id,
+                    billId = orderWithStatuses.billId,
+                    status = orderWithStatuses.status, // Use dynamically calculated status
+                    userName = orderWithStatuses.userName,
+                    items = orderWithStatuses.items.map { item ->
+                        ItemOrder(
+                            itemId = item.itemId,
+                            orderId = item.orderId,
+                            name = item.name,
+                            observation = item.observation,
+                            count = item.count,
+                            status = item.status
+                        )
+                    },
+                    createdAt = orderWithStatuses.createdAt,
+                    updatedAt = orderWithStatuses.updatedAt,
+                    tableNumber = transaction { 
+                        orderTable.selectAll().where { orderTable.id eq orderId }
+                            .singleOrNull()?.get(orderTable.tableId) ?: 0
+                    },
+                )
+            }
         }
     }
 
@@ -336,6 +370,9 @@ class OrderRepositoryImpl(
                         }
                     }
                 }
+
+                // Update overall order status based on all items after processing individual changes
+                updateOverallOrderStatus(id)
 
                 // Return updated order
                 orderTable.selectAll().where { orderTable.id eq id }
@@ -856,12 +893,27 @@ class OrderRepositoryImpl(
      * Calculate overall order status based on all item statuses
      */
     private fun calculateOrderStatus(individualStatuses: List<ItemStatus>): OrderStatus {
-        return when {
-            individualStatuses.isEmpty() -> OrderStatus.PENDING
-            individualStatuses.all { it == ItemStatus.DELIVERED } -> OrderStatus.DELIVERED
-            individualStatuses.all { it == ItemStatus.CANCELED } -> OrderStatus.PENDING // Order remains pending if all canceled
-            else -> OrderStatus.PENDING
+        logger.debug { "calculateOrderStatus - individual statuses: $individualStatuses" }
+        val result = when {
+            individualStatuses.isEmpty() -> {
+                logger.debug { "calculateOrderStatus - empty statuses, returning PENDING" }
+                OrderStatus.PENDING
+            }
+            individualStatuses.all { it == ItemStatus.DELIVERED } -> {
+                logger.debug { "calculateOrderStatus - all delivered, returning DELIVERED" }
+                OrderStatus.DELIVERED
+            }
+            individualStatuses.all { it == ItemStatus.CANCELED } -> {
+                logger.debug { "calculateOrderStatus - all canceled, returning CANCELED" }
+                OrderStatus.CANCELED // Order is canceled if all items are canceled
+            }
+            else -> {
+                logger.debug { "calculateOrderStatus - mixed statuses, returning PENDING" }
+                OrderStatus.PENDING
+            }
         }
+        logger.debug { "calculateOrderStatus - final result: $result" }
+        return result
     }
 
     /**
@@ -946,10 +998,36 @@ class OrderRepositoryImpl(
             }
         }
 
+        // Calculate the new order status based on all individual item statuses
         val newOrderStatus = if (hasIncompleteItems) {
             OrderStatus.PENDING
         } else {
-            OrderStatus.DELIVERED
+            // All items are complete (either delivered or canceled)
+            // Collect all individual statuses to determine order status
+            val allIndividualStatuses = mutableListOf<ItemStatus>()
+            
+            items.forEach { item ->
+                val itemId = item[OrderItemTable.itemId]
+                val expectedCount = item[OrderItemTable.count]
+                
+                val unitStatuses = orderItemStatusTable.selectAll()
+                    .where {
+                        (orderItemStatusTable.orderId eq orderId) and
+                                (orderItemStatusTable.itemId eq itemId)
+                    }
+                    .map { ItemStatus.valueOf(it[orderItemStatusTable.status]) }
+                    .toList()
+                
+                allIndividualStatuses.addAll(unitStatuses)
+            }
+            
+            // Use the same logic as calculateOrderStatus
+            when {
+                allIndividualStatuses.isEmpty() -> OrderStatus.PENDING
+                allIndividualStatuses.all { it == ItemStatus.DELIVERED } -> OrderStatus.DELIVERED
+                allIndividualStatuses.all { it == ItemStatus.CANCELED } -> OrderStatus.CANCELED
+                else -> OrderStatus.PENDING
+            }
         }
 
         OrderTable.update({ OrderTable.id eq orderId }) {

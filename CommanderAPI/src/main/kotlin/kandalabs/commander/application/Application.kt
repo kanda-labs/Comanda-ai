@@ -187,7 +187,13 @@ private fun appModule(healthMonitor: HealthMonitor) = module {
 
 
     single<UserRepository> { UserRepositoryImpl(userTable = get(), logger = get()) }
-    single<TableRepository> { TableRepositoryImpl(tableTable = get(), logger = get()) }
+    single<OrderRepository> { OrderRepositoryImpl(
+        orderTable = get(), logger = get(),
+        orderItemTable = get(), orderItemStatusTable = get(),
+        userTable = get(),
+        tableTable = get()
+    ) }
+    single<TableRepository> { TableRepositoryImpl(tableTable = get(), orderRepository = get(), logger = get()) }
     single<BillRepository> { BillRepositoryImpl(
         billTable = get(), 
         orderTable = get(),
@@ -199,12 +205,6 @@ private fun appModule(healthMonitor: HealthMonitor) = module {
         logger = get()
     ) }
     single<ItemRepository> { ItemRepositoryImpl(itemTable = get(), logger = get()) }
-    single<OrderRepository> { OrderRepositoryImpl(
-        orderTable = get(), logger = get(),
-        orderItemTable = get(), orderItemStatusTable = get(),
-        userTable = get(),
-        tableTable = get()
-    ) }
 
     single { UserService(get()) }
     single { TableService(get()) }

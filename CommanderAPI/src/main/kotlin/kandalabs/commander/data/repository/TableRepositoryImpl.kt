@@ -23,14 +23,34 @@ typealias SQLTable = org.jetbrains.exposed.sql.Table
 
 class TableRepositoryImpl(
     val tableTable: TableTable,
+    val orderRepository: kandalabs.commander.domain.repository.OrderRepository,
     val logger: KLogger
 ) : TableRepository {
 
     override suspend fun getAllTables(): List<Table> {
         logger.debug { "Fetching all tables" }
-        return transaction {
+        val tablesWithBasicInfo = transaction {
             tableTable.selectAll()
-                .map { it.toTable() }
+                .map { row ->
+                    Table(
+                        id = row[tableTable.id],
+                        billId = row[tableTable.billId],
+                        number = row[tableTable.number],
+                        createdAt = Instant.fromEpochMilliseconds(row[tableTable.createdAt])
+                            .toLocalDateTime(TimeZone.currentSystemDefault()),
+                        status = TableStatus.valueOf(row[tableTable.status]),
+                        orders = emptyList()
+                    )
+                }
+        }
+        
+        // Fetch orders for each table outside transaction
+        return tablesWithBasicInfo.map { table ->
+            val orders = table.billId?.let { billId ->
+                orderRepository.getOrdersByBillId(billId)
+            } ?: emptyList()
+            
+            table.copy(orders = orders)
         }
     }
 
@@ -38,8 +58,34 @@ class TableRepositoryImpl(
         logger.debug { "Fetching table by id: $id" }
         return transaction {
             tableTable.selectAll().where { tableTable.id eq id }
-                .map { it.toTable() }
+                .map { row ->
+                    // Get basic table info from row
+                    val tableId = row[tableTable.id]
+                    val billId = row[tableTable.billId]
+                    val number = row[tableTable.number]
+                    val createdAt = Instant.fromEpochMilliseconds(row[tableTable.createdAt])
+                        .toLocalDateTime(TimeZone.currentSystemDefault())
+                    val status = TableStatus.valueOf(row[tableTable.status])
+                    
+                    // Create table without orders first
+                    Table(
+                        id = tableId,
+                        billId = billId,
+                        number = number,
+                        createdAt = createdAt,
+                        status = status,
+                        orders = emptyList() // Will be populated below
+                    )
+                }
                 .singleOrNull()
+        }?.let { table ->
+            // Fetch orders outside of transaction
+            val orders = table.billId?.let { billId ->
+                orderRepository.getOrdersByBillId(billId)
+            } ?: emptyList()
+            
+            // Return table with orders
+            table.copy(orders = orders)
         }
     }
 
@@ -60,7 +106,7 @@ class TableRepositoryImpl(
 
     override suspend fun updateTable(tableId: Int, newBillId: Int?, newStatus: TableStatus?): Table? {
         logger.debug { "Updating table with id: $tableId, newBillId: $newBillId, newStatus: $newStatus" }
-        return transaction {
+        val updateResult = transaction {
             val rowsUpdated = tableTable.update({ tableTable.id eq tableId }) {
                 // Update billId - null value explicitly clears the billId
                 it[billId] = newBillId
@@ -68,11 +114,30 @@ class TableRepositoryImpl(
             }
             if (rowsUpdated > 0) {
                 tableTable.selectAll().where { tableTable.id eq tableId }
-                    .map { it.toTable() }
+                    .map { row ->
+                        Table(
+                            id = row[tableTable.id],
+                            billId = row[tableTable.billId],
+                            number = row[tableTable.number],
+                            createdAt = Instant.fromEpochMilliseconds(row[tableTable.createdAt])
+                                .toLocalDateTime(TimeZone.currentSystemDefault()),
+                            status = TableStatus.valueOf(row[tableTable.status]),
+                            orders = emptyList()
+                        )
+                    }
                     .singleOrNull()
             } else {
                 null
             }
+        }
+        
+        // Fetch orders outside transaction if table was found
+        return updateResult?.let { table ->
+            val orders = table.billId?.let { billId ->
+                orderRepository.getOrdersByBillId(billId)
+            } ?: emptyList()
+            
+            table.copy(orders = orders)
         }
     }
 
@@ -163,18 +228,5 @@ class TableRepositoryImpl(
         }
     }
 
-    /**
-     * Maps a database row to a domain Table entity
-     */
-    private fun ResultRow.toTable(): Table {
-        return Table(
-            id = this[tableTable.id],
-            billId = this[tableTable.billId],
-            number = this[tableTable.number],
-            createdAt = Instant.fromEpochMilliseconds(this[tableTable.createdAt])
-                .toLocalDateTime(TimeZone.currentSystemDefault()),
-            status = TableStatus.valueOf(this[tableTable.status])
-        )
-    }
 }
 
