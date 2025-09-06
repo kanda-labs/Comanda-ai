@@ -67,9 +67,9 @@ app/build/compose/binaries/main/
 
 | Ambiente | Porta | URL Base | Uso |
 |----------|-------|----------|-----|
-| **DEBUG** | 8082 | http://192.168.1.5:8082 | Desenvolvimento |
-| **SANDBOX** | 8081 | http://192.168.1.5:8081 | Teste/Homologação |
-| **RELEASE** | 8081 | http://192.168.1.5:8081 | Produção |
+| **DEBUG** | 8082 | http://192.168.2.200:8082 | Desenvolvimento |
+| **SANDBOX** | 8081 | http://192.168.2.200:8081 | Teste/Homologação |
+| **RELEASE** | 8081 | http://192.168.2.200:8081 | Produção |
 
 **📝 Nota**: SANDBOX e RELEASE compartilham a porta 8081, mas geram executáveis com identificação visual diferente.
 

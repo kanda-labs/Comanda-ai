@@ -55,7 +55,7 @@
 <body>
     <div class="container">
         <h1>QR Code - Cardápio</h1>
-        <div class="url">http://192.168.1.5:8003/cardapio/</div>
+        <div class="url">http://192.168.2.200:8003/cardapio/</div>
         
         <div class="qr-container">
             <canvas id="qrcode" width="256" height="256" style="border: 1px solid #ddd;"></canvas>
@@ -119,7 +119,7 @@
         // Generate QR code on page load
         window.onload = function() {
             const canvas = document.getElementById('qrcode');
-            generateQRCode('http://192.168.1.5:8003/cardapio/', canvas);
+            generateQRCode('http://192.168.2.200:8003/cardapio/', canvas);
         };
     </script>
 </body>

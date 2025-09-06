@@ -62,7 +62,7 @@ java -jar app/build/compose/jars/ComandaAi-desktop-1.0.0.jar
 
 ### Configuração de Rede
 O app desktop está configurado para usar:
-- **IP Base**: 192.168.1.5
+- **IP Base**: 192.168.2.200
 - **Porta Produção**: 8081
 - **Porta Debug**: 8082
 - **URL Atual**: Debug (8082) por padrão

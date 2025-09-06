@@ -1,7 +1,7 @@
 package co.kandalabs.comandaai.network
 
 actual object NetworkConfig {
-    actual val baseIp: String = "192.168.1.5"
+    actual val baseIp: String = "192.168.2.200"
     actual val productionPort: Int = 8081
     actual val debugPort: Int = 8082
     
