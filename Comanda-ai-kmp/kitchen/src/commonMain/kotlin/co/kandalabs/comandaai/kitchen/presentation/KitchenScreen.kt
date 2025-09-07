@@ -27,7 +27,7 @@ import co.kandalabs.comandaai.kitchen.presentation.components.UserProfileModal
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
 
-class KitchenScreen : Screen {
+object KitchenScreen : Screen {
 
     @Composable
     override fun Content() {

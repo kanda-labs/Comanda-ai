@@ -899,13 +899,13 @@ class OrderRepositoryImpl(
                 logger.debug { "calculateOrderStatus - empty statuses, returning PENDING" }
                 OrderStatus.PENDING
             }
-            individualStatuses.all { it == ItemStatus.DELIVERED } -> {
-                logger.debug { "calculateOrderStatus - all delivered, returning DELIVERED" }
-                OrderStatus.DELIVERED
-            }
             individualStatuses.all { it == ItemStatus.CANCELED } -> {
                 logger.debug { "calculateOrderStatus - all canceled, returning CANCELED" }
                 OrderStatus.CANCELED // Order is canceled if all items are canceled
+            }
+            individualStatuses.all { it == ItemStatus.DELIVERED || it == ItemStatus.CANCELED } -> {
+                logger.debug { "calculateOrderStatus - all delivered or canceled, returning DELIVERED" }
+                OrderStatus.DELIVERED
             }
             else -> {
                 logger.debug { "calculateOrderStatus - mixed statuses, returning PENDING" }
@@ -1024,8 +1024,8 @@ class OrderRepositoryImpl(
             // Use the same logic as calculateOrderStatus
             when {
                 allIndividualStatuses.isEmpty() -> OrderStatus.PENDING
-                allIndividualStatuses.all { it == ItemStatus.DELIVERED } -> OrderStatus.DELIVERED
                 allIndividualStatuses.all { it == ItemStatus.CANCELED } -> OrderStatus.CANCELED
+                allIndividualStatuses.all { it == ItemStatus.DELIVERED || it == ItemStatus.CANCELED} -> OrderStatus.DELIVERED
                 else -> OrderStatus.PENDING
             }
         }

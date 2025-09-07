@@ -6,7 +6,7 @@ import co.kandalabs.comandaai.kitchen.presentation.KitchenScreen
 import org.kodein.di.DI
 
 object KitchenModule {
-    fun getKitchenScreen(): Screen = KitchenScreen()
+    fun getKitchenScreen(): Screen = KitchenScreen
     
     val kitchenDI = KitchenDIModule.kitchenModule
 }

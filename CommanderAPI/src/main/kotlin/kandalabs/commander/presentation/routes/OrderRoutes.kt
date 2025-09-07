@@ -62,12 +62,10 @@ fun Route.orderRoutes(orderService: OrderService) {
             val id = call.parameters["id"]?.toIntOrNull() ?: return@put call.respond(HttpStatusCode.BadRequest)
             val request = call.receive<UpdateOrderWithStatusesRequest>()
             val updatedOrder = orderService.updateOrderWithIndividualStatuses(
-                id, 
-                request.order.copy(
-                    updatedAt = localDateTimeNow()
-                ),
-                request.individualStatuses,
-                request.updatedBy
+                id = id,
+                orderResponse = request.order.copy(updatedAt = localDateTimeNow()),
+                individualStatuses = request.individualStatuses,
+                updatedBy = request.updatedBy
             )
             if (updatedOrder != null) {
                 call.respond(updatedOrder)

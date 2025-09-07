@@ -109,13 +109,8 @@ class OrderControlViewModel(
                         
                         when (result) {
                             is ComandaAiResult.Success -> {
-                                _state.value = _state.value.copy(
-                                    order = result.data,
-                                    individualItemStatuses = currentStatuses,
-                                    isLoading = false,
-                                    showStatusModal = false,
-                                    selectedItem = null
-                                )
+                                // Buscar dados atualizados do backend para garantir consistência
+                                refreshOrderData(updatedOrder.id!!, currentStatuses)
                             }
                             is ComandaAiResult.Failure -> {
                                 // Manter atualização local mesmo com erro no backend
@@ -422,14 +417,8 @@ class OrderControlViewModel(
                         
                         when (result) {
                             is ComandaAiResult.Success -> {
-                                // Atualizar com o resultado do backend
-                                _state.value = _state.value.copy(
-                                    order = result.data,
-                                    individualItemStatuses = currentStatuses,
-                                    isLoading = false,
-                                    showStatusModal = false,
-                                    selectedIndividualItem = null
-                                )
+                                // Buscar dados atualizados do backend para garantir consistência
+                                refreshOrderData(updatedOrder.id!!, currentStatuses)
                             }
                             is ComandaAiResult.Failure -> {
                                 println("Erro ao persistir status individual no backend: ${result.exception.message}")
@@ -695,6 +684,58 @@ class OrderControlViewModel(
                 // Tratar erro geral
                 _state.value = _state.value.copy(
                     error = ComandaAiException.UnknownException(e.message ?: "Erro ao verificar status do pedido")
+                )
+            }
+        }
+    }
+    
+    private fun refreshOrderData(orderId: Int, fallbackStatuses: Map<String, ItemStatus>) {
+        screenModelScope.launch {
+            try {
+                when (val result = orderRepository.getOrderByIdWithStatuses(orderId)) {
+                    is ComandaAiResult.Success -> {
+                        val orderWithStatuses = result.data
+                        
+                        // Converter para Order regular para compatibilidade
+                        val order = Order(
+                            id = orderWithStatuses.id,
+                            billId = orderWithStatuses.billId,
+                            tableNumber = orderWithStatuses.tableNumber,
+                            userName = orderWithStatuses.userName,
+                            items = orderWithStatuses.items,
+                            status = orderWithStatuses.status,
+                            createdAt = orderWithStatuses.createdAt
+                        )
+                        
+                        _state.value = _state.value.copy(
+                            order = order,
+                            individualItemStatuses = orderWithStatuses.individualStatuses,
+                            isLoading = false,
+                            showStatusModal = false,
+                            selectedItem = null,
+                            selectedIndividualItem = null
+                        )
+                    }
+                    is ComandaAiResult.Failure -> {
+                        // Em caso de falha, usar dados de fallback
+                        println("Erro ao atualizar dados do pedido: ${result.exception.message}")
+                        _state.value = _state.value.copy(
+                            individualItemStatuses = fallbackStatuses,
+                            isLoading = false,
+                            showStatusModal = false,
+                            selectedItem = null,
+                            selectedIndividualItem = null
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                println("Erro ao buscar dados atualizados do pedido: ${e.message}")
+                _state.value = _state.value.copy(
+                    individualItemStatuses = fallbackStatuses,
+                    isLoading = false,
+                    showStatusModal = false,
+                    selectedItem = null,
+                    selectedIndividualItem = null
                 )
             }
         }

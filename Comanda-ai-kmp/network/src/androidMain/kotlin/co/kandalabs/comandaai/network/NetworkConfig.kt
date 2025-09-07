@@ -28,13 +28,15 @@ actual object NetworkConfig {
     actual val debugBaseUrl: String = NetworkUtils.formatBaseUrl(baseIp, debugPort)
     
     /**
-     * Current environment's base URL based on BuildConfig.DEBUG
-     * - Debug builds automatically use debug port (8082)
-     * - Release builds automatically use production port (8081)
+     * Current environment's base URL based on build type
+     * - Debug builds use debug port (8082)
+     * - Sandbox builds use production port (8081)
+     * - Release builds use production port (8081)
      */
-    actual val currentBaseUrl: String = if (BuildConfig.DEBUG) {
-        debugBaseUrl
-    } else {
-        productionBaseUrl
+    actual val currentBaseUrl: String = when (BuildConfig.BUILD_TYPE) {
+        "debug" -> debugBaseUrl
+        "sandbox" -> productionBaseUrl
+        "release" -> productionBaseUrl
+        else -> debugBaseUrl // fallback
     }
 }

@@ -30,7 +30,7 @@ fun ComandaAiApp() {
                 CoroutineScope(Dispatchers.Main).launch {
                     val session = sessionManager.getSession()
                     when (session?.role) {
-                        UserRole.KITCHEN -> navigator.replace(KitchenScreen())
+                        UserRole.KITCHEN -> navigator.replace(KitchenScreen)
                         UserRole.ADMIN -> navigator.replace(AdminScreen)
                         else -> navigator.replace(TablesScreen)
                     }

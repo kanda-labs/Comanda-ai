@@ -132,7 +132,9 @@ val productionPort = localProperties.getProperty("production.port") ?: "8081"
 val debugPort = localProperties.getProperty("debug.port") ?: "8082"
 
 // Se o IP for 10.0.2.2 (emulador), a API deve usar 0.0.0.0 para aceitar conexões
-val apiHost = if (baseIp == "10.0.2.2") "0.0.0.0" else baseIp
+// Server should always bind to all interfaces (0.0.0.0) for local development
+// The baseIp is only used by clients to connect to the server
+val apiHost = "0.0.0.0"
 
 // Task para rodar em modo debug
 tasks.register<JavaExec>("runDebug") {

@@ -137,18 +137,22 @@ android {
         buildConfigField("String", "BASE_IP", "\"$baseIp\"")
         buildConfigField("int", "PRODUCTION_PORT", "$productionPort")
         buildConfigField("int", "DEBUG_PORT", "$debugPort")
+        buildConfigField("String", "BUILD_TYPE", "\"debug\"")
     }
     
     buildTypes {
         getByName("debug") {
             // Debug build uses configuration from local.properties (already set in defaultConfig)
+            buildConfigField("String", "BUILD_TYPE", "\"debug\"")
         }
         create("sandbox") {
             initWith(getByName("debug"))
-            // Sandbox build uses configuration from local.properties (already set in defaultConfig)
+            // Sandbox build uses production port (8081) for testing against production API
+            buildConfigField("String", "BUILD_TYPE", "\"sandbox\"")
         }
         getByName("release") {
             // Release build uses configuration from local.properties (already set in defaultConfig)
+            buildConfigField("String", "BUILD_TYPE", "\"release\"")
         }
     }
     
