@@ -17,8 +17,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -79,6 +83,7 @@ public object TablesScreen : Screen {
             userSession = userSession,
             showUserModal = showUserModal,
             retry = { viewModel.retrieveTables() },
+            onRefresh = { viewModel.retrieveTables() },
             onClick = { table: Table ->
                 navigator?.push(TableDetailsScreen(tableId = table.id ?: 0, tableNumber = table.number))
             },
@@ -103,6 +108,7 @@ private fun TablesScreenContent(
     userSession: UserSession?,
     showUserModal: Boolean,
     retry: () -> Unit,
+    onRefresh: () -> Unit,
     onClick: (Table) -> Unit,
     onUserAvatarClick: () -> Unit,
     onDismissUserModal: () -> Unit,
@@ -126,7 +132,20 @@ private fun TablesScreenContent(
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
 
-                ComandaAiTopAppBar(title = state.title)
+                ComandaAiTopAppBar(
+                    title = state.title,
+                    actions = {
+                        IconButton(
+                            onClick = onRefresh
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Atualizar",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+                )
                 // Welcome message
                 if (userSession?.userName != null) {
                     Row(
@@ -247,6 +266,7 @@ private fun TablesScreenPreview() {
             userSession = null,
             showUserModal = false,
             retry = {},
+            onRefresh = {},
             onClick = {},
             onUserAvatarClick = {},
             onDismissUserModal = {},
