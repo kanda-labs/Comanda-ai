@@ -40,8 +40,8 @@ import co.kandalabs.comandaai.kitchen.presentation.KitchenScreenState
 fun OrderOverviewTab(state: KitchenScreenState) {
     var selectedCategories by remember { mutableStateOf(setOf(ItemCategory.SKEWER)) }
 
-    val itemSummary = remember(state.orders, selectedCategories) {
-        state.orders.flatMap { order ->
+    val itemSummary = remember(state.activeOrders, selectedCategories) {
+        state.activeOrders.flatMap { order ->
             order.items.filter { item ->
                 selectedCategories.contains(item.category)
             }
@@ -55,7 +55,7 @@ fun OrderOverviewTab(state: KitchenScreenState) {
                 }
             }
             .mapKeys { (itemId, _) ->
-                state.orders.flatMap { it.items }
+                state.activeOrders.flatMap { it.items }
                     .first { it.itemId == itemId }
             }
             .filter { (_, count) -> count > 0 } // Remover itens com contagem zero
