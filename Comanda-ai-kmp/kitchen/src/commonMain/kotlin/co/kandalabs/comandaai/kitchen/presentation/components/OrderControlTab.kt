@@ -47,7 +47,8 @@ fun OrderControlTab(
                         },
                         onMarkItemAsDelivered = onMarkItemAsDelivered,
                         onShowDeliveryConfirmation = onShowDeliveryConfirmation,
-                        isDeliveredView = state.currentFilter == OrderFilter.DELIVERED
+                        isDeliveredView = state.currentFilter == OrderFilter.DELIVERED,
+                        loadingItemIds = state.loadingItemIds
                     )
                 }
             }

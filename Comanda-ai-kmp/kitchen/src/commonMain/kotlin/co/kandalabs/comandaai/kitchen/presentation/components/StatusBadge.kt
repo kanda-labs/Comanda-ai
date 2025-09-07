@@ -25,6 +25,7 @@ fun StatusBadge(
     count: Int,
     isMultipleItems: Boolean = false,
     isDeliveredView: Boolean = false,
+    isLoading: Boolean = false,
     onClick: () -> Unit = {}
 ) {
     val (backgroundColor, textColor, icon) = when (status) {
@@ -58,12 +59,20 @@ fun StatusBadge(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-                tint = textColor
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                    color = textColor
+                )
+            } else {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = textColor
+                )
+            }
 
             if (count > 0)
                 Text(

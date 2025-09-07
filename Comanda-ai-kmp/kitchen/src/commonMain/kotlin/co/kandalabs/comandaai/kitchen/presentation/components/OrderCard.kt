@@ -24,7 +24,8 @@ fun OrderCard(
     onItemStatusChange: (Int, Int, ItemStatus) -> Unit,
     onMarkItemAsDelivered: (Int, Int) -> Unit,
     onShowDeliveryConfirmation: (KitchenOrder) -> Unit = {},
-    isDeliveredView: Boolean = false
+    isDeliveredView: Boolean = false,
+    loadingItemIds: Set<String> = emptySet()
 ) {
     val allDelivered = order.items.all { item ->
         item.unitStatuses.all { it.status == ItemStatus.DELIVERED || it.status == ItemStatus.CANCELED }
@@ -61,7 +62,9 @@ fun OrderCard(
                         onMarkItemAsDelivered = { itemId ->
                             onMarkItemAsDelivered(order.id, itemId)
                         },
-                        isDeliveredView = isDeliveredView
+                        isDeliveredView = isDeliveredView,
+                        loadingItemIds = loadingItemIds,
+                        orderId = order.id
                     )
                     
                     if (index < order.items.size - 1) {

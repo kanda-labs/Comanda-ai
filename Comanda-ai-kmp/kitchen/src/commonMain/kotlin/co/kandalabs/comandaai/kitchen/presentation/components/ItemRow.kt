@@ -31,10 +31,14 @@ fun ItemRow(
     item: KitchenItemDetail,
     onStatusChange: (Int, ItemStatus) -> Unit,
     onMarkItemAsDelivered: (Int) -> Unit,
-    isDeliveredView: Boolean = false
+    isDeliveredView: Boolean = false,
+    loadingItemIds: Set<String> = emptySet(),
+    orderId: Int
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val hasUndeliveredItems = item.unitStatuses.any { it.status != ItemStatus.DELIVERED }
+    val itemKey = "$orderId-${item.itemId}"
+    val isItemLoading = loadingItemIds.contains(itemKey)
     
     Column {
         // Header do item
@@ -84,6 +88,7 @@ fun ItemRow(
                 count = item.unitStatuses.count { it.status == ItemStatus.PENDING },
                 isMultipleItems = item.totalCount > 1,
                 isDeliveredView = isDeliveredView,
+                isLoading = isItemLoading,
                 onClick = {
                     if (item.totalCount > 1) {
                         // Toggle accordion for multiple items
@@ -190,6 +195,7 @@ fun ItemRow(
                                 FilledTonalButton(
                                     onClick = { onMarkItemAsDelivered(item.itemId) },
                                     modifier = Modifier.fillMaxWidth(),
+                                    enabled = !isItemLoading,
                                     colors = ButtonDefaults.filledTonalButtonColors(
                                         containerColor = MaterialTheme.colorScheme.primary,
                                         contentColor = MaterialTheme.colorScheme.onPrimary

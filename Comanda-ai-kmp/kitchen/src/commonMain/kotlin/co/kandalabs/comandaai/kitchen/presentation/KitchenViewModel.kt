@@ -132,32 +132,38 @@ class KitchenViewModel(
         unitIndex: Int,
         newStatus: ItemStatus
     ) {
-        // Store current state for rollback
-        val currentState = _state.value
+        val itemKey = "$orderId-$itemId"
         
-        // OPTIMISTIC UPDATE: Update UI immediately
-        val (updatedActiveOrders, updatedDeliveredOrders) = updateOrdersOptimisticallyWithFilter(
-            currentState.activeOrders, currentState.deliveredOrders, orderId, itemId, unitIndex, newStatus
-        )
-        
+        // Add to loading items
         _state.update { 
-            it.copy(
-                activeOrders = updatedActiveOrders,
-                deliveredOrders = updatedDeliveredOrders
-            )
+            it.copy(loadingItemIds = it.loadingItemIds + itemKey)
         }
         
         // Make API call
         screenModelScope.launch {
             repository.updateItemUnitStatus(orderId, itemId, unitIndex, newStatus)
                 .onSuccess {
-                    // Success: Keep the optimistic update
-                    // No action needed, state is already updated
+                    // Success: Update orders and remove from loading
+                    val currentState = _state.value
+                    val (updatedActiveOrders, updatedDeliveredOrders) = updateOrdersWithFilter(
+                        currentState.activeOrders, currentState.deliveredOrders, orderId, itemId, unitIndex, newStatus
+                    )
+                    
+                    _state.update { 
+                        it.copy(
+                            activeOrders = updatedActiveOrders,
+                            deliveredOrders = updatedDeliveredOrders,
+                            loadingItemIds = it.loadingItemIds - itemKey
+                        )
+                    }
                 }
                 .onFailure { error ->
-                    // ROLLBACK: Revert to previous state on error
+                    // Error: Remove from loading and show error
                     _state.update { 
-                        currentState.copy(error = error.message) 
+                        it.copy(
+                            loadingItemIds = it.loadingItemIds - itemKey,
+                            error = "Falha ao atualizar item. Tente novamente."
+                        )
                     }
                 }
         }
@@ -208,31 +214,39 @@ class KitchenViewModel(
      * Handles moving orders between active and delivered lists.
      */
     fun markItemAsDelivered(orderId: Int, itemId: Int) {
-        // Store current state for rollback
-        val currentState = _state.value
+        val itemKey = "$orderId-$itemId"
         
-        // OPTIMISTIC UPDATE: Update UI immediately
-        val (updatedActiveOrders, updatedDeliveredOrders) = markItemAsDeliveredOptimisticallyWithFilter(
-            currentState.activeOrders, currentState.deliveredOrders, orderId, itemId
-        )
-        
+        // Add to loading items
         _state.update { 
-            it.copy(
-                activeOrders = updatedActiveOrders,
-                deliveredOrders = updatedDeliveredOrders
-            )
+            it.copy(loadingItemIds = it.loadingItemIds + itemKey)
         }
         
         // Make API call
         screenModelScope.launch {
             repository.markItemAsDelivered(orderId, itemId)
                 .onSuccess {
-                    // Success: Keep the optimistic update
-                    // No action needed, state is already updated
+                    // Success: Update orders and remove from loading
+                    val currentState = _state.value
+                    val (updatedActiveOrders, updatedDeliveredOrders) = markItemAsDeliveredWithFilter(
+                        currentState.activeOrders, currentState.deliveredOrders, orderId, itemId
+                    )
+                    
+                    _state.update { 
+                        it.copy(
+                            activeOrders = updatedActiveOrders,
+                            deliveredOrders = updatedDeliveredOrders,
+                            loadingItemIds = it.loadingItemIds - itemKey
+                        )
+                    }
                 }
                 .onFailure { error ->
-                    // ROLLBACK: Revert to previous state on error
-                    _state.update { currentState.copy(error = error.message) }
+                    // Error: Remove from loading and show error
+                    _state.update { 
+                        it.copy(
+                            loadingItemIds = it.loadingItemIds - itemKey,
+                            error = "Falha ao entregar item. Tente novamente."
+                        )
+                    }
                 }
         }
     }
@@ -497,10 +511,10 @@ class KitchenViewModel(
     }
     
     /**
-     * Apply optimistic updates to orders with filter support.
+     * Apply updates to orders with filter support.
      * Handles moving orders between active and delivered lists.
      */
-    private fun updateOrdersOptimisticallyWithFilter(
+    private fun updateOrdersWithFilter(
         activeOrders: List<KitchenOrder>,
         deliveredOrders: List<KitchenOrder>,
         orderId: Int,
@@ -649,7 +663,7 @@ class KitchenViewModel(
     /**
      * Mark all units of an item as delivered with filter support.
      */
-    private fun markItemAsDeliveredOptimisticallyWithFilter(
+    private fun markItemAsDeliveredWithFilter(
         activeOrders: List<KitchenOrder>,
         deliveredOrders: List<KitchenOrder>,
         orderId: Int,

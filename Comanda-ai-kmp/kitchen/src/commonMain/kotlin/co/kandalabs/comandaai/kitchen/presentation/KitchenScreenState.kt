@@ -16,7 +16,8 @@ data class KitchenScreenState(
     val error: String? = null,
     val isRefreshing: Boolean = false,
     val isConnected: Boolean = false,
-    val isReconnecting: Boolean = false
+    val isReconnecting: Boolean = false,
+    val loadingItemIds: Set<String> = emptySet()
 ) {
     val orders: List<KitchenOrder>
         get() = when (currentFilter) {
