@@ -1,5 +1,7 @@
 package co.kandalabs.comandaai.kitchen.presentation.components
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,13 +27,27 @@ fun OrderCard(
     onMarkItemAsDelivered: (Int, Int) -> Unit,
     onShowDeliveryConfirmation: (KitchenOrder) -> Unit = {},
     isDeliveredView: Boolean = false,
-    loadingItemIds: Set<String> = emptySet()
+    loadingItemIds: Set<String> = emptySet(),
+    isRemoving: Boolean = false,
+    onRemovalAnimationComplete: () -> Unit = {}
 ) {
     val allDelivered = order.items.all { item ->
         item.unitStatuses.all { it.status == ItemStatus.DELIVERED || it.status == ItemStatus.CANCELED }
     }
     
-    Card(
+    AnimatedVisibility(
+        visible = !isRemoving,
+        exit = slideOutVertically(
+            animationSpec = tween(durationMillis = 300),
+            targetOffsetY = { -it }
+        ) + fadeOut(
+            animationSpec = tween(durationMillis = 300)
+        ),
+        modifier = Modifier.animateContentSize(
+            animationSpec = tween(durationMillis = 300)
+        )
+    ) {
+        Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp),
@@ -109,10 +125,18 @@ fun OrderCard(
             }
         }
     }
+    }
+    
+    LaunchedEffect(isRemoving) {
+        if (isRemoving) {
+            kotlinx.coroutines.delay(300)
+            onRemovalAnimationComplete()
+        }
+    }
 }
 
 @Composable
-private fun OrderHeader(order: KitchenOrder) {
+fun OrderHeader(order: KitchenOrder) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,

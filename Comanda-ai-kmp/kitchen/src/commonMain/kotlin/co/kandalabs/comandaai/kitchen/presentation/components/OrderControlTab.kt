@@ -22,7 +22,9 @@ fun OrderControlTab(
     listState: LazyListState,
     onItemStatusChange: (Int, Int, Int, ItemStatus) -> Unit,
     onMarkItemAsDelivered: (Int, Int) -> Unit,
-    onShowDeliveryConfirmation: (KitchenOrder) -> Unit = {}
+    onShowDeliveryConfirmation: (KitchenOrder) -> Unit = {},
+    removingOrderIds: Set<Int> = emptySet(),
+    onOrderRemovalComplete: (Int) -> Unit = {}
 ) {
     when {
         state.isLoading -> LoadingState()
@@ -48,7 +50,9 @@ fun OrderControlTab(
                         onMarkItemAsDelivered = onMarkItemAsDelivered,
                         onShowDeliveryConfirmation = onShowDeliveryConfirmation,
                         isDeliveredView = state.currentFilter == OrderFilter.DELIVERED,
-                        loadingItemIds = state.loadingItemIds
+                        loadingItemIds = state.loadingItemIds,
+                        isRemoving = removingOrderIds.contains(order.id),
+                        onRemovalAnimationComplete = { onOrderRemovalComplete(order.id) }
                     )
                 }
             }

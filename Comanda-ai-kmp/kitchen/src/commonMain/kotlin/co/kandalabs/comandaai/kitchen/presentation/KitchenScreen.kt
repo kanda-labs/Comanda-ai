@@ -41,6 +41,7 @@ object KitchenScreen : Screen {
         var orderToDeliver by remember { mutableStateOf<KitchenOrder?>(null) }
         var userSession by remember { mutableStateOf<UserSession?>(null) }
         var selectedTab by remember { mutableStateOf(0) }
+        var removingOrderIds by remember { mutableStateOf<Set<Int>>(emptySet()) }
 
         LaunchedEffect(Unit) {
             userSession = viewModel.getUserSession()
@@ -53,6 +54,7 @@ object KitchenScreen : Screen {
             showDeliveryConfirmationModal = showDeliveryConfirmationModal,
             orderToDeliver = orderToDeliver,
             selectedTab = selectedTab,
+            removingOrderIds = removingOrderIds,
             onTabChange = { selectedTab = it },
             onRefresh = viewModel::refreshOrders,
             onReconnect = viewModel::reconnectSSE,
@@ -76,9 +78,13 @@ object KitchenScreen : Screen {
                 orderToDeliver = null
             },
             onConfirmDelivery = { orderId ->
-                viewModel.markOrderAsDelivered(orderId)
+                removingOrderIds = removingOrderIds + orderId
                 showDeliveryConfirmationModal = false
                 orderToDeliver = null
+            },
+            onOrderRemovalComplete = { orderId ->
+                removingOrderIds = removingOrderIds - orderId
+                viewModel.markOrderAsDelivered(orderId)
             },
             onLogout = {
                 viewModel.logout()
@@ -97,6 +103,7 @@ private fun KitchenScreenContent(
     showDeliveryConfirmationModal: Boolean,
     orderToDeliver: KitchenOrder?,
     selectedTab: Int,
+    removingOrderIds: Set<Int>,
     onTabChange: (Int) -> Unit,
     onRefresh: () -> Unit,
     onReconnect: () -> Unit,
@@ -109,6 +116,7 @@ private fun KitchenScreenContent(
     onShowDeliveryConfirmation: (KitchenOrder) -> Unit,
     onDismissDeliveryConfirmation: () -> Unit,
     onConfirmDelivery: (Int) -> Unit,
+    onOrderRemovalComplete: (Int) -> Unit,
     onLogout: () -> Unit
 ) {
     // Preservar estado do scroll
@@ -212,7 +220,9 @@ private fun KitchenScreenContent(
                         listState = listState,
                         onItemStatusChange = onItemStatusChange,
                         onMarkItemAsDelivered = onMarkItemAsDelivered,
-                        onShowDeliveryConfirmation = onShowDeliveryConfirmation
+                        onShowDeliveryConfirmation = onShowDeliveryConfirmation,
+                        removingOrderIds = removingOrderIds,
+                        onOrderRemovalComplete = onOrderRemovalComplete
                     )
                 }
 
