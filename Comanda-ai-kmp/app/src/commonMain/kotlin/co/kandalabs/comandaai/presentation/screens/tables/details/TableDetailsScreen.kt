@@ -44,7 +44,7 @@ import co.kandalabs.comandaai.presentation.screens.order.OrderScreen
 import co.kandalabs.comandaai.presentation.screens.ordercontrol.OrderControlScreen
 import co.kandalabs.comandaai.presentation.screens.payment.PaymentSummaryScreen
 import co.kandalabs.comandaai.presentation.screens.tables.details.component.CloseTableConfirmationModal
-import co.kandalabs.comandaai.presentation.screens.tables.details.component.PartialPaymentModal
+import co.kandalabs.comandaai.presentation.screens.payment.components.PartialPaymentModal
 import co.kandalabs.comandaai.presentation.screens.tables.details.component.TableDetailsOrders
 import co.kandalabs.comandaai.presentation.screens.tables.migration.TableMigrationSelection
 import co.kandalabs.comandaai.theme.ComandaAiTypography
@@ -68,18 +68,33 @@ public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : S
                         viewModel.openTable(currentTable)
                     }
                 }
+
                 TableDetailsAction.CLOSE_TABLE -> {
                     val currentTable = state.currentTable
                     if (currentTable != null) {
-                        viewModel.closeTable(currentTable)
+                        viewModel.closeTable(currentTable, navigateToPayments = {
+                            navigator.push(
+                                PaymentSummaryScreen(
+                                    currentTable.id ?: 0,
+                                    currentTable.number
+                                )
+                            )
+                        })
                     }
                 }
+
                 TableDetailsAction.CLOSE_TABLE_MANAGER -> {
                     val currentTable = state.currentTable
                     if (currentTable != null) {
-                        navigator.push(PaymentSummaryScreen(currentTable.id ?: 0, currentTable.number))
+                        navigator.push(
+                            PaymentSummaryScreen(
+                                currentTable.id ?: 0,
+                                currentTable.number
+                            )
+                        )
                     }
                 }
+
                 TableDetailsAction.MAKE_ORDER -> {
                     val currentTable = state.currentTable
                     val billId = currentTable?.billId
@@ -96,41 +111,64 @@ public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : S
                         println("Erro: Mesa ${currentTable?.number ?: tableNumber} não possui bill ativa")
                     }
                 }
+
                 TableDetailsAction.BACK -> navigator.pop()
-                TableDetailsAction.SHOW_ORDER_DETAILS -> { /* Handled by onOrderClick */ }
+                TableDetailsAction.SHOW_ORDER_DETAILS -> { /* Handled by onOrderClick */
+                }
+
                 TableDetailsAction.SHOW_PARTIAL_PAYMENT_DIALOG -> {
                     viewModel.showPartialPaymentDialog()
                 }
+
                 TableDetailsAction.HIDE_PARTIAL_PAYMENT_DIALOG -> {
                     viewModel.hidePartialPaymentDialog()
                 }
+
                 is TableDetailsAction.CREATE_PARTIAL_PAYMENT -> {
                     val currentTable = state.currentTable
                     if (currentTable?.id != null) {
-                        viewModel.createPartialPayment(currentTable.id, action.paidBy, action.amountInCentavos, action.description) {
+                        viewModel.createPartialPayment(
+                            currentTable.id,
+                            action.paidBy,
+                            action.amountInCentavos,
+                            action.description
+                        ) {
                             // Payment success callback
                             println("Partial payment created successfully for ${action.paidBy}")
                         }
                     }
                 }
+
                 TableDetailsAction.REOPEN_TABLE -> {
                     val currentTable = state.currentTable
                     if (currentTable != null) {
                         viewModel.reopenTable(currentTable)
                     }
                 }
+
                 TableDetailsAction.SHOW_CLOSE_TABLE_CONFIRMATION -> {
                     viewModel.showCloseTableConfirmation()
                 }
+
                 TableDetailsAction.HIDE_CLOSE_TABLE_CONFIRMATION -> {
                     viewModel.hideCloseTableConfirmation()
                 }
+
                 TableDetailsAction.CONFIRM_CLOSE_TABLE -> {
                     val currentTable = state.currentTable
                     if (currentTable != null) {
-                        viewModel.closeTable(currentTable)
+                        viewModel.closeTable(currentTable, navigateToPayments = {
+                            navigator.push(
+                                PaymentSummaryScreen(
+                                    currentTable.id ?: 0,
+                                    currentTable.number
+                                )
+                            )
+
+                        })
                     }
                 }
+
                 TableDetailsAction.SHOW_TABLE_MIGRATION -> {
                     val currentTable = state.currentTable
                     if (currentTable != null) {
@@ -143,7 +181,7 @@ public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : S
         LaunchedEffect(Unit) {
             viewModel.setupDetailsById(tableId = tableId)
         }
-        
+
         LaunchedEffect(navigator.size) {
             // Refresh data whenever we return to this screen (navigation stack changes)
             if (navigator.lastItem == this@TableDetailsScreen) {
@@ -154,7 +192,7 @@ public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : S
         TableDetailsScreenContent(
             state = state,
             action = { action -> actions(action) },
-            onOrderClick = { order -> 
+            onOrderClick = { order ->
                 order.id?.let { orderId ->
                     navigator.push(OrderControlScreen(orderId))
                 }
@@ -257,7 +295,7 @@ private fun TableDetailsScreenContent(
                     TableDetailsButtons(state, action)
                 }
             }
-            
+
             // Partial Payment Dialog
             if (state.showPartialPaymentDialog) {
                 PartialPaymentModal(
@@ -273,7 +311,7 @@ private fun TableDetailsScreenContent(
                     }
                 )
             }
-            
+
             // Close Table Confirmation Dialog
             if (state.showCloseTableConfirmation) {
                 CloseTableConfirmationModal(
@@ -301,7 +339,7 @@ private fun TableDetailsButtons(
                 modifier = Modifier.padding(bottom = ComandaAiSpacing.Small.value)
             )
         }
-        
+
         state.secondaryButton?.let {
             ComandaAiButton(
                 text = it.text,

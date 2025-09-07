@@ -14,7 +14,7 @@ internal data class PaymentSummaryScreenState(
     val showPartialPaymentDialog: Boolean = false,
     val showFinishPaymentConfirmation: Boolean = false,
 ) {
-    val appBarTitle = "Resumo do Pagamento"
+    val appBarTitle = "Pagamento"
     val contentTitle: String = "Mesa $tableNumber"
     
     // Propriedades derivadas diretamente do PaymentSummaryResponse

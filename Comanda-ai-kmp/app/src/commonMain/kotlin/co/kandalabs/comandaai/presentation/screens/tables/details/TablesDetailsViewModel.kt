@@ -3,13 +3,11 @@ package co.kandalabs.comandaai.presentation.screens.tables.details
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
+import co.kandalabs.comandaai.core.enums.UserRole
 import co.kandalabs.comandaai.core.session.SessionManager
 import co.kandalabs.comandaai.domain.repository.TablesRepository
-import co.kandalabs.comandaai.domain.models.model.Order
 import co.kandalabs.comandaai.domain.models.model.Table
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
-import kotlin.collections.emptyList
 
 internal class TablesDetailsViewModel(
     private val repository: TablesRepository,
@@ -28,7 +26,11 @@ internal class TablesDetailsViewModel(
                         onFailure = { table }
                     )
                 } ?: table
-                TableDetailsScreenState(table = updatedTable, userSession = userSession, isLoading = false)
+                TableDetailsScreenState(
+                    table = updatedTable,
+                    userSession = userSession,
+                    isLoading = false
+                )
             }.fold(
                 onSuccess = { tableDetailsScreenState ->
                     mutableState.emit(tableDetailsScreenState)
@@ -64,30 +66,37 @@ internal class TablesDetailsViewModel(
     private fun refreshTableData(tableId: Int) {
         screenModelScope.launch {
             mutableState.emit(state.value.copy(isLoading = true))
-            
+
             repository.getTableById(tableId).fold(
                 onSuccess = { updatedTable ->
                     setupDetails(updatedTable)
                 },
                 onFailure = { error ->
                     mutableState.emit(
-                        state.value.copy(isLoading = false, error = error as? co.kandalabs.comandaai.core.error.ComandaAiException)
+                        state.value.copy(
+                            isLoading = false,
+                            error = error as? co.kandalabs.comandaai.core.error.ComandaAiException
+                        )
                     )
                 }
             )
         }
     }
 
-    fun closeTable(table: Table) {
+    fun closeTable(table: Table, navigateToPayments: () -> Unit) {
         screenModelScope.launch {
             val tableId = table.id ?: return@launch
             safeRunCatching {
                 repository.closeTable(tableId)
             }.fold(
                 onSuccess = {
-                    // Hide confirmation dialog and fetch updated table data
-                    mutableState.emit(state.value.copy(showCloseTableConfirmation = false))
                     refreshTableData(tableId)
+
+                    if (sessionManager.getSession()?.role == UserRole.MANAGER) {
+                        navigateToPayments()
+                    } else {
+                        mutableState.emit(state.value.copy(showCloseTableConfirmation = false))
+                    }
                 },
                 onFailure = { error ->
                     mutableState.emit(
@@ -153,12 +162,18 @@ internal class TablesDetailsViewModel(
         }
     }
 
-    fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String? = null, onSuccess: () -> Unit) {
+    fun createPartialPayment(
+        tableId: Int,
+        paidBy: String,
+        amountInCentavos: Long,
+        description: String? = null,
+        onSuccess: () -> Unit
+    ) {
         screenModelScope.launch {
             mutableState.emit(state.value.copy(isProcessingPayment = true))
-            
+
             repository.createPartialPayment(tableId, paidBy, amountInCentavos, description).fold(
-                onSuccess = { 
+                onSuccess = {
                     println("Partial payment created successfully for $paidBy")
                     // Reload table data to show updated status
                     refreshData()

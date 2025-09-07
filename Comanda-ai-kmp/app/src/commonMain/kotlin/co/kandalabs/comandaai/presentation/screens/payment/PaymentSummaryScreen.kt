@@ -134,6 +134,7 @@ private fun PaymentSummaryScreenContent(
                 state.isLoading -> ComandaAiLoadingView(
                     loadingImage = painterResource(Res.drawable.golden_loading)
                 )
+
                 state.error != null -> ErrorView(
                     error = state.error,
                     onRetry = { action(PaymentSummaryAction.RETRY) } // Add retry action
@@ -401,19 +402,12 @@ private fun PartialPaymentCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = payment.displayDescription,
-                    style = ComandaAiTypography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = ComandaAiColors.OnSurface.value
-                )
-                Text(
-                    text = payment.timeAgo,
-                    style = ComandaAiTypography.bodySmall,
-                    color = ComandaAiColors.Gray500.value
-                )
-            }
+            Text(
+                text = payment.displayDescription,
+                style = ComandaAiTypography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = ComandaAiColors.OnSurface.value
+            )
 
             Text(
                 text = payment.amount,
@@ -454,27 +448,6 @@ private fun PaymentSummaryBottom(
                 )
 
                 Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
-            }
-
-            // Mostrar resumo e opções de pagamento sempre
-            if (state.hasPartialPayments && !state.isFullyPaid) {
-                Text(
-                    text = "Restante: ${state.remainingAmountPresentation}",
-                    style = ComandaAiTypography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = ComandaAiColors.Primary.value,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-            } else if (!state.isFullyPaid) {
-                Text(
-                    text = "Total: ${state.totalAmountPresentation}",
-                    style = ComandaAiTypography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = ComandaAiColors.Primary.value,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
             }
 
             if (!state.isFullyPaid) {
