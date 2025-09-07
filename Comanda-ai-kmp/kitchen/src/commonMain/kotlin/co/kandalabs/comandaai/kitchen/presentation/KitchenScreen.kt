@@ -20,14 +20,12 @@ import co.kandalabs.comandaai.core.session.UserSession
 import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
 import co.kandalabs.comandaai.kitchen.presentation.components.ConnectionStatusBullet
-import co.kandalabs.comandaai.kitchen.presentation.components.OrderCard
 import co.kandalabs.comandaai.kitchen.presentation.components.OrderControlTab
 import co.kandalabs.comandaai.kitchen.presentation.components.OrderFilterToggle
 import co.kandalabs.comandaai.kitchen.presentation.components.OrderOverviewTab
 import co.kandalabs.comandaai.kitchen.presentation.components.UserAvatar
 import co.kandalabs.comandaai.kitchen.presentation.components.UserProfileModal
 import kotlinx.coroutines.launch
-import org.kodein.di.instance
 
 object KitchenScreen : Screen {
 
@@ -59,7 +57,6 @@ object KitchenScreen : Screen {
             onRefresh = viewModel::refreshOrders,
             onReconnect = viewModel::reconnectSSE,
             onItemStatusChange = viewModel::updateItemStatus,
-            onMarkAsDelivered = viewModel::markOrderAsDelivered,
             onMarkItemAsDelivered = viewModel::markItemAsDelivered,
             onErrorDismiss = viewModel::clearError,
             onFilterChange = viewModel::switchOrderFilter,
@@ -104,7 +101,6 @@ private fun KitchenScreenContent(
     onRefresh: () -> Unit,
     onReconnect: () -> Unit,
     onItemStatusChange: (Int, Int, Int, ItemStatus) -> Unit,
-    onMarkAsDelivered: (Int) -> Unit,
     onMarkItemAsDelivered: (Int, Int) -> Unit,
     onErrorDismiss: () -> Unit,
     onFilterChange: (OrderFilter) -> Unit,
@@ -215,7 +211,6 @@ private fun KitchenScreenContent(
                         state = state,
                         listState = listState,
                         onItemStatusChange = onItemStatusChange,
-                        onMarkAsDelivered = onMarkAsDelivered,
                         onMarkItemAsDelivered = onMarkItemAsDelivered,
                         onShowDeliveryConfirmation = onShowDeliveryConfirmation
                     )

@@ -21,7 +21,6 @@ fun OrderControlTab(
     state: KitchenScreenState,
     listState: LazyListState,
     onItemStatusChange: (Int, Int, Int, ItemStatus) -> Unit,
-    onMarkAsDelivered: (Int) -> Unit,
     onMarkItemAsDelivered: (Int, Int) -> Unit,
     onShowDeliveryConfirmation: (KitchenOrder) -> Unit = {}
 ) {
@@ -46,7 +45,6 @@ fun OrderControlTab(
                         onItemStatusChange = { itemId, unitIndex, status ->
                             onItemStatusChange(order.id, itemId, unitIndex, status)
                         },
-                        onMarkAsDelivered = onMarkAsDelivered,
                         onMarkItemAsDelivered = onMarkItemAsDelivered,
                         onShowDeliveryConfirmation = onShowDeliveryConfirmation,
                         isDeliveredView = state.currentFilter == OrderFilter.DELIVERED

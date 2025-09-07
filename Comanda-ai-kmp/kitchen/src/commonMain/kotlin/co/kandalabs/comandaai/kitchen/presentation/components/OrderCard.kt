@@ -22,7 +22,6 @@ import kotlinx.datetime.toLocalDateTime
 fun OrderCard(
     order: KitchenOrder,
     onItemStatusChange: (Int, Int, ItemStatus) -> Unit,
-    onMarkAsDelivered: (Int) -> Unit,
     onMarkItemAsDelivered: (Int, Int) -> Unit,
     onShowDeliveryConfirmation: (KitchenOrder) -> Unit = {},
     isDeliveredView: Boolean = false
@@ -43,9 +42,7 @@ fun OrderCard(
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
         )
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
+        Column(modifier = Modifier.padding(20.dp)) {
             // Enhanced Header with better visual hierarchy
             OrderHeader(order = order)
             
