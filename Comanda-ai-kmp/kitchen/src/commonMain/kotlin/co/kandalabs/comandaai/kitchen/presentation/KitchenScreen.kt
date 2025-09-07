@@ -15,8 +15,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import co.kandalabs.comandaai.auth.AuthModule
+import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
 import co.kandalabs.comandaai.core.session.UserSession
 import co.kandalabs.comandaai.domain.ItemStatus
+import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
 import co.kandalabs.comandaai.kitchen.presentation.components.ConnectionStatusBullet
 import co.kandalabs.comandaai.kitchen.presentation.components.OrderCard
 import co.kandalabs.comandaai.kitchen.presentation.components.OrderControlTab
@@ -37,6 +39,8 @@ object KitchenScreen : Screen {
         val scope = rememberCoroutineScope()
 
         var showUserModal by remember { mutableStateOf(false) }
+        var showDeliveryConfirmationModal by remember { mutableStateOf(false) }
+        var orderToDeliver by remember { mutableStateOf<KitchenOrder?>(null) }
         var userSession by remember { mutableStateOf<UserSession?>(null) }
         var selectedTab by remember { mutableStateOf(0) }
 
@@ -48,6 +52,8 @@ object KitchenScreen : Screen {
             state = state,
             userSession = userSession,
             showUserModal = showUserModal,
+            showDeliveryConfirmationModal = showDeliveryConfirmationModal,
+            orderToDeliver = orderToDeliver,
             selectedTab = selectedTab,
             onTabChange = { selectedTab = it },
             onRefresh = viewModel::refreshOrders,
@@ -64,6 +70,19 @@ object KitchenScreen : Screen {
                 }
             },
             onDismissUserModal = { showUserModal = false },
+            onShowDeliveryConfirmation = { order ->
+                orderToDeliver = order
+                showDeliveryConfirmationModal = true
+            },
+            onDismissDeliveryConfirmation = { 
+                showDeliveryConfirmationModal = false
+                orderToDeliver = null
+            },
+            onConfirmDelivery = { orderId ->
+                viewModel.markOrderAsDelivered(orderId)
+                showDeliveryConfirmationModal = false
+                orderToDeliver = null
+            },
             onLogout = {
                 viewModel.logout()
                 navigator?.replaceAll(AuthModule.getLoginScreen())
@@ -78,6 +97,8 @@ private fun KitchenScreenContent(
     state: KitchenScreenState,
     userSession: UserSession?,
     showUserModal: Boolean,
+    showDeliveryConfirmationModal: Boolean,
+    orderToDeliver: KitchenOrder?,
     selectedTab: Int,
     onTabChange: (Int) -> Unit,
     onRefresh: () -> Unit,
@@ -89,6 +110,9 @@ private fun KitchenScreenContent(
     onFilterChange: (OrderFilter) -> Unit,
     onUserAvatarClick: () -> Unit,
     onDismissUserModal: () -> Unit,
+    onShowDeliveryConfirmation: (KitchenOrder) -> Unit,
+    onDismissDeliveryConfirmation: () -> Unit,
+    onConfirmDelivery: (Int) -> Unit,
     onLogout: () -> Unit
 ) {
     // Preservar estado do scroll
@@ -192,7 +216,8 @@ private fun KitchenScreenContent(
                         listState = listState,
                         onItemStatusChange = onItemStatusChange,
                         onMarkAsDelivered = onMarkAsDelivered,
-                        onMarkItemAsDelivered = onMarkItemAsDelivered
+                        onMarkItemAsDelivered = onMarkItemAsDelivered,
+                        onShowDeliveryConfirmation = onShowDeliveryConfirmation
                     )
                 }
 
@@ -209,5 +234,50 @@ private fun KitchenScreenContent(
         onDismiss = onDismissUserModal,
         onLogout = onLogout
     )
+    
+    // Delivery Confirmation Modal - Moved outside of Scaffold to fix z-index issue
+    orderToDeliver?.let { order ->
+        ComandaAiBottomSheetModal(
+            isVisible = showDeliveryConfirmationModal,
+            title = "Confirmar entrega",
+            onDismiss = onDismissDeliveryConfirmation,
+            actions = {
+                OutlinedButton(
+                    onClick = onDismissDeliveryConfirmation,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+                
+                Button(
+                    onClick = { onConfirmDelivery(order.id) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Confirmar entrega")
+                }
+            }
+        ) {
+            Text(
+                text = "Deseja marcar este pedido como entregue?",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = "Mesa ${order.tableNumber} • ${order.userName}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
+        }
+    }
 }
 

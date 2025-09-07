@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.domain.ItemStatus
+import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
 import co.kandalabs.comandaai.kitchen.presentation.KitchenScreenState
 import co.kandalabs.comandaai.kitchen.presentation.OrderFilter
 
@@ -21,7 +22,8 @@ fun OrderControlTab(
     listState: LazyListState,
     onItemStatusChange: (Int, Int, Int, ItemStatus) -> Unit,
     onMarkAsDelivered: (Int) -> Unit,
-    onMarkItemAsDelivered: (Int, Int) -> Unit
+    onMarkItemAsDelivered: (Int, Int) -> Unit,
+    onShowDeliveryConfirmation: (KitchenOrder) -> Unit = {}
 ) {
     when {
         state.isLoading -> LoadingState()
@@ -46,6 +48,7 @@ fun OrderControlTab(
                         },
                         onMarkAsDelivered = onMarkAsDelivered,
                         onMarkItemAsDelivered = onMarkItemAsDelivered,
+                        onShowDeliveryConfirmation = onShowDeliveryConfirmation,
                         isDeliveredView = state.currentFilter == OrderFilter.DELIVERED
                     )
                 }

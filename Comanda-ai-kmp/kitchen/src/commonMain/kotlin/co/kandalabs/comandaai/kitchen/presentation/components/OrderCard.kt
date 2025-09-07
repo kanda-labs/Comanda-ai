@@ -24,6 +24,7 @@ fun OrderCard(
     onItemStatusChange: (Int, Int, ItemStatus) -> Unit,
     onMarkAsDelivered: (Int) -> Unit,
     onMarkItemAsDelivered: (Int, Int) -> Unit,
+    onShowDeliveryConfirmation: (KitchenOrder) -> Unit = {},
     isDeliveredView: Boolean = false
 ) {
     val allDelivered = order.items.all { item ->
@@ -80,7 +81,7 @@ fun OrderCard(
                 Spacer(modifier = Modifier.height(24.dp))
                 
                 Button(
-                    onClick = { onMarkAsDelivered(order.id) },
+                    onClick = { onShowDeliveryConfirmation(order) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(32.dp),
