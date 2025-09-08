@@ -68,6 +68,14 @@ fun Route.orderSSERoutes(orderService: OrderService) {
                         delay(5000) // Update every 5 seconds
                     } catch (e: CancellationException) {
                         throw e
+                    } catch (e: java.io.IOException) {
+                        if (e.message?.contains("Cannot write to a channel") == true) {
+                            logger.debug { "Client disconnected from SSE stream: ${e.message}" }
+                            break // Exit the loop gracefully
+                        } else {
+                            logger.warn { "IO error in SSE stream: ${e.message}" }
+                            break
+                        }
                     } catch (e: Exception) {
                         logger.error(e) { "Error sending SSE update" }
                         // Try to send error event
@@ -79,8 +87,10 @@ fun Route.orderSSERoutes(orderService: OrderService) {
                                 )),
                                 event = "error"
                             )
-                        } catch (_: Exception) {
-                            // Connection might be closed
+                        } catch (sendError: Exception) {
+                            // Connection might be closed, log and break
+                            logger.debug { "Failed to send error event, connection closed: ${sendError.message}" }
+                            break
                         }
                     }
                 }
@@ -92,9 +102,15 @@ fun Route.orderSSERoutes(orderService: OrderService) {
             job.join()
             
         } catch (e: CancellationException) {
-            logger.info { "SSE connection cancelled for $connectionId" }
+            logger.debug { "SSE connection cancelled for $connectionId" }
+        } catch (e: java.io.IOException) {
+            if (e.message?.contains("Cannot write to a channel") == true) {
+                logger.debug { "SSE connection closed by client: $connectionId" }
+            } else {
+                logger.warn { "IO error in SSE connection $connectionId: ${e.message}" }
+            }
         } catch (e: Exception) {
-            logger.error(e) { "Error in SSE connection" }
+            logger.error(e) { "Unexpected error in SSE connection $connectionId" }
         } finally {
             connections.remove(connectionId)?.cancel()
             logger.info { "SSE connection closed for $connectionId" }

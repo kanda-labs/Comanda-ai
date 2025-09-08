@@ -188,6 +188,14 @@ fun Route.kitchenRoutes(kitchenService: KitchenService) {
                             delay(3000)
                         } catch (e: CancellationException) {
                             throw e
+                        } catch (e: java.io.IOException) {
+                            if (e.message?.contains("Cannot write to a channel") == true) {
+                                logger.debug { "Kitchen client disconnected from SSE stream: ${e.message}" }
+                                break // Exit the loop gracefully
+                            } else {
+                                logger.warn { "IO error in Kitchen SSE stream: ${e.message}" }
+                                break
+                            }
                         } catch (e: Exception) {
                             logger.error(e) { "Error sending Kitchen SSE update" }
                             try {
@@ -198,8 +206,10 @@ fun Route.kitchenRoutes(kitchenService: KitchenService) {
                                     )),
                                     event = "error"
                                 )
-                            } catch (_: Exception) {
-                                // Connection might be closed
+                            } catch (sendError: Exception) {
+                                // Connection might be closed, log and break
+                                logger.debug { "Failed to send Kitchen error event, connection closed: ${sendError.message}" }
+                                break
                             }
                         }
                     }
@@ -208,9 +218,15 @@ fun Route.kitchenRoutes(kitchenService: KitchenService) {
                 job.join()
                 
             } catch (e: CancellationException) {
-                logger.info { "Kitchen SSE connection cancelled for $connectionId" }
+                logger.debug { "Kitchen SSE connection cancelled for $connectionId" }
+            } catch (e: java.io.IOException) {
+                if (e.message?.contains("Cannot write to a channel") == true) {
+                    logger.debug { "Kitchen SSE connection closed by client: $connectionId" }
+                } else {
+                    logger.warn { "IO error in Kitchen SSE connection $connectionId: ${e.message}" }
+                }
             } catch (e: Exception) {
-                logger.error(e) { "Error in Kitchen SSE connection" }
+                logger.error(e) { "Unexpected error in Kitchen SSE connection $connectionId" }
             } finally {
                 logger.info { "Kitchen SSE connection closed for $connectionId" }
             }

@@ -103,11 +103,31 @@ fun Application.configurePlugins() {
         
         // Handle general exceptions
         exception<Throwable> { call, cause ->
-            logger.error(cause) { "Unhandled exception occurred" }
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                mapOf("error" to "Internal server error")
-            )
+            // Filter out non-fatal SSE channel errors
+            when {
+                cause is java.io.IOException && 
+                cause.message?.contains("Cannot write to a channel") == true -> {
+                    logger.debug { "Client disconnected from SSE stream: ${cause.message}" }
+                    // Don't respond to call as connection is already closed
+                    return@exception
+                }
+                cause is kotlinx.coroutines.CancellationException -> {
+                    logger.debug { "Request cancelled: ${cause.message}" }
+                    // Don't respond to call as it was cancelled
+                    return@exception
+                }
+                else -> {
+                    logger.error(cause) { "Unhandled exception occurred" }
+                    try {
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            mapOf("error" to "Internal server error")
+                        )
+                    } catch (e: Exception) {
+                        logger.debug { "Failed to send error response, connection likely closed: ${e.message}" }
+                    }
+                }
+            }
         }
         
         // Handle 404 for undefined routes
