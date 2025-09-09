@@ -33,6 +33,7 @@ object KitchenScreen : Screen {
     override fun Content() {
         val viewModel = rememberScreenModel<KitchenViewModel>()
         val state by viewModel.state.collectAsState()
+        
         val navigator = LocalNavigator.current
         val scope = rememberCoroutineScope()
 
@@ -46,7 +47,7 @@ object KitchenScreen : Screen {
         LaunchedEffect(Unit) {
             userSession = viewModel.getUserSession()
         }
-
+        
         KitchenScreenContent(
             state = state,
             userSession = userSession,

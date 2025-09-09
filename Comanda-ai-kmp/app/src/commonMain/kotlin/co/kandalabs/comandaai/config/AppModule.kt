@@ -41,6 +41,15 @@ object AppModule {
             ComandaAiLoggerImpl()
         }
 
+        // JSON
+        bindSingleton<Json> {
+            Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+            }
+        }
+
         // HTTP Client
         bindSingleton<HttpClient> {
             HttpClient {

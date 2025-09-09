@@ -2,7 +2,7 @@ package co.kandalabs.comandaai.config
 
 import co.kandalabs.comandaai.config.sqldelight.DriverFactory
 import co.kandalabs.comandaai.sdk.session.SessionManager
-import co.kandalabs.comandaai.sdk.session.SessionManagerImpl
+import co.kandalabs.comandaai.core.session.SessionManagerImpl
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 

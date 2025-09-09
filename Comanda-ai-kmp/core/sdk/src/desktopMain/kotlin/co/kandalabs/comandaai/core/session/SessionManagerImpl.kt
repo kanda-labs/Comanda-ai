@@ -1,4 +1,7 @@
-package co.kandalabs.comandaai.sdk.session
+package co.kandalabs.comandaai.core.session
+
+import co.kandalabs.comandaai.sdk.session.SessionManager
+import co.kandalabs.comandaai.sdk.session.UserSession
 
 class SessionManagerImpl : SessionManager {
     

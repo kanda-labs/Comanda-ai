@@ -23,18 +23,49 @@ class SessionManagerImpl(
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
     
-    private val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
-        context,
-        "session_prefs",
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
+    private val sharedPreferences: SharedPreferences = createEncryptedSharedPreferences()
     
     private val json = Json { ignoreUnknownKeys = true }
     
     companion object {
         private const val SESSION_KEY = "user_session"
+        private const val PREFS_NAME = "session_prefs"
+    }
+    
+    private fun createEncryptedSharedPreferences(): SharedPreferences {
+        return try {
+            EncryptedSharedPreferences.create(
+                context,
+                PREFS_NAME,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: Exception) {
+            println("SessionManager - EncryptedSharedPreferences corrupted, clearing and recreating: ${e.message}")
+            
+            // Clear corrupted preferences file
+            try {
+                context.deleteSharedPreferences(PREFS_NAME)
+            } catch (deleteException: Exception) {
+                println("SessionManager - Failed to delete corrupted preferences: ${deleteException.message}")
+            }
+            
+            // Try to create fresh EncryptedSharedPreferences
+            try {
+                EncryptedSharedPreferences.create(
+                    context,
+                    PREFS_NAME,
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                )
+            } catch (retryException: Exception) {
+                println("SessionManager - Failed to recreate EncryptedSharedPreferences, falling back to regular SharedPreferences: ${retryException.message}")
+                // Fallback to regular SharedPreferences
+                context.getSharedPreferences("${PREFS_NAME}_fallback", Context.MODE_PRIVATE)
+            }
+        }
     }
     
     override suspend fun saveSession(session: UserSession) = withContext(Dispatchers.IO) {
