@@ -20,11 +20,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.AdminScreen
+import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.listing.TablesScreen
 import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.kitchen.KitchenModule
-import co.kandalabs.comandaai.presentation.screens.tables.listing.TablesScreen
 import co.kandalabs.comandaai.core.enums.UserRole
-import co.kandalabs.comandaai.presentation.screens.admin.AdminScreen
 
 object SplashScreen : Screen {
     @Composable

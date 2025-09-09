@@ -1,0 +1,80 @@
+package co.kandalabs.comandaai.features.attendance.presentation.screens.admin
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import co.kandalabs.comandaai.components.ComandaAiTopAppBar
+import co.kandalabs.comandaai.theme.ComandaAiTypography
+import co.kandalabs.comandaai.tokens.ComandaAiSpacing
+
+public object CategoriesManagementScreen : Screen {
+
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.current
+
+        CategoriesManagementScreenContent(
+            onNavigateBack = { navigator?.pop() }
+        )
+    }
+}
+
+@Composable
+private fun CategoriesManagementScreenContent(
+    onNavigateBack: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+    ) {
+        ComandaAiTopAppBar(
+            title = "Gerenciar Categorias",
+            onBackOrClose = onNavigateBack,
+            icon = Icons.Default.ArrowBack
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(ComandaAiSpacing.Large.value),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Gerenciamento de Categorias",
+                style = ComandaAiTypography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
+
+            Text(
+                text = "Esta funcionalidade será implementada em breve.\n\nPermitirá:\n• Criar novas categorias\n• Editar categorias existentes\n• Remover categorias\n• Organizar items por categoria",
+                style = ComandaAiTypography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = ComandaAiSpacing.Medium.value)
+            )
+        }
+    }
+}

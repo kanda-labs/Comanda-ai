@@ -9,6 +9,6 @@ import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
 
 actual class DriverFactory(private val context: Context) {
     actual fun createDriver(): SqlDriver {
-        return AndroidSqliteDriver(ComandaAiDatabase.Schema, context, "ComandaAiDatabase.db")
+        return AndroidSqliteDriver(ComandaAiDatabase.Schema, context, "comandaai.db")
     }
 }

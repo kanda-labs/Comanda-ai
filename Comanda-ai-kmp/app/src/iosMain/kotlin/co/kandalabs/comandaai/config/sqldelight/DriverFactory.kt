@@ -8,6 +8,6 @@ import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
 
 actual class DriverFactory {
     actual fun createDriver(): SqlDriver {
-        return NativeSqliteDriver(ComandaAiDatabase.Schema, "ComandaAiDatabase.db")
+        return NativeSqliteDriver(ComandaAiDatabase.Schema, "comandaai.db")
     }
 }

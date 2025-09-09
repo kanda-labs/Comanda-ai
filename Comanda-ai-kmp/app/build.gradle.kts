@@ -66,6 +66,7 @@ kotlin {
             implementation(projects.core)
             implementation(projects.domain)
             implementation(projects.kitchen)
+            implementation(projects.features.attendance)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
