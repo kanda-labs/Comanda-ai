@@ -1,8 +1,8 @@
 package co.kandalabs.comandaai.platform
 
 import android.content.Context
-import co.kandalabs.comandaai.core.session.SessionManager
-import co.kandalabs.comandaai.core.session.SessionManagerImpl
+import co.kandalabs.comandaai.sdk.session.SessionManager
+import co.kandalabs.comandaai.sdk.session.SessionManagerImpl
 
 actual fun createSessionManager(): SessionManager {
     // This will be injected from the Android Application context

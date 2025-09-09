@@ -3,7 +3,7 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSel
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.features.attendance.domain.repository.ItemsRepository
-import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
+import co.kandalabs.comandaai.sdk.coroutinesResult.ComandaAiResult
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 

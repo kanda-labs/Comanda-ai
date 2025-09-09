@@ -1,6 +1,6 @@
 package co.kandalabs.comandaai.features.attendance.domain.usecase
 
-import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
+import co.kandalabs.comandaai.sdk.coroutinesResult.ComandaAiResult
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Order
 import co.kandalabs.comandaai.features.attendance.domain.models.request.CreateOrderItemRequest
 

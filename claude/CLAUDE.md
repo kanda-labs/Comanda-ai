@@ -9,12 +9,15 @@ comanda-ai/
 ├── CommanderAPI/        # Backend REST API (Kotlin/Ktor)
 ├── Comanda-ai-kmp/     # Mobile app (Kotlin Multiplatform)
 │   ├── app/            # Main mobile application
-│   ├── auth/           # Authentication module
-│   ├── kitchen/        # Kitchen management module (NEW)
-│   ├── core/           # Shared core utilities
-│   ├── designsystem/   # UI components and theming
-│   ├── domain/         # Domain models
-│   └── network/        # Network configuration module (NEW)
+│   ├── core/           # Core modules (organized namespace)
+│   │   ├── auth/       # Authentication module
+│   │   ├── network/    # Network configuration module  
+│   │   └── sdk/        # Shared SDK utilities (renamed from core)
+│   ├── features/       # Feature modules (organized namespace)
+│   │   ├── attendance/ # Restaurant attendance features
+│   │   ├── domain/     # Domain models (moved to features)
+│   │   └── kitchen/    # Kitchen management module
+│   └── designsystem/   # UI components and theming
 └── claude/             # Documentation and guidance files
 ```
 
@@ -86,16 +89,53 @@ kandalabs.commander/
 
 **Module Structure:**
 ```
-├── app/            # Main app (MVVM implementation)
-├── auth/           # Authentication module (Login, Registration)
-├── kitchen/        # Kitchen management module (Order control, Real-time updates)
-├── core/           # Utilities, error handling
-├── designsystem/   # UI components, theming
-├── domain/         # Shared domain models
-└── network/        # Centralized network configuration
+├── app/                    # Main app (MVVM implementation)
+├── core/                   # Core modules namespace
+│   ├── auth/              # Authentication module (Login, Registration)
+│   ├── network/           # Centralized network configuration
+│   └── sdk/               # Shared utilities, error handling (renamed from core)
+├── features/               # Feature modules namespace
+│   ├── attendance/        # Restaurant attendance features (Tables, Orders, Items)
+│   ├── domain/            # Shared domain models
+│   └── kitchen/           # Kitchen management module (Order control, Real-time updates)
+└── designsystem/          # UI components, theming
 ```
 
 **Key Screens:** LoginScreen, TablesScreen, TableDetailsScreen, ItemsScreen, OrderScreen, KitchenScreen
+
+## 🔄 Recent Architecture Changes (NEW)
+
+### Module Reorganization (2024)
+The project underwent a major reorganization to improve modularity and maintainability:
+
+#### Core Modules Namespace
+- **`core:auth`** - Authentication module (formerly `auth`)
+- **`core:network`** - Network configuration with auto IP management
+- **`core:sdk`** - Shared utilities and SDK components (renamed from `core`)
+
+#### Features Modules Namespace  
+- **`features:attendance`** - Restaurant table and order management
+- **`features:domain`** - Shared domain models (moved from root)
+- **`features:kitchen`** - Kitchen operations and real-time updates
+
+#### Benefits of New Architecture
+- ✅ **Clear Separation**: Core infrastructure vs business features
+- ✅ **Scalability**: Easy to add new features under `features:*`
+- ✅ **Dependency Management**: Better module boundaries
+- ✅ **Auto-Generated Config**: Network settings from single source
+- ✅ **Type-Safe Accessors**: Gradle projects.core.* and projects.features.*
+
+### Network Configuration Revolution
+- **Before**: Manual IP updates in multiple files across platforms
+- **After**: Single `local.properties` edit → automatic regeneration everywhere
+- **Platforms Supported**: Android (BuildConfig), iOS (Generated Kotlin), Desktop (Generated Kotlin)
+
+### Migration Status
+- ✅ All 62 Kotlin files updated with new package structure
+- ✅ Gradle configurations updated with new module references  
+- ✅ DI modules reconfigured for new architecture
+- ✅ Build system generates network config automatically
+- ✅ Cross-platform builds working (Android, iOS, Desktop)
 
 ## 🛠️ Development Guidelines
 
@@ -113,7 +153,9 @@ kandalabs.commander/
 - Ktor Client + Ktorfit for API communication
 - SQLDelight for local persistence
 - Kodein for dependency injection
-- **Network Module**: Centralized IP/port configuration for all environments
+- **Core Modules**: Organized core functionality (auth, network, sdk)
+- **Features Modules**: Business logic separated by domain (attendance, kitchen, domain)
+- **Network Module**: Automatic IP configuration from local.properties
 
 ### Testing
 - **Backend:** JUnit 5 + MockK, separate test config
@@ -194,10 +236,11 @@ The system comes with these pre-configured menu items:
 | LOG_LEVEL | INFO | Logging level |
 
 ### Network Configuration (Mobile)
-**Single configuration point in `network` module:**
-- **Production**: `192.168.0.161:8081` (Release builds)
-- **Debug**: `192.168.0.161:8082` (Debug builds)
-- **Change IP**: Update only `/network/build.gradle.kts` (Android) and `/network/src/iosMain/kotlin/.../NetworkConfig.kt` (iOS)
+**Automatic configuration from `local.properties`:**
+- **Current IP**: `10.0.2.2` (from local.properties)
+- **Production**: `10.0.2.2:8081` (Release builds)
+- **Debug**: `10.0.2.2:8082` (Debug builds)  
+- **Change IP**: Update only `local.properties` → `base.ip=YOUR_IP` (auto-regenerates for all platforms)
 
 ### Build Variants
 | Build Type | App ID | Server Port | Database |
@@ -333,8 +376,8 @@ fun ComandaAiApp() {
 
 ### Auth Module Dependencies
 ```kotlin
-auth {
-    - core (error handling, utilities)
+core:auth {
+    - core:sdk (error handling, utilities)
     - designsystem (UI components, theming)
     - voyager (navigation framework)
     - kodein (dependency injection)
@@ -351,10 +394,10 @@ auth {
 - 🔄 Automatic token refresh
 
 ### Key Auth Files
-- **auth/AuthModule.kt**: Public API for auth integration
-- **auth/presentation/login/LoginScreen.kt**: Main login interface
-- **auth/presentation/login/LoginViewModel.kt**: Login business logic
-- **auth/presentation/login/LoginScreenState.kt**: UI state management
+- **core/auth/AuthModule.kt**: Public API for auth integration
+- **core/auth/presentation/login/LoginScreen.kt**: Main login interface
+- **core/auth/presentation/login/LoginViewModel.kt**: Login business logic
+- **core/auth/presentation/login/LoginScreenState.kt**: UI state management
 
 ## 🍳 Kitchen Module (NEW)
 
@@ -362,7 +405,7 @@ The app now includes a dedicated kitchen module for order management and real-ti
 
 ### Kitchen Module Structure
 ```
-kitchen/
+features/kitchen/
 ├── build.gradle.kts
 └── src/
     └── commonMain/kotlin/co/kandalabs/comandaai/kitchen/
@@ -407,10 +450,10 @@ val kitchenDI = KitchenModule.kitchenDI
 - `GET /api/v1/kitchen/events` - SSE endpoint for real-time updates
 
 ### Key Kitchen Files
-- **kitchen/KitchenModule.kt**: Public API for kitchen integration
-- **kitchen/presentation/KitchenScreen.kt**: Main kitchen management interface
-- **kitchen/presentation/KitchenViewModel.kt**: Kitchen business logic
-- **kitchen/data/api/KitchenSSEClient.kt**: Real-time order updates via SSE
+- **features/kitchen/KitchenModule.kt**: Public API for kitchen integration
+- **features/kitchen/presentation/KitchenScreen.kt**: Main kitchen management interface
+- **features/kitchen/presentation/KitchenViewModel.kt**: Kitchen business logic
+- **features/kitchen/data/api/KitchenSSEClient.kt**: Real-time order updates via SSE
 
 ## 📱 Order Details Modal
 
@@ -465,27 +508,27 @@ Centralized network configuration module that manages all API endpoints and envi
 
 ### Network Module Structure
 ```
-network/
-├── build.gradle.kts                    # Android build config with IP
+core/network/
+├── build.gradle.kts                    # Auto-reads local.properties for IP config
 └── src/
     ├── commonMain/kotlin/.../network/
-    │   └── NetworkConfig.kt            # Common network interface
+    │   ├── NetworkConfig.kt            # Common network interface
+    │   └── generated/
+    │       └── GeneratedNetworkConfig.kt # Auto-generated from local.properties
     ├── androidMain/kotlin/.../network/
-    │   └── NetworkConfig.kt            # Android implementation
+    │   └── NetworkConfig.kt            # Android implementation (BuildConfig)
     └── iosMain/kotlin/.../network/
-        └── NetworkConfig.kt            # iOS implementation  
+        └── NetworkConfig.kt            # iOS implementation (generated config)
 ```
 
-### How to Change IP Address
-**Android**: Edit `/network/build.gradle.kts`
-```kotlin
-buildConfigField("String", "BASE_IP", "\"YOUR_IP_HERE\"")
+### How to Change IP Address (NEW)
+**All Platforms**: Edit `/local.properties` (one place for everything!)
+```properties
+base.ip=YOUR_IP_HERE
+production.port=8081
+debug.port=8082
 ```
-
-**iOS**: Edit `/network/src/iosMain/kotlin/.../NetworkConfig.kt`  
-```kotlin
-actual val baseIp: String = "YOUR_IP_HERE"
-```
+The build system automatically regenerates configuration for Android, iOS, and Desktop on any compilation.
 
 ### Network Usage in Modules
 ```kotlin
@@ -511,9 +554,10 @@ val sseUrl = NetworkUtils.buildSseUrl(
 
 ### Migrated Modules
 - ✅ **app**: Uses NetworkConfig.currentBaseUrl
-- ✅ **auth**: Uses NetworkUtils for URL building  
-- ✅ **kitchen**: Uses NetworkConfig for all connections
-- ✅ **network**: Centralizes all configuration
+- ✅ **core:auth**: Uses NetworkUtils for URL building  
+- ✅ **features:kitchen**: Uses NetworkConfig for all connections
+- ✅ **core:network**: Centralizes all configuration with auto-generation
+- ✅ **features:attendance**: Uses generated network configuration
 
 ## 🔄 Environment Separation (NEW)
 

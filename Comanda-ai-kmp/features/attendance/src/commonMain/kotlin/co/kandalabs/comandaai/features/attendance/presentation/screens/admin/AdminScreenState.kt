@@ -1,6 +1,6 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.admin
 
-import co.kandalabs.comandaai.core.session.UserSession
+import co.kandalabs.comandaai.sdk.session.UserSession
 
 /**
  * UI state for the Admin screen

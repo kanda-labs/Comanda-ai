@@ -1,7 +1,7 @@
 package co.kandalabs.comandaai.features.attendance.domain.usecase
 
-import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
-import co.kandalabs.comandaai.core.error.ComandaAiException
+import co.kandalabs.comandaai.sdk.coroutinesResult.ComandaAiResult
+import co.kandalabs.comandaai.sdk.error.ComandaAiException
 import co.kandalabs.comandaai.features.attendance.domain.models.request.CreateOrderItemRequest
 import co.kandalabs.comandaai.features.attendance.domain.repository.ItemsRepository
 import co.kandalabs.comandaai.features.attendance.domain.repository.OrderRepository

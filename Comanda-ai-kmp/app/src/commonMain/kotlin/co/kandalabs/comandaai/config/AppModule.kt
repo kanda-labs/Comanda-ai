@@ -1,10 +1,10 @@
 package co.kandalabs.comandaai.config
 
 import co.kandalabs.comandaai.config.sqldelight.createDatabase
-import co.kandalabs.comandaai.core.cache.CacheManager
-import co.kandalabs.comandaai.core.cache.CacheManagerImpl
-import co.kandalabs.comandaai.core.logger.ComandaAiLogger
-import co.kandalabs.comandaai.core.logger.ComandaAiLoggerImpl
+import co.kandalabs.comandaai.sdk.cache.CacheManager
+import co.kandalabs.comandaai.sdk.cache.CacheManagerImpl
+import co.kandalabs.comandaai.sdk.logger.ComandaAiLogger
+import co.kandalabs.comandaai.sdk.logger.ComandaAiLoggerImpl
 import co.kandalabs.comandaai.presentation.screens.splash.SplashViewModel
 import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
 import de.jensklingenberg.ktorfit.Ktorfit

@@ -1,7 +1,7 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.tables.listing
 
 import androidx.compose.ui.graphics.Color
-import co.kandalabs.comandaai.core.error.ComandaAiException
+import co.kandalabs.comandaai.sdk.error.ComandaAiException
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
 import co.kandalabs.comandaai.features.attendance.domain.models.model.TableStatus

@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
-import co.kandalabs.comandaai.core.error.ComandaAiException
+import co.kandalabs.comandaai.sdk.error.ComandaAiException
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.theme.ComandaAiTypography

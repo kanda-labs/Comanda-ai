@@ -1,8 +1,8 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details
 
-import co.kandalabs.comandaai.core.error.ComandaAiException
-import co.kandalabs.comandaai.core.enums.UserRole
-import co.kandalabs.comandaai.core.session.UserSession
+import co.kandalabs.comandaai.sdk.error.ComandaAiException
+import co.kandalabs.comandaai.core.session.UserRole
+import co.kandalabs.comandaai.sdk.session.UserSession
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Order
 import co.kandalabs.comandaai.features.attendance.domain.models.model.OrderStatus

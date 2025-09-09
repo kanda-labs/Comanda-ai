@@ -20,10 +20,10 @@ dependencyResolutionManagement {
 }
 
 include(":app")
-include(":auth")
+include(":core:sdk")
+include(":core:network")
+include(":core:auth")
 include(":designsystem")
-include(":core")
-include(":domain")
-include(":kitchen")
-include(":network")
+include(":features:domain")
+include(":features:kitchen")
 include(":features:attendance")

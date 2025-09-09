@@ -4,9 +4,9 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
 import co.kandalabs.comandaai.features.attendance.domain.repository.TablesRepository
-import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
-import co.kandalabs.comandaai.core.enums.UserRole
-import co.kandalabs.comandaai.core.session.SessionManager
+import co.kandalabs.comandaai.sdk.coroutinesResult.safeRunCatching
+import co.kandalabs.comandaai.core.session.UserRole
+import co.kandalabs.comandaai.sdk.session.SessionManager
 import kotlinx.coroutines.launch
 
 internal class TablesDetailsViewModel(
@@ -56,7 +56,7 @@ internal class TablesDetailsViewModel(
                 },
                 onFailure = { error ->
                     mutableState.emit(
-                        state.value.copy(error = error as? co.kandalabs.comandaai.core.error.ComandaAiException)
+                        state.value.copy(error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException)
                     )
                 }
             )
@@ -75,7 +75,7 @@ internal class TablesDetailsViewModel(
                     mutableState.emit(
                         state.value.copy(
                             isLoading = false,
-                            error = error as? co.kandalabs.comandaai.core.error.ComandaAiException
+                            error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException
                         )
                     )
                 }
@@ -101,7 +101,7 @@ internal class TablesDetailsViewModel(
                 onFailure = { error ->
                     mutableState.emit(
                         state.value.copy(
-                            error = error as? co.kandalabs.comandaai.core.error.ComandaAiException,
+                            error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException,
                             showCloseTableConfirmation = false
                         )
                     )
@@ -190,7 +190,7 @@ internal class TablesDetailsViewModel(
                     mutableState.emit(
                         state.value.copy(
                             isProcessingPayment = false,
-                            error = error as? co.kandalabs.comandaai.core.error.ComandaAiException
+                            error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException
                         )
                     )
                 }
@@ -210,7 +210,7 @@ internal class TablesDetailsViewModel(
                 },
                 onFailure = { error ->
                     mutableState.emit(
-                        state.value.copy(error = error as? co.kandalabs.comandaai.core.error.ComandaAiException)
+                        state.value.copy(error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException)
                     )
                 }
             )

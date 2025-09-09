@@ -5,7 +5,7 @@ import co.kandalabs.comandaai.features.attendance.domain.models.model.Order
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PartialPayment
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PaymentSummaryResponse
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
-import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
+import co.kandalabs.comandaai.sdk.coroutinesResult.ComandaAiResult
 
 interface TablesRepository {
     suspend fun getTables(): ComandaAiResult<List<Table>>

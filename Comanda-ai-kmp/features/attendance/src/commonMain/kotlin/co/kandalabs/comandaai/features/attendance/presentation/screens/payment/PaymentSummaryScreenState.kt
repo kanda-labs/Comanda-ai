@@ -1,6 +1,6 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.payment
 
-import co.kandalabs.comandaai.core.error.ComandaAiException
+import co.kandalabs.comandaai.sdk.error.ComandaAiException
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PaymentSummaryResponse
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PartialPayment
 import co.kandalabs.comandaai.tokens.ComandaAiColors

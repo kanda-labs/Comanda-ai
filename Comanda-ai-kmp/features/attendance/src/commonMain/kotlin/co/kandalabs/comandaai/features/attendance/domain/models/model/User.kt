@@ -1,6 +1,6 @@
 package co.kandalabs.comandaai.features.attendance.domain.models.model
 
-import co.kandalabs.comandaai.core.enums.UserRole
+import co.kandalabs.comandaai.core.session.UserRole
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable

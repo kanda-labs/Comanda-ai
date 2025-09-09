@@ -3,8 +3,8 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.tables.l
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.features.attendance.domain.repository.TablesRepository
-import co.kandalabs.comandaai.core.session.LogoutManager
-import co.kandalabs.comandaai.core.session.SessionManager
+import co.kandalabs.comandaai.sdk.session.LogoutManager
+import co.kandalabs.comandaai.sdk.session.SessionManager
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 

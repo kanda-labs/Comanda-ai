@@ -2,10 +2,10 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.ordercon
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import co.kandalabs.comandaai.core.session.UserSession
-import co.kandalabs.comandaai.core.session.SessionManager
-import co.kandalabs.comandaai.core.error.ComandaAiException
-import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
+import co.kandalabs.comandaai.sdk.session.UserSession
+import co.kandalabs.comandaai.sdk.session.SessionManager
+import co.kandalabs.comandaai.sdk.error.ComandaAiException
+import co.kandalabs.comandaai.sdk.coroutinesResult.ComandaAiResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

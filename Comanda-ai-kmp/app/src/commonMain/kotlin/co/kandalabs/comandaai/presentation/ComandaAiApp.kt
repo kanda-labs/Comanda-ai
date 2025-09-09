@@ -7,10 +7,10 @@ import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.Adm
 import co.kandalabs.comandaai.presentation.screens.splash.SplashScreen
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.listing.TablesScreen
 import co.kandalabs.comandaai.auth.navigation.AuthNavigationCallback
-import co.kandalabs.comandaai.core.session.LogoutManager
+import co.kandalabs.comandaai.sdk.session.LogoutManager
 import co.kandalabs.comandaai.kitchen.presentation.KitchenScreen
-import co.kandalabs.comandaai.core.enums.UserRole
-import co.kandalabs.comandaai.core.session.SessionManager
+import co.kandalabs.comandaai.core.session.UserRole
+import co.kandalabs.comandaai.sdk.session.SessionManager
 import co.kandalabs.comandaai.theme.ComandaAiTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

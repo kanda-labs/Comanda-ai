@@ -60,12 +60,12 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            implementation(projects.network)
-            implementation(projects.auth)
+            implementation(projects.core.network)
+            implementation(projects.core.auth)
             implementation(projects.designsystem)
-            implementation(projects.core)
-            implementation(projects.domain)
-            implementation(projects.kitchen)
+            implementation(projects.core.sdk)
+            implementation(projects.features.domain)
+            implementation(projects.features.kitchen)
             implementation(projects.features.attendance)
             implementation(compose.runtime)
             implementation(compose.foundation)

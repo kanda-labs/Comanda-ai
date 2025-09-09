@@ -1,7 +1,7 @@
 package co.kandalabs.comandaai.presentation.screens.splash
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import co.kandalabs.comandaai.core.session.SessionManager
+import co.kandalabs.comandaai.sdk.session.SessionManager
 
 class SplashViewModel(
     private val sessionManager: SessionManager

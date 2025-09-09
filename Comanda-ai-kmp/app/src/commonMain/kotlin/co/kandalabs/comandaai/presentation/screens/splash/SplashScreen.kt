@@ -24,7 +24,7 @@ import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.Adm
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.listing.TablesScreen
 import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.kitchen.KitchenModule
-import co.kandalabs.comandaai.core.enums.UserRole
+import co.kandalabs.comandaai.core.session.UserRole
 
 object SplashScreen : Screen {
     @Composable

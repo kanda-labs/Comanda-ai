@@ -1,6 +1,6 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.ordercontrol
 
-import co.kandalabs.comandaai.core.error.ComandaAiException
+import co.kandalabs.comandaai.sdk.error.ComandaAiException
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Order
 import co.kandalabs.comandaai.domain.ItemOrder
 import co.kandalabs.comandaai.domain.ItemStatus

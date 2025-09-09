@@ -2,9 +2,9 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.admin
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import co.kandalabs.comandaai.core.session.LogoutManager
-import co.kandalabs.comandaai.core.session.SessionManager
-import co.kandalabs.comandaai.core.enums.UserRole
+import co.kandalabs.comandaai.sdk.session.LogoutManager
+import co.kandalabs.comandaai.sdk.session.SessionManager
+import co.kandalabs.comandaai.core.session.UserRole
 import kotlinx.coroutines.launch
 
 internal class AdminViewModel(

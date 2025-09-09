@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
 import co.kandalabs.comandaai.components.UserAvatar
-import co.kandalabs.comandaai.core.session.UserSession
+import co.kandalabs.comandaai.sdk.session.UserSession
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.listing.components.UserProfileModal
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.components.ComandaAiLoadingView

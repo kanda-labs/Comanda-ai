@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.components.ComandaAiTextButton
-import co.kandalabs.comandaai.core.session.UserSession
+import co.kandalabs.comandaai.sdk.session.UserSession
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt

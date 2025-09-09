@@ -2,8 +2,8 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.order
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
-import co.kandalabs.comandaai.core.session.SessionManager
+import co.kandalabs.comandaai.sdk.coroutinesResult.ComandaAiResult
+import co.kandalabs.comandaai.sdk.session.SessionManager
 import co.kandalabs.comandaai.features.attendance.domain.model.ItemWithCount
 import co.kandalabs.comandaai.features.attendance.domain.models.request.CreateOrderItemRequest
 import co.kandalabs.comandaai.features.attendance.domain.repository.ItemsRepository

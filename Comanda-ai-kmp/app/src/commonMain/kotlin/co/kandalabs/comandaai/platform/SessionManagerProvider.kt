@@ -1,5 +1,5 @@
 package co.kandalabs.comandaai.platform
 
-import co.kandalabs.comandaai.core.session.SessionManager
+import co.kandalabs.comandaai.sdk.session.SessionManager
 
 expect fun createSessionManager(): SessionManager

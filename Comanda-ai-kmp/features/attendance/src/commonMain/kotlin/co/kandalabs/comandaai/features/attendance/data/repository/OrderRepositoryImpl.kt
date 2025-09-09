@@ -1,7 +1,7 @@
 package co.kandalabs.comandaai.features.attendance.data.repository
 
-import co.kandalabs.comandaai.core.coroutinesResult.ComandaAiResult
-import co.kandalabs.comandaai.core.coroutinesResult.safeRunCatching
+import co.kandalabs.comandaai.sdk.coroutinesResult.ComandaAiResult
+import co.kandalabs.comandaai.sdk.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Order
 import co.kandalabs.comandaai.features.attendance.domain.models.model.OrderWithStatuses
 import co.kandalabs.comandaai.features.attendance.domain.models.model.TableStatus

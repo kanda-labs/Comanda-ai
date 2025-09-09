@@ -78,11 +78,11 @@ kotlin {
             implementation(libs.kotlinx.collections.immutable)
 
             // Project modules
-            implementation(projects.network)
-            implementation(projects.core)
-            implementation(projects.domain)
+            implementation(projects.core.network)
+            implementation(projects.core.sdk)
+            implementation(projects.features.domain)
             implementation(projects.designsystem)
-            implementation(projects.auth)
+            implementation(projects.core.auth)
 
             implementation(libs.coil.compose)
         }
