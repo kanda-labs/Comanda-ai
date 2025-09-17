@@ -21,7 +21,8 @@ object DatabaseMigrations {
         migration003_UpdateOrderStatusesToSimplified()
         migration004_CreatePartialPaymentsTable()
         migration005_AddUpdatedAtToOrders()
-        
+        migration006_AddUniqueBillConstraint()
+
         logger.info { "All database migrations completed successfully" }
     }
     
@@ -192,6 +193,41 @@ object DatabaseMigrations {
                     logger.error(migrationError) { "Failed to add updated_at column: ${migrationError.message}" }
                     throw migrationError
                 }
+            }
+        }
+    }
+
+    /**
+     * Migration 006: Add unique constraint to prevent duplicate bills for same table
+     */
+    private fun migration006_AddUniqueBillConstraint() {
+        logger.info { "Running migration 006: Add unique constraint to prevent duplicate bills" }
+
+        transaction {
+            try {
+                // Check if the unique index already exists
+                val indexExists = exec("""
+                    SELECT name FROM sqlite_master
+                    WHERE type='index' AND name='idx_bills_table_status_unique'
+                """) { rs ->
+                    rs.next()
+                } ?: false
+
+                if (!indexExists) {
+                    // Create unique index to prevent multiple active bills for same table
+                    // This allows only one bill per table with status OPEN or PARTIALLY_PAID
+                    exec("""
+                        CREATE UNIQUE INDEX idx_bills_table_status_unique
+                        ON bills (table_id)
+                        WHERE status IN ('OPEN', 'PARTIALLY_PAID')
+                    """)
+                    logger.info { "Created unique constraint for bills table to prevent duplicates" }
+                } else {
+                    logger.info { "Unique constraint for bills already exists, skipping migration" }
+                }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to create unique constraint for bills: ${e.message}" }
+                throw e
             }
         }
     }

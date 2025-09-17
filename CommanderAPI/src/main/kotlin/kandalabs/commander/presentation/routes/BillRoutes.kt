@@ -54,6 +54,16 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
         post {
             runCatching {
                 val request = call.receive<CreateBillRequest>()
+
+                // Check if there's already an active bill for this table
+                request.tableId?.let { tableId ->
+                    val existingBill = billService.getBillByTableId(tableId)
+                    if (existingBill != null) {
+                        // Return success with existing bill to prevent duplicate creation
+                        return@runCatching call.respond(HttpStatusCode.OK, "Bill already exists for this table")
+                    }
+                }
+
                 val bill = Bill(
                     id = null,
                     tableId = request.tableId,
@@ -72,9 +82,9 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
                     )
                 }
 
-                call.respond(HttpStatusCode.Created)
+                call.respond(HttpStatusCode.Created, "Bill created successfully")
             }.fold(
-                onSuccess = { call.respond(HttpStatusCode.Created) },
+                onSuccess = { },
                 onFailure = { exception ->
                     call.respond(HttpStatusCode.InternalServerError, "An unexpected error occurred $exception")
                 })

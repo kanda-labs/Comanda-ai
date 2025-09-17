@@ -352,7 +352,8 @@ private fun TableDetailsButtons(
         state.primaryButton?.let {
             ComandaAiButton(
                 text = it.text,
-                onClick = { action(it.action) }
+                onClick = { action(it.action) },
+                isEnabled = !state.isLoading
             )
         }
     }

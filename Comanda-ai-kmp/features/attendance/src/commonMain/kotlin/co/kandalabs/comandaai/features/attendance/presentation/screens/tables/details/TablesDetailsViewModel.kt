@@ -47,6 +47,15 @@ internal class TablesDetailsViewModel(
     fun openTable(table: Table) {
         screenModelScope.launch {
             val tableId = table.id ?: return@launch
+
+            // Prevent double-clicking by checking if we're already processing
+            if (state.value.isLoading) {
+                return@launch
+            }
+
+            // Set loading state to prevent multiple clicks
+            mutableState.emit(state.value.copy(isLoading = true))
+
             safeRunCatching {
                 repository.openTable(tableId, table.number)
             }.fold(
@@ -56,7 +65,10 @@ internal class TablesDetailsViewModel(
                 },
                 onFailure = { error ->
                     mutableState.emit(
-                        state.value.copy(error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException)
+                        state.value.copy(
+                            isLoading = false,
+                            error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException
+                        )
                     )
                 }
             )
