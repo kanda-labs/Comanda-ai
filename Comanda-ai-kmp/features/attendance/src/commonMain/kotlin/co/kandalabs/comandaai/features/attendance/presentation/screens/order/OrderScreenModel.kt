@@ -19,6 +19,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 
 class OrderScreenModel(
@@ -36,7 +39,8 @@ class OrderScreenModel(
     private val _error = MutableStateFlow<String?>(null)
     private val _orderSubmitted = MutableStateFlow(false)
     private val _showConfirmationModal = MutableStateFlow(false)
-    private val _isSubmitting = MutableStateFlow(false)
+    private val _orderSubmissionState = MutableStateFlow(OrderSubmissionState.IDLE)
+    private val _orderSubmissionError = MutableStateFlow<String?>(null)
     private val _showObservationModal = MutableStateFlow(false)
     private val _selectedItemForObservation = MutableStateFlow<Item?>(null)
     private val _itemObservations = MutableStateFlow<Map<Int, String>>(emptyMap()) // itemId -> observation
@@ -47,9 +51,11 @@ class OrderScreenModel(
     val error = _error.asStateFlow()
     val orderSubmitted = _orderSubmitted.asStateFlow()
     val showConfirmationModal = _showConfirmationModal.asStateFlow()
-    val isSubmitting = _isSubmitting.asStateFlow()
+    val orderSubmissionState = _orderSubmissionState.asStateFlow()
+    val orderSubmissionError = _orderSubmissionError.asStateFlow()
     val showObservationModal = _showObservationModal.asStateFlow()
     val selectedItemForObservation = _selectedItemForObservation.asStateFlow()
+    val itemObservations = _itemObservations.asStateFlow()
     
     val currentObservationForSelectedItem = combine(
         _selectedItemForObservation,
@@ -117,64 +123,89 @@ class OrderScreenModel(
     }
     
     fun submitOrder(tableId: Int, billId: Int) {
+        if (_orderSubmissionState.value == OrderSubmissionState.LOADING) {
+            return
+        }
+
         screenModelScope.launch {
-            _isSubmitting.value = true
-            _error.value = null
-            
+            _orderSubmissionState.value = OrderSubmissionState.LOADING
+            _orderSubmissionError.value = null
+
             try {
-                val orderItems = _selectedItems.value.mapNotNull { (itemId, count) ->
-                    val item = _allItems.value.find { it.id == itemId }
-                    item?.let {
-                        CreateOrderItemRequest(
-                            itemId = itemId,
-                            name = it.name,
-                            count = count,
-                            observation = _itemObservations.value[itemId]
-                        )
-                    }
-                }
+                coroutineScope {
 
-                // Processar itens promocionais automaticamente
-                val promotionalResult = processPromotionalItemsUseCase.processPromotionalItems(orderItems)
-
-                val userSession = sessionManager.getSession()
-                val userName = userSession?.userName ?: ""
-                
-                // Processar bebidas separadamente
-                val drinksResult = processDrinksUseCase.processDrinks(
-                    selectedItems = promotionalResult.processedItems,
-                    tableId = tableId,
-                    billId = billId,
-                    userName = userName
-                )
-                
-                when (drinksResult) {
-                    is ComandaAiResult.Failure -> {
-                        _error.value = "Erro ao processar bebidas: ${drinksResult.exception.message}"
-                        _showConfirmationModal.value = false
-                        return@launch
+                    val operationResult = async {
+                        processOrder(tableId, billId)
                     }
-                    is ComandaAiResult.Success -> {
-                        val drinksProcessResult = drinksResult.data
-                        
-                        // Se não há itens para a cozinha, não criar pedido da cozinha
-                        if (drinksProcessResult.kitchenItems.isEmpty()) {
-                            // Processar apenas itens promocionais se houver
-                            if (promotionalResult.promotionalItemIds.isNotEmpty() && drinksProcessResult.drinkOrder != null) {
-                                processPromotionalItemsUseCase.markPromotionalItemsAsDelivered(
-                                    order = drinksProcessResult.drinkOrder,
-                                    promotionalItemIds = promotionalResult.promotionalItemIds,
-                                    updatedBy = userName
-                                )
-                            }
-                            
+
+                    val result = operationResult.await()
+
+                    when (result) {
+                        is OrderResult.Success -> {
                             _selectedItems.value = emptyMap()
                             _itemObservations.value = emptyMap()
-                            _orderSubmitted.value = true
-                            _showConfirmationModal.value = false
-                            return@launch
+                            _orderSubmissionState.value = OrderSubmissionState.SUCCESS
                         }
-                        
+                        is OrderResult.Error -> {
+                            _orderSubmissionState.value = OrderSubmissionState.ERROR
+                            _orderSubmissionError.value = result.message
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                _orderSubmissionState.value = OrderSubmissionState.ERROR
+                _orderSubmissionError.value = "Erro inesperado: ${e.message}"
+            }
+        }
+    }
+
+    private suspend fun processOrder(tableId: Int, billId: Int): OrderResult {
+        return try {
+            val orderItems = _selectedItems.value.mapNotNull { (itemId, count) ->
+                val item = _allItems.value.find { it.id == itemId }
+                item?.let {
+                    CreateOrderItemRequest(
+                        itemId = itemId,
+                        name = it.name,
+                        count = count,
+                        observation = _itemObservations.value[itemId]
+                    )
+                }
+            }
+
+            // Processar itens promocionais automaticamente
+            val promotionalResult = processPromotionalItemsUseCase.processPromotionalItems(orderItems)
+
+            val userSession = sessionManager.getSession()
+            val userName = userSession?.userName ?: ""
+
+            // Processar bebidas separadamente
+            val drinksResult = processDrinksUseCase.processDrinks(
+                selectedItems = promotionalResult.processedItems,
+                tableId = tableId,
+                billId = billId,
+                userName = userName
+            )
+
+            when (drinksResult) {
+                is ComandaAiResult.Failure -> {
+                    OrderResult.Error("Erro ao processar bebidas: ${drinksResult.exception.message}")
+                }
+                is ComandaAiResult.Success -> {
+                    val drinksProcessResult = drinksResult.data
+
+                    // Se não há itens para a cozinha, não criar pedido da cozinha
+                    if (drinksProcessResult.kitchenItems.isEmpty()) {
+                        // Processar apenas itens promocionais se houver
+                        if (promotionalResult.promotionalItemIds.isNotEmpty() && drinksProcessResult.drinkOrder != null) {
+                            processPromotionalItemsUseCase.markPromotionalItemsAsDelivered(
+                                order = drinksProcessResult.drinkOrder,
+                                promotionalItemIds = promotionalResult.promotionalItemIds,
+                                updatedBy = userName
+                            )
+                        }
+                        OrderResult.Success
+                    } else {
                         // Criar pedido da cozinha apenas com os itens que não são bebidas
                         val result = orderRepository.createOrder(
                             tableId = tableId,
@@ -182,11 +213,11 @@ class OrderScreenModel(
                             userName = userName,
                             items = drinksProcessResult.kitchenItems
                         )
-                
+
                         when (result) {
                             is ComandaAiResult.Success -> {
                                 val createdOrder = result.data
-                                
+
                                 // Marcar itens promocionais como DELIVERED se existirem
                                 if (promotionalResult.promotionalItemIds.isNotEmpty()) {
                                     processPromotionalItemsUseCase.markPromotionalItemsAsDelivered(
@@ -195,26 +226,23 @@ class OrderScreenModel(
                                         updatedBy = userName
                                     )
                                 }
-                                
-                                _selectedItems.value = emptyMap()
-                                _itemObservations.value = emptyMap()
-                                _orderSubmitted.value = true
-                                _showConfirmationModal.value = false
+                                OrderResult.Success
                             }
                             is ComandaAiResult.Failure -> {
-                                _error.value = "Erro ao criar pedido: ${result.exception.message}"
-                                _showConfirmationModal.value = false
+                                OrderResult.Error("Erro ao criar pedido: ${result.exception.message}")
                             }
                         }
                     }
                 }
-            } catch (e: Exception) {
-                _error.value = "Erro inesperado: ${e.message}"
-                _showConfirmationModal.value = false
-            } finally {
-                _isSubmitting.value = false
             }
+        } catch (e: Exception) {
+            OrderResult.Error("Erro inesperado: ${e.message}")
         }
+    }
+
+    private sealed class OrderResult {
+        object Success : OrderResult()
+        data class Error(val message: String) : OrderResult()
     }
     
     fun clearError() {
@@ -231,6 +259,11 @@ class OrderScreenModel(
     
     fun hideConfirmationModal() {
         _showConfirmationModal.value = false
+    }
+
+    fun resetOrderSubmissionState() {
+        _orderSubmissionState.value = OrderSubmissionState.IDLE
+        _orderSubmissionError.value = null
     }
     
     fun showObservationModal(item: Item) {

@@ -22,7 +22,7 @@ class OrderScreen(
             tableNumber = tableNumber,
             screenModel = screenModel,
             onBackClick = { navigator.pop() },
-            onSubmitOrder = { 
+            onSubmitOrder = {
                 screenModel.submitOrder(tableId, billId)
             },
             onOrderSuccess = {
@@ -31,6 +31,16 @@ class OrderScreen(
             },
             onShowFeedback = { isSuccess, message ->
                 navigator.push(FeedbackScreen(isSuccess, message))
+            },
+            onNavigateToConfirmation = {
+                navigator.push(
+                    OrderConfirmationScreen(
+                        tableNumber = tableNumber,
+                        tableId = tableId,
+                        billId = billId,
+                        screenModel = screenModel
+                    )
+                )
             }
         )
     }

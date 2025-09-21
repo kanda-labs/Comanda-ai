@@ -20,7 +20,6 @@ import co.kandalabs.comandaai.components.ComandaAiTopAppBar
 import co.kandalabs.comandaai.components.OrderItemData
 import co.kandalabs.comandaai.features.attendance.presentation.screens.order.components.CategoryTabs
 import co.kandalabs.comandaai.features.attendance.presentation.screens.order.components.ObservationModal
-import co.kandalabs.comandaai.features.attendance.presentation.screens.order.components.OrderConfirmationModal
 import co.kandalabs.comandaai.domain.ItemCategory
 import co.kandalabs.comandaai.features.attendance.domain.model.ItemWithCount
 
@@ -33,6 +32,7 @@ fun OrderScreenContent(
     onSubmitOrder: () -> Unit,
     onOrderSuccess: () -> Unit,
     onShowFeedback: (isSuccess: Boolean, message: String) -> Unit,
+    onNavigateToConfirmation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val categories = screenModel.categories
@@ -45,7 +45,8 @@ fun OrderScreenContent(
     val orderSubmitted by screenModel.orderSubmitted.collectAsState()
     val showConfirmationModal by screenModel.showConfirmationModal.collectAsState()
     val selectedItemsWithCount by screenModel.selectedItemsWithCount.collectAsState()
-    val isSubmitting by screenModel.isSubmitting.collectAsState()
+    val orderSubmissionState by screenModel.orderSubmissionState.collectAsState()
+    val orderSubmissionError by screenModel.orderSubmissionError.collectAsState()
     val showObservationModal by screenModel.showObservationModal.collectAsState()
     val selectedItemForObservation by screenModel.selectedItemForObservation.collectAsState()
     val currentObservationForSelectedItem by screenModel.currentObservationForSelectedItem.collectAsState()
@@ -85,8 +86,8 @@ fun OrderScreenContent(
                     ) {
                         ComandaAiButton(
                             text = "Fazer pedido ($totalItems ${if (totalItems == 1) "item" else "itens"})",
-                            onClick = { screenModel.showConfirmationModal() },
-                            isEnabled = !isLoading && !isSubmitting,
+                            onClick = onNavigateToConfirmation,
+                            isEnabled = !isLoading && orderSubmissionState != OrderSubmissionState.LOADING,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
@@ -170,17 +171,7 @@ fun OrderScreenContent(
             }
         }
         }
-        
-        // Order Confirmation Modal - overlays the entire screen
-        OrderConfirmationModal(
-            isVisible = showConfirmationModal,
-            selectedItems = selectedItemsWithCount,
-            totalItems = totalItems,
-            isLoading = isSubmitting,
-            onConfirm = onSubmitOrder,
-            onDismiss = { screenModel.hideConfirmationModal() }
-        )
-        
+
         // Observation Modal - overlays the entire screen
         ObservationModal(
             isVisible = showObservationModal,
