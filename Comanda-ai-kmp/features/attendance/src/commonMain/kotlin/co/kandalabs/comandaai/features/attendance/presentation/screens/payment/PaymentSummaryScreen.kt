@@ -495,7 +495,7 @@ private fun PaymentSummaryBottom(
             } else if (state.isFullyPaid) {
                 "Finalizar mesa"
             } else if (state.hasPartialPayments) {
-                "Pagar restante"
+                "Finalizar conta"
             } else {
                 "Finalizar pagamento"
             }
@@ -503,20 +503,18 @@ private fun PaymentSummaryBottom(
             ComandaAiButton(
                 text = buttonText,
                 onClick = { action(PaymentSummaryAction.SHOW_FINISH_PAYMENT_CONFIRMATION) },
-                isEnabled = !state.isProcessingPayment,
+                isEnabled = !state.isProcessingPayment && state.isFullyPaid,
                 modifier = Modifier.padding(bottom = ComandaAiSpacing.Small.value)
             )
 
-            // Mostrar botão de pagamento parcial apenas se não estiver totalmente pago
-            if (!state.isFullyPaid) {
-                ComandaAiButton(
-                    text = "Adicionar Pagamento Parcial",
-                    variant = ComandaAiButtonVariant.Secondary,
-                    onClick = { action(PaymentSummaryAction.SHOW_PARTIAL_PAYMENT_DIALOG) },
-                    isEnabled = !state.isProcessingPayment,
-                    modifier = Modifier.padding(bottom = ComandaAiSpacing.Small.value)
-                )
-            }
+            // Botão de pagamento parcial sempre visível
+            ComandaAiButton(
+                text = "Adicionar Pagamento Parcial",
+                variant = ComandaAiButtonVariant.Secondary,
+                onClick = { action(PaymentSummaryAction.SHOW_PARTIAL_PAYMENT_DIALOG) },
+                isEnabled = !state.isProcessingPayment,
+                modifier = Modifier.padding(bottom = ComandaAiSpacing.Small.value)
+            )
 
             ComandaAiButton(
                 text = "Voltar",

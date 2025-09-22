@@ -90,12 +90,12 @@ internal fun PartialPaymentModal(
             ) {
 
                 ComandaAiButton(
-                    text = "Cancelar",
+                    text = "Voltar",
                     onClick = {
                         onDismiss()
                         keyboardController?.hide()
                     },
-                    isEnabled = amountText.text.isNotBlank(),
+                    isEnabled = true,
                     modifier = Modifier.fillMaxWidth(),
                     variant = ComandaAiButtonVariant.Secondary
                 )
