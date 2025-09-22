@@ -163,66 +163,6 @@ internal class TablesDetailsViewModel(
         }
     }
 
-    fun showPartialPaymentDialog() {
-        screenModelScope.launch {
-            mutableState.emit(state.value.copy(showPartialPaymentDialog = true))
-        }
-    }
-
-    fun hidePartialPaymentDialog() {
-        screenModelScope.launch {
-            mutableState.emit(state.value.copy(showPartialPaymentDialog = false))
-        }
-    }
-
-    fun createPartialPayment(
-        tableId: Int,
-        paidBy: String,
-        amountInCentavos: Long,
-        description: String? = null,
-        paymentMethod: PaymentMethod? = null,
-        onSuccess: () -> Unit
-    ) {
-        screenModelScope.launch {
-            mutableState.emit(state.value.copy(isProcessingPayment = true))
-
-            // Get waiter name from session - this will be the receivedBy
-            val session = sessionManager.getSession()
-            val receivedBy = session?.name ?: "Sistema"
-
-            repository.createPartialPayment(
-                tableId = tableId,
-                paidBy = paidBy, // Who paid (customer name)
-                amountInCentavos = amountInCentavos,
-                description = description,
-                paymentMethod = paymentMethod,
-                receivedBy = receivedBy // Waiter who received the payment
-            ).fold(
-                onSuccess = {
-                    println("Partial payment created successfully - paid by: $paidBy, received by: $receivedBy")
-                    // Reload table data to show updated status
-                    refreshData()
-                    mutableState.emit(
-                        state.value.copy(
-                            isProcessingPayment = false,
-                            showPartialPaymentDialog = false
-                        )
-                    )
-                    onSuccess()
-                },
-                onFailure = { error ->
-                    println("Error creating partial payment: ${error.message}")
-                    mutableState.emit(
-                        state.value.copy(
-                            isProcessingPayment = false,
-                            error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException
-                        )
-                    )
-                }
-            )
-        }
-    }
-
     fun reopenTable(table: Table) {
         screenModelScope.launch {
             val tableId = table.id ?: return@launch

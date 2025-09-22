@@ -295,7 +295,7 @@ private fun CancelPaymentConfirmationModal(
                 )
             }
         },
-        onDismiss = {},
+        onDismiss = onDismiss,
     ) {
         Text(
             text = "Cancelar pagamento de $amount?",

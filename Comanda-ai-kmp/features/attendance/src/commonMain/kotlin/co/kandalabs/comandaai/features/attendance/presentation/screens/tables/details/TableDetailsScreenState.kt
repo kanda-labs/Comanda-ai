@@ -16,7 +16,6 @@ internal data class TableDetailsScreenState(
     val userSession: UserSession? = null,
     val isLoading: Boolean = true,
     val error: ComandaAiException? = null,
-    val showPartialPaymentDialog: Boolean = false,
     val isProcessingPayment: Boolean = false,
     val showCloseTableConfirmation: Boolean = false
 ) {
@@ -96,12 +95,11 @@ internal data class TableDetailsScreenState(
         else -> null
     }
 
-    //only manager can receive early payments
     val tertiaryButton: TableDetailsScreenButton? =
         if (table?.status == TableStatus.OCCUPIED && userSession?.role == UserRole.MANAGER)
             TableDetailsScreenButton(
-                text = "Pagamento Parcial",
-                action = TableDetailsAction.SHOW_PARTIAL_PAYMENT_DIALOG
+                text = "Verificar Parcial",
+                action = TableDetailsAction.NAVIGATE_TO_PAYMENTS_SCREEN
             )
         else null
 

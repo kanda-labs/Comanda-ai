@@ -44,9 +44,9 @@ import co.kandalabs.comandaai.features.attendance.presentation.screens.order.Ord
 import co.kandalabs.comandaai.features.attendance.presentation.screens.ordercontrol.OrderControlScreen
 import co.kandalabs.comandaai.features.attendance.presentation.screens.payment.PaymentSummaryScreen
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.component.CloseTableConfirmationModal
-import co.kandalabs.comandaai.features.attendance.presentation.screens.payment.components.PartialPaymentModal
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.component.TableDetailsOrders
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.migration.TableMigrationSelection
+import co.kandalabs.comandaai.sdk.getOrThrow
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
@@ -116,27 +116,13 @@ public data class TableDetailsScreen(val tableId: Int, val tableNumber: Int) : S
                 TableDetailsAction.SHOW_ORDER_DETAILS -> { /* Handled by onOrderClick */
                 }
 
-                TableDetailsAction.SHOW_PARTIAL_PAYMENT_DIALOG -> {
-                    viewModel.showPartialPaymentDialog()
-                }
-
-                TableDetailsAction.HIDE_PARTIAL_PAYMENT_DIALOG -> {
-                    viewModel.hidePartialPaymentDialog()
-                }
-
-                is TableDetailsAction.CREATE_PARTIAL_PAYMENT -> {
-                    val currentTable = state.currentTable
-                    if (currentTable?.id != null) {
-                        viewModel.createPartialPayment(
-                            currentTable.id,
-                            action.paidBy,
-                            action.amountInCentavos,
-                            action.description
-                        ) {
-                            // Payment success callback
-                            println("Partial payment created successfully for ${action.paidBy}")
-                        }
-                    }
+                TableDetailsAction.NAVIGATE_TO_PAYMENTS_SCREEN -> {
+                    navigator.push(
+                        PaymentSummaryScreen(
+                            state.currentTable?.id.getOrThrow(),
+                            state.currentTable?.number.getOrThrow()
+                        )
+                    )
                 }
 
                 TableDetailsAction.REOPEN_TABLE -> {
@@ -294,23 +280,6 @@ private fun TableDetailsScreenContent(
 
                     TableDetailsButtons(state, action)
                 }
-            }
-
-            // Partial Payment Dialog
-            if (state.showPartialPaymentDialog) {
-                PartialPaymentModal(
-                    onDismiss = { action(TableDetailsAction.HIDE_PARTIAL_PAYMENT_DIALOG) },
-                    onConfirm = { paidBy, amount, description, paymentMethod ->
-                        action(
-                            TableDetailsAction.CREATE_PARTIAL_PAYMENT(
-                                paidBy ?: "Cliente",
-                                amount,
-                                description,
-                                paymentMethod
-                            )
-                        )
-                    }
-                )
             }
 
             // Close Table Confirmation Dialog
