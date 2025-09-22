@@ -11,6 +11,8 @@ import kandalabs.commander.data.model.sqlModels.TableTable
 import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.BillStatus
 import kandalabs.commander.domain.model.PartialPayment
+import kandalabs.commander.domain.model.PartialPaymentStatus
+import kandalabs.commander.domain.model.PaymentMethod
 import kandalabs.commander.domain.model.OrderResponse
 import kandalabs.commander.domain.model.OrderStatus
 import kandalabs.commander.domain.model.ItemOrder
@@ -340,7 +342,9 @@ class BillRepositoryImpl(
                 it[paidBy] = partialPayment.paidBy
                 it[amountInCentavos] = partialPayment.amountInCentavos
                 it[description] = partialPayment.description
-                it[paymentMethod] = partialPayment.paymentMethod
+                it[paymentMethod] = partialPayment.paymentMethod?.name
+                it[receivedBy] = partialPayment.receivedBy
+                it[status] = partialPayment.status.name
                 it[createdAt] = System.currentTimeMillis()
             }
             val generatedId = insertStatement[partialPaymentTable.id]
@@ -360,12 +364,12 @@ class BillRepositoryImpl(
         return transaction {
             // Get current bill for this table first
             val billRow = billTable.selectAll()
-                .where { 
-                    (billTable.tableId eq tableId) and 
+                .where {
+                    (billTable.tableId eq tableId) and
                     (billTable.status inList listOf(BillStatus.OPEN.name, BillStatus.PARTIALLY_PAID.name))
                 }
                 .singleOrNull()
-            
+
             if (billRow == null) {
                 emptyList()
             } else {
@@ -374,10 +378,48 @@ class BillRepositoryImpl(
             }
         }
     }
-    
+
+    override suspend fun getPartialPaymentDetails(paymentId: Int): PartialPayment? {
+        logger.debug { "Getting partial payment details for payment id: $paymentId" }
+        return transaction {
+            partialPaymentTable.selectAll()
+                .where { partialPaymentTable.id eq paymentId }
+                .singleOrNull()
+                ?.toPartialPayment()
+        }
+    }
+
+    override suspend fun cancelPartialPayment(paymentId: Int): Boolean {
+        logger.debug { "Canceling partial payment with id: $paymentId" }
+        return transaction {
+            runCatching {
+                val updateResult = partialPaymentTable.update({ partialPaymentTable.id eq paymentId }) {
+                    it[status] = PartialPaymentStatus.CANCELED.name
+                }
+                updateResult > 0
+            }.fold(
+                onSuccess = { success ->
+                    if (success) {
+                        logger.info { "Successfully canceled partial payment with id: $paymentId" }
+                    } else {
+                        logger.warn { "No partial payment found with id: $paymentId" }
+                    }
+                    success
+                },
+                onFailure = { error ->
+                    logger.error(error) { "Error canceling partial payment with id: $paymentId" }
+                    false
+                }
+            )
+        }
+    }
+
     private fun getPartialPaymentsByBillId(billId: Int): List<PartialPayment> {
         return partialPaymentTable.selectAll()
-            .where { partialPaymentTable.billId eq billId }
+            .where {
+                (partialPaymentTable.billId eq billId) and
+                (partialPaymentTable.status eq PartialPaymentStatus.PAID.name)
+            }
             .orderBy(partialPaymentTable.createdAt, SortOrder.DESC)
             .map { it.toPartialPayment() }
     }
@@ -436,6 +478,8 @@ class BillRepositoryImpl(
 
     private fun ResultRow.toPartialPayment(): PartialPayment {
         val amountInCentavos = this[partialPaymentTable.amountInCentavos]
+        val paymentMethodString = this[partialPaymentTable.paymentMethod]
+        val statusString = this[partialPaymentTable.status]
         return PartialPayment(
             id = this[partialPaymentTable.id],
             billId = this[partialPaymentTable.billId],
@@ -444,7 +488,9 @@ class BillRepositoryImpl(
             amountInCentavos = amountInCentavos,
             amountFormatted = formatCurrency(amountInCentavos),
             description = this[partialPaymentTable.description],
-            paymentMethod = this[partialPaymentTable.paymentMethod],
+            paymentMethod = paymentMethodString?.let { PaymentMethod.valueOf(it) },
+            receivedBy = this[partialPaymentTable.receivedBy],
+            status = PartialPaymentStatus.valueOf(statusString),
             createdAt = this[partialPaymentTable.createdAt].toLocalDateTime()
         )
     }

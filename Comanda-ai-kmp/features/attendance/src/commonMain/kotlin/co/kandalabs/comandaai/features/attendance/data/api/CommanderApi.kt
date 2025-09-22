@@ -8,6 +8,7 @@ import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.PUT
+import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.Path
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Bill
 import co.kandalabs.comandaai.domain.Item
@@ -18,6 +19,7 @@ import co.kandalabs.comandaai.features.attendance.domain.models.request.CreatePa
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PaymentSummaryResponse
 import co.kandalabs.comandaai.features.attendance.data.models.TableMigrationResponse
+import co.kandalabs.comandaai.features.attendance.presentation.screens.partialPaymentDetails.PartialPaymentDetails
 
 internal interface CommanderApi {
     companion object {
@@ -77,4 +79,10 @@ internal interface CommanderApi {
     
     @POST("api/v1/tables/{originId}/migrate/{destinationId}")
     suspend fun migrateTable(@Path("originId") originId: Int, @Path("destinationId") destinationId: Int): TableMigrationResponse
+
+    @GET("api/v1/bills/partial-payments/{paymentId}")
+    suspend fun getPartialPaymentDetails(@Path("paymentId") paymentId: Int): PartialPaymentDetails
+
+    @PATCH("api/v1/bills/partial-payments/{paymentId}/cancel")
+    suspend fun cancelPartialPayment(@Path("paymentId") paymentId: Int)
 }

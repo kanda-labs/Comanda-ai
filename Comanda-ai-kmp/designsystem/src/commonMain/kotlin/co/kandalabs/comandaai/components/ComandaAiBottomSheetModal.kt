@@ -44,7 +44,6 @@ fun ComandaAiBottomSheetModal(
     content: @Composable ColumnScope.() -> Unit
 ) {
     if (isVisible) {
-        val density = LocalDensity.current
         val scope = rememberCoroutineScope()
         val offsetY = remember { Animatable(0f) }
         var isDragging by remember { mutableStateOf(false) }

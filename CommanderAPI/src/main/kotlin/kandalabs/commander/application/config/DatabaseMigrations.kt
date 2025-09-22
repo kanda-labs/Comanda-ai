@@ -22,6 +22,8 @@ object DatabaseMigrations {
         migration004_CreatePartialPaymentsTable()
         migration005_AddUpdatedAtToOrders()
         migration006_AddUniqueBillConstraint()
+        migration007_AddReceivedByToPartialPayments()
+        migration008_AddStatusToPartialPayments()
 
         logger.info { "All database migrations completed successfully" }
     }
@@ -228,6 +230,54 @@ object DatabaseMigrations {
             } catch (e: Exception) {
                 logger.error(e) { "Failed to create unique constraint for bills: ${e.message}" }
                 throw e
+            }
+        }
+    }
+
+    /**
+     * Migration 007: Add received_by column to partial_payments table
+     */
+    private fun migration007_AddReceivedByToPartialPayments() {
+        logger.info { "Running migration 007: Add received_by column to partial_payments table" }
+
+        transaction {
+            try {
+                // Try to select with received_by column to check if it exists
+                exec("SELECT received_by FROM partial_payments LIMIT 1")
+                logger.info { "received_by column already exists in partial_payments table, skipping migration" }
+            } catch (e: Exception) {
+                // Column doesn't exist, add it
+                try {
+                    exec("ALTER TABLE partial_payments ADD COLUMN received_by VARCHAR(255)")
+                    logger.info { "Added received_by column to partial_payments table" }
+                } catch (migrationError: Exception) {
+                    logger.error(migrationError) { "Failed to add received_by column: ${migrationError.message}" }
+                    throw migrationError
+                }
+            }
+        }
+    }
+
+    /**
+     * Migration 008: Add status column to partial_payments table
+     */
+    private fun migration008_AddStatusToPartialPayments() {
+        logger.info { "Running migration 008: Add status column to partial_payments table" }
+
+        transaction {
+            try {
+                // Try to select with status column to check if it exists
+                exec("SELECT status FROM partial_payments LIMIT 1")
+                logger.info { "status column already exists in partial_payments table, skipping migration" }
+            } catch (e: Exception) {
+                // Column doesn't exist, add it
+                try {
+                    exec("ALTER TABLE partial_payments ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'PAID'")
+                    logger.info { "Added status column to partial_payments table" }
+                } catch (migrationError: Exception) {
+                    logger.error(migrationError) { "Failed to add status column: ${migrationError.message}" }
+                    throw migrationError
+                }
             }
         }
     }

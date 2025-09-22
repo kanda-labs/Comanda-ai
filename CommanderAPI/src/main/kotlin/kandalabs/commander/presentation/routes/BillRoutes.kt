@@ -13,6 +13,7 @@ import kandalabs.commander.domain.service.BillService
 import kandalabs.commander.domain.service.TableService
 import kandalabs.commander.presentation.models.request.CreateBillRequest
 import kandalabs.commander.presentation.models.request.CreatePartialPaymentRequest
+import kandalabs.commander.presentation.models.response.PartialPaymentDetailsResponse
 
 fun Route.billRoutes(billService: BillService, tableService: TableService) {
     route("/bills") {
@@ -129,6 +130,7 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
                     amountFormatted = "R$ ${request.amountInCentavos / 100},${(request.amountInCentavos % 100).toString().padStart(2, '0')}",
                     description = request.description,
                     paymentMethod = request.paymentMethod,
+                    receivedBy = request.receivedBy,
                     createdAt = localDateTimeNow()
                 )
                 
@@ -146,6 +148,46 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
             val tableId = call.parameters["tableId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
             val partialPayments = billService.getPartialPayments(tableId.toInt())
             call.respond(partialPayments)
+        }
+
+        get("/partial-payments/{paymentId}") {
+            val paymentId = call.parameters["paymentId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val partialPayment = billService.getPartialPaymentDetails(paymentId.toInt())
+            if (partialPayment != null) {
+                val response = PartialPaymentDetailsResponse(
+                    id = partialPayment.id!!,
+                    tableId = partialPayment.tableId,
+                    paidBy = partialPayment.paidBy,
+                    amountInCentavos = partialPayment.amountInCentavos,
+                    amountFormatted = partialPayment.amountFormatted,
+                    description = partialPayment.description,
+                    paymentMethod = partialPayment.paymentMethod?.name,
+                    receivedBy = partialPayment.receivedBy,
+                    status = partialPayment.status.name,
+                    createdAt = partialPayment.createdAt.toString()
+                )
+                call.respond(response)
+            } else {
+                call.respond(HttpStatusCode.NotFound, mapOf("error" to "Partial payment not found"))
+            }
+        }
+
+        patch("/partial-payments/{paymentId}/cancel") {
+            val paymentId = call.parameters["paymentId"] ?: return@patch call.respond(HttpStatusCode.BadRequest)
+
+            runCatching {
+                val success = billService.cancelPartialPayment(paymentId.toInt())
+                if (success) {
+                    call.respond(HttpStatusCode.OK, mapOf("message" to "Partial payment canceled successfully"))
+                } else {
+                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "Partial payment not found"))
+                }
+            }.fold(
+                onSuccess = { },
+                onFailure = { exception ->
+                    call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to cancel partial payment: ${exception.message}"))
+                }
+            )
         }
 
         delete("/{id}") {

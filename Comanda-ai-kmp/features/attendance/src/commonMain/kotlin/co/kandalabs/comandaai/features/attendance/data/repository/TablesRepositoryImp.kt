@@ -12,6 +12,8 @@ import co.kandalabs.comandaai.features.attendance.domain.models.model.PartialPay
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
 import co.kandalabs.comandaai.features.attendance.domain.models.model.TableStatus
 import co.kandalabs.comandaai.features.attendance.domain.models.request.CreatePartialPaymentRequest
+import co.kandalabs.comandaai.features.attendance.domain.models.enum.PaymentMethod
+import co.kandalabs.comandaai.features.attendance.presentation.screens.partialPaymentDetails.PartialPaymentDetails
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -117,13 +119,21 @@ internal class TablesRepositoryImp(
         }
     }
 
-    override suspend fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String?): ComandaAiResult<PartialPayment> {
+    override suspend fun createPartialPayment(
+        tableId: Int,
+        paidBy: String,
+        amountInCentavos: Long,
+        description: String?,
+        paymentMethod: PaymentMethod?,
+        receivedBy: String?
+    ): ComandaAiResult<PartialPayment> {
         return safeRunCatching {
             val request = CreatePartialPaymentRequest(
                 paidBy = paidBy,
                 amountInCentavos = amountInCentavos,
                 description = description,
-                paymentMethod = null
+                paymentMethod = paymentMethod,
+                receivedBy = receivedBy
             )
             commanderApi.createPartialPayment(tableId, request)
         }.onFailure { error ->
@@ -162,6 +172,22 @@ internal class TablesRepositoryImp(
             commanderApi.getTables().filter { it.status == TableStatus.FREE }
         }.onFailure { error ->
             println("Error fetching free tables: $error")
+        }
+    }
+
+    override suspend fun getPartialPaymentDetails(paymentId: Int): ComandaAiResult<PartialPaymentDetails> {
+        return safeRunCatching {
+            commanderApi.getPartialPaymentDetails(paymentId)
+        }.onFailure { error ->
+            println("Error fetching partial payment details: $error")
+        }
+    }
+
+    override suspend fun cancelPartialPayment(paymentId: Int): ComandaAiResult<Unit> {
+        return safeRunCatching {
+            commanderApi.cancelPartialPayment(paymentId)
+        }.onFailure { error ->
+            println("Error canceling partial payment: $error")
         }
     }
 }

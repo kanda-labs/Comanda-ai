@@ -1,6 +1,7 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.payment
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,15 +13,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -41,6 +45,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSelection.components.ErrorView
 import co.kandalabs.comandaai.features.attendance.presentation.screens.payment.components.FinishPaymentConfirmationModal
 import co.kandalabs.comandaai.features.attendance.presentation.screens.payment.components.PartialPaymentModal
+import co.kandalabs.comandaai.features.attendance.presentation.screens.partialPaymentDetails.PartialPaymentDetailsScreen
 import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
@@ -96,11 +101,16 @@ public data class PaymentSummaryScreen(val tableId: Int, val tableNumber: Int) :
                         tableId,
                         action.paidBy,
                         action.amountInCentavos,
-                        action.description
+                        action.description,
+                        action.paymentMethod
                     ) {
                         // Payment success callback - could show a toast or update UI
-                        println("Partial payment created successfully for ${action.paidBy}")
+                        println("Partial payment created successfully")
                     }
+                }
+
+                is PaymentSummaryAction.NAVIGATE_TO_PARTIAL_PAYMENT_DETAILS -> {
+                    navigator.push(PartialPaymentDetailsScreen(action.paymentId, action.tableId))
                 }
 
                 is PaymentSummaryAction.RETRY -> {
@@ -115,7 +125,8 @@ public data class PaymentSummaryScreen(val tableId: Int, val tableNumber: Int) :
 
         PaymentSummaryScreenContent(
             state = state,
-            action = actions
+            action = actions,
+            tableId = tableId
         )
     }
 }
@@ -123,7 +134,8 @@ public data class PaymentSummaryScreen(val tableId: Int, val tableNumber: Int) :
 @Composable
 private fun PaymentSummaryScreenContent(
     state: PaymentSummaryScreenState,
-    action: (PaymentSummaryAction) -> Unit
+    action: (PaymentSummaryAction) -> Unit,
+    tableId: Int
 ) {
     MaterialTheme {
         Surface(
@@ -211,7 +223,12 @@ private fun PaymentSummaryScreenContent(
                             }
 
                             items(state.partialPaymentsList) { payment ->
-                                PartialPaymentCard(payment = payment)
+                                PartialPaymentCard(
+                                    payment = payment,
+                                    onClick = {
+                                        action(PaymentSummaryAction.NAVIGATE_TO_PARTIAL_PAYMENT_DETAILS(payment.id, tableId))
+                                    }
+                                )
                             }
                         }
                     }
@@ -224,8 +241,8 @@ private fun PaymentSummaryScreenContent(
         if (state.showPartialPaymentDialog) {
             PartialPaymentModal(
                 onDismiss = { action(PaymentSummaryAction.HIDE_PARTIAL_PAYMENT_DIALOG) },
-                onConfirm = { paidBy, amount, description ->
-                    action(PaymentSummaryAction.CREATE_PARTIAL_PAYMENT(paidBy, amount, description))
+                onConfirm = { paidBy, amount, description, paymentMethod ->
+                    action(PaymentSummaryAction.CREATE_PARTIAL_PAYMENT(paidBy, amount, description, paymentMethod))
                 }
             )
         }
@@ -387,10 +404,13 @@ private fun PaymentSummarySection(
 
 @Composable
 private fun PartialPaymentCard(
-    payment: PartialPaymentState
+    payment: PartialPaymentState,
+    onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = ComandaAiColors.Green50.value),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -406,15 +426,30 @@ private fun PartialPaymentCard(
                 text = payment.displayDescription,
                 style = ComandaAiTypography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = ComandaAiColors.OnSurface.value
+                color = ComandaAiColors.OnSurface.value,
+                modifier = Modifier.weight(1f)
             )
 
-            Text(
-                text = payment.amount,
-                style = ComandaAiTypography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = ComandaAiColors.Green500.value
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = payment.amount,
+                    style = ComandaAiTypography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = ComandaAiColors.Green500.value
+                )
+
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "Ver detalhes",
+                    tint = ComandaAiColors.Gray500.value,
+                    modifier = Modifier
+                        .padding(start = ComandaAiSpacing.Small.value)
+                        .size(20.dp)
+                )
+            }
         }
     }
 }

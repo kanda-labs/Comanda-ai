@@ -300,12 +300,13 @@ private fun TableDetailsScreenContent(
             if (state.showPartialPaymentDialog) {
                 PartialPaymentModal(
                     onDismiss = { action(TableDetailsAction.HIDE_PARTIAL_PAYMENT_DIALOG) },
-                    onConfirm = { paidBy, amount, description ->
+                    onConfirm = { paidBy, amount, description, paymentMethod ->
                         action(
                             TableDetailsAction.CREATE_PARTIAL_PAYMENT(
-                                paidBy,
+                                paidBy ?: "Cliente",
                                 amount,
-                                description
+                                description,
+                                paymentMethod
                             )
                         )
                     }

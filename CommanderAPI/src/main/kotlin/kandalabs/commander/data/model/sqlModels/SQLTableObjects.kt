@@ -84,8 +84,10 @@ object PartialPaymentTable : SQLTable("partial_payments") {
     val amountInCentavos = long("amount_in_centavos")
     val description = varchar("description", 500).nullable()
     val paymentMethod = varchar("payment_method", 50).nullable()
+    val receivedBy = varchar("received_by", 255).nullable() // Nome da pessoa que recebeu o pagamento
+    val status = varchar("status", 50).default("PAID")
     val createdAt = long("created_at")
-    
+
     override val primaryKey = PrimaryKey(id)
 }
 

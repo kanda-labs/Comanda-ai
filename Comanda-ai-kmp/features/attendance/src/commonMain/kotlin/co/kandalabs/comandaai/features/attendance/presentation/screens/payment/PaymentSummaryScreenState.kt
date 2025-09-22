@@ -50,7 +50,7 @@ internal data class PaymentSummaryScreenState(
                 paidBy = payment.paidBy,
                 amount = payment.amountFormatted,
                 description = payment.description,
-                paymentMethod = payment.paymentMethod,
+                paymentMethod = payment.paymentMethod?.displayName,
                 createdAt = payment.createdAt
             )
         } ?: emptyList()

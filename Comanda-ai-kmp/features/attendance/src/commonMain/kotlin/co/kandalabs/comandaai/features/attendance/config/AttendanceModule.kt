@@ -16,9 +16,11 @@ import co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSele
 import co.kandalabs.comandaai.features.attendance.presentation.screens.order.OrderScreenModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.ordercontrol.OrderControlViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.payment.PaymentSummaryViewModel
+import co.kandalabs.comandaai.features.attendance.presentation.screens.partialPaymentDetails.PartialPaymentDetailsViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.TablesDetailsViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.listing.TablesViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.migration.TableMigrationViewModel
+import co.kandalabs.comandaai.sdk.session.SessionManager
 import de.jensklingenberg.ktorfit.Ktorfit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -94,6 +96,13 @@ object AttendanceModule {
 
         bindProvider<PaymentSummaryViewModel> {
             PaymentSummaryViewModel(
+                repository = instance<TablesRepository>(),
+                sessionManager = instance<SessionManager>()
+            )
+        }
+
+        bindProvider<PartialPaymentDetailsViewModel> {
+            PartialPaymentDetailsViewModel(
                 repository = instance<TablesRepository>()
             )
         }

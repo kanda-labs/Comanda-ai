@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
 import co.kandalabs.comandaai.features.attendance.domain.repository.TablesRepository
+import co.kandalabs.comandaai.features.attendance.domain.models.enum.PaymentMethod
 import co.kandalabs.comandaai.sdk.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.core.session.UserRole
 import co.kandalabs.comandaai.sdk.session.SessionManager
@@ -179,14 +180,26 @@ internal class TablesDetailsViewModel(
         paidBy: String,
         amountInCentavos: Long,
         description: String? = null,
+        paymentMethod: PaymentMethod? = null,
         onSuccess: () -> Unit
     ) {
         screenModelScope.launch {
             mutableState.emit(state.value.copy(isProcessingPayment = true))
 
-            repository.createPartialPayment(tableId, paidBy, amountInCentavos, description).fold(
+            // Get waiter name from session - this will be the receivedBy
+            val session = sessionManager.getSession()
+            val receivedBy = session?.name ?: "Sistema"
+
+            repository.createPartialPayment(
+                tableId = tableId,
+                paidBy = paidBy, // Who paid (customer name)
+                amountInCentavos = amountInCentavos,
+                description = description,
+                paymentMethod = paymentMethod,
+                receivedBy = receivedBy // Waiter who received the payment
+            ).fold(
                 onSuccess = {
-                    println("Partial payment created successfully for $paidBy")
+                    println("Partial payment created successfully - paid by: $paidBy, received by: $receivedBy")
                     // Reload table data to show updated status
                     refreshData()
                     mutableState.emit(

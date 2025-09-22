@@ -1,5 +1,7 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details
 
+import co.kandalabs.comandaai.features.attendance.domain.models.enum.PaymentMethod
+
 sealed class TableDetailsAction {
     object OPEN_TABLE : TableDetailsAction()
     object CLOSE_TABLE : TableDetailsAction()
@@ -9,11 +11,12 @@ sealed class TableDetailsAction {
     object CLOSE_TABLE_MANAGER : TableDetailsAction()
     object SHOW_PARTIAL_PAYMENT_DIALOG : TableDetailsAction()
     object HIDE_PARTIAL_PAYMENT_DIALOG : TableDetailsAction()
-    
+
     data class CREATE_PARTIAL_PAYMENT(
         val paidBy: String,
         val amountInCentavos: Long,
-        val description: String?
+        val description: String?,
+        val paymentMethod: PaymentMethod?
     ) : TableDetailsAction()
     
     object REOPEN_TABLE : TableDetailsAction()

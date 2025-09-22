@@ -3,10 +3,13 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.payment
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.features.attendance.domain.repository.TablesRepository
+import co.kandalabs.comandaai.features.attendance.domain.models.enum.PaymentMethod
+import co.kandalabs.comandaai.sdk.session.SessionManager
 import kotlinx.coroutines.launch
 
 internal class PaymentSummaryViewModel(
-    private val repository: TablesRepository
+    private val repository: TablesRepository,
+    private val sessionManager: SessionManager
 ) : StateScreenModel<PaymentSummaryScreenState>(PaymentSummaryScreenState()) {
 
     fun setupPaymentSummaryById(tableId: Int, tableNumber: Int) {
@@ -67,13 +70,31 @@ internal class PaymentSummaryViewModel(
         }
     }
 
-    fun createPartialPayment(tableId: Int, paidBy: String, amountInCentavos: Long, description: String? = null, onSuccess: () -> Unit) {
+    fun createPartialPayment(
+        tableId: Int,
+        paidBy: String?,
+        amountInCentavos: Long,
+        description: String? = null,
+        paymentMethod: PaymentMethod? = null,
+        onSuccess: () -> Unit
+    ) {
         screenModelScope.launch {
             updateState { it.copy(isProcessingPayment = true) }
-            
-            repository.createPartialPayment(tableId, paidBy, amountInCentavos, description).fold(
-                onSuccess = { 
-                    println("Partial payment created successfully for $paidBy")
+
+            // Get waiter name from session - this will be the receivedBy
+            val session = sessionManager.getSession()
+            val receivedBy = session?.name ?: "Sistema"
+
+            repository.createPartialPayment(
+                tableId = tableId,
+                paidBy = paidBy ?: "Cliente", // Who paid (customer name or "Cliente" if empty)
+                amountInCentavos = amountInCentavos,
+                description = description,
+                paymentMethod = paymentMethod,
+                receivedBy = receivedBy // Waiter who received the payment
+            ).fold(
+                onSuccess = {
+                    println("Partial payment created successfully - paid by: ${paidBy ?: "Cliente"}, received by: $receivedBy")
                     // Reload payment summary to show updated statuses
                     setupPaymentSummaryById(tableId, state.value.tableNumber.toIntOrNull() ?: 0)
                     updateState {

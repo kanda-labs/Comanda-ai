@@ -11,6 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -38,16 +41,20 @@ import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.features.attendance.utils.CurrencyFormatter
+import co.kandalabs.comandaai.features.attendance.domain.models.enum.PaymentMethod
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 internal fun PartialPaymentModal(
     onDismiss: () -> Unit,
-    onConfirm: (paidBy: String, amountInCentavos: Long, description: String?) -> Unit
+    onConfirm: (paidBy: String?, amountInCentavos: Long, description: String?, paymentMethod: PaymentMethod?) -> Unit
 ) {
     var paidBy by remember { mutableStateOf("") }
     var amountText by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf("") }
+    var selectedPaymentMethod by remember { mutableStateOf<PaymentMethod?>(PaymentMethod.CARTAO) }
+    var isPaymentMethodDropdownExpanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -56,17 +63,16 @@ internal fun PartialPaymentModal(
     val confirmPayment = {
         if (amountText.text.isNotBlank()) {
             val amountInCentavos = CurrencyFormatter.brlToCentavos(amountText.text)
-            val finalPaidBy = paidBy.trim().takeIf { it.isNotBlank() } ?: ""
             onConfirm(
-                finalPaidBy,
+                paidBy.trim().takeIf { it.isNotBlank() },
                 amountInCentavos,
-                description.trim().takeIf { it.isNotBlank() }
+                description.trim().takeIf { it.isNotBlank() },
+                selectedPaymentMethod
             )
-            keyboardController?.hide() // Fecha o teclado após confirmar
+            keyboardController?.hide()
         }
     }
 
-    // Auto-focus no campo de valor quando o modal abre
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
@@ -87,7 +93,7 @@ internal fun PartialPaymentModal(
                     text = "Cancelar",
                     onClick = {
                         onDismiss()
-                        keyboardController?.hide() // Fecha o teclado ao cancelar
+                        keyboardController?.hide()
                     },
                     isEnabled = amountText.text.isNotBlank(),
                     modifier = Modifier.fillMaxWidth(),
@@ -169,6 +175,44 @@ internal fun PartialPaymentModal(
                 )
             )
 
+            // Payment Method Dropdown
+            ExposedDropdownMenuBox(
+                expanded = isPaymentMethodDropdownExpanded,
+                onExpandedChange = { isPaymentMethodDropdownExpanded = it },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = selectedPaymentMethod?.displayName ?: "",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Método de Pagamento") },
+                    placeholder = { Text("Selecione o método") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isPaymentMethodDropdownExpanded) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+
+                ExposedDropdownMenu(
+                    expanded = isPaymentMethodDropdownExpanded,
+                    onDismissRequest = { isPaymentMethodDropdownExpanded = false }
+                ) {
+                    PaymentMethod.entries.forEach { method ->
+                        DropdownMenuItem(
+                            text = { Text(method.displayName) },
+                            onClick = {
+                                selectedPaymentMethod = method
+                                isPaymentMethodDropdownExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -176,7 +220,7 @@ internal fun PartialPaymentModal(
                 placeholder = { Text("Ex: Pagamento via PIX") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(

@@ -44,6 +44,14 @@ class BillService(private val billRepository: BillRepository) {
         return billRepository.getPartialPayments(tableId)
     }
 
+    suspend fun getPartialPaymentDetails(paymentId: Int): PartialPayment? {
+        return billRepository.getPartialPaymentDetails(paymentId)
+    }
+
+    suspend fun cancelPartialPayment(paymentId: Int): Boolean {
+        return billRepository.cancelPartialPayment(paymentId)
+    }
+
     suspend fun deleteBill(id: Int): Boolean {
         return billRepository.deleteBill(id)
     }

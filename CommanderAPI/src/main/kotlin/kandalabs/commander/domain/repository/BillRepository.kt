@@ -15,5 +15,7 @@ interface BillRepository {
     suspend fun processTablePayment(tableId: Int): Boolean
     suspend fun createPartialPayment(partialPayment: PartialPayment): PartialPayment
     suspend fun getPartialPayments(tableId: Int): List<PartialPayment>
+    suspend fun getPartialPaymentDetails(paymentId: Int): PartialPayment?
+    suspend fun cancelPartialPayment(paymentId: Int): Boolean
     suspend fun deleteBill(id: Int): Boolean
 }
