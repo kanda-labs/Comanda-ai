@@ -65,7 +65,7 @@ fun ObservationModal(
             title = "Observação",
             onDismiss = onDismiss,
             modifier = modifier,
-            presentationMode = ComandaAiModalPresentationMode.Full,
+            presentationMode = ComandaAiModalPresentationMode.Full      ,
             dismissOnBackgroundClick = true,
             dismissOnDrag = true,
             actions = {

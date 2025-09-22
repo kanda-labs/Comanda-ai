@@ -4,14 +4,23 @@ import co.kandalabs.comandaai.features.attendance.data.api.CommanderApi
 import co.kandalabs.comandaai.features.attendance.data.repository.ItemsRepositoryImp
 import co.kandalabs.comandaai.features.attendance.data.repository.OrderRepositoryImpl
 import co.kandalabs.comandaai.features.attendance.data.repository.TablesRepositoryImp
+import co.kandalabs.comandaai.features.attendance.data.repository.UserRepositoryImpl
 import co.kandalabs.comandaai.features.attendance.domain.repository.ItemsRepository
 import co.kandalabs.comandaai.features.attendance.domain.repository.OrderRepository
 import co.kandalabs.comandaai.features.attendance.domain.repository.TablesRepository
+import co.kandalabs.comandaai.features.attendance.domain.repository.UserRepository
 import co.kandalabs.comandaai.features.attendance.domain.usecase.ProcessDrinksUseCase
 import co.kandalabs.comandaai.features.attendance.domain.usecase.ProcessDrinksUseCaseImpl
 import co.kandalabs.comandaai.features.attendance.domain.usecase.ProcessPromotionalItemsUseCase
 import co.kandalabs.comandaai.features.attendance.domain.usecase.ProcessPromotionalItemsUseCaseImpl
+import co.kandalabs.comandaai.features.attendance.domain.usecases.CreateUserUseCase
+import co.kandalabs.comandaai.features.attendance.domain.usecases.GetAllUsersUseCase
+import co.kandalabs.comandaai.features.attendance.domain.usecases.GetUserByIdUseCase
+import co.kandalabs.comandaai.features.attendance.domain.usecases.UpdateUserUseCase
 import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.AdminViewModel
+import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.UsersManagementViewModel
+import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.UsersListViewModel
+import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.UserDetailsViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSelection.BreedsListingViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.order.OrderScreenModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.ordercontrol.OrderControlViewModel
@@ -58,6 +67,13 @@ object AttendanceModule {
             )
         }
 
+        bindSingleton<UserRepository> {
+            UserRepositoryImpl(
+                api = instance(),
+                dispatcher = Dispatchers.IO
+            )
+        }
+
         // Use Cases
         bindProvider<ProcessPromotionalItemsUseCase> {
             ProcessPromotionalItemsUseCaseImpl(
@@ -70,6 +86,30 @@ object AttendanceModule {
             ProcessDrinksUseCaseImpl(
                 itemsRepository = instance(),
                 orderRepository = instance()
+            )
+        }
+
+        bindProvider<CreateUserUseCase> {
+            CreateUserUseCase(
+                userRepository = instance()
+            )
+        }
+
+        bindProvider<GetAllUsersUseCase> {
+            GetAllUsersUseCase(
+                userRepository = instance()
+            )
+        }
+
+        bindProvider<GetUserByIdUseCase> {
+            GetUserByIdUseCase(
+                userRepository = instance()
+            )
+        }
+
+        bindProvider<UpdateUserUseCase> {
+            UpdateUserUseCase(
+                userRepository = instance()
             )
         }
 
@@ -133,5 +173,25 @@ object AttendanceModule {
                 instance()
             )
         }
+
+        bindProvider<UsersManagementViewModel> {
+            UsersManagementViewModel(
+                createUserUseCase = instance()
+            )
+        }
+
+        bindProvider<UsersListViewModel> {
+            UsersListViewModel(
+                getAllUsersUseCase = instance()
+            )
+        }
+
+        bindProvider<UserDetailsViewModel> {
+            UserDetailsViewModel(
+                getUserByIdUseCase = instance(),
+                updateUserUseCase = instance()
+            )
+        }
+
     }
 }

@@ -8,6 +8,7 @@ object UserTable : Table("users") {
     val name = varchar("name", 255)
     val userName = varchar("user_name", 255).uniqueIndex()
     val email = varchar("email", 255).nullable()
+    val password = varchar("password", 255)
     val active = bool("active").default(true)
     val role = varchar("role", 20).default("WAITER")
     val createdAt = long("created_at")

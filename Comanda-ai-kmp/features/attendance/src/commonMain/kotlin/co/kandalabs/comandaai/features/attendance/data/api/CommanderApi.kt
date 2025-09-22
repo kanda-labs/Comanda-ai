@@ -16,10 +16,12 @@ import co.kandalabs.comandaai.features.attendance.domain.models.model.Order
 import co.kandalabs.comandaai.features.attendance.domain.models.model.OrderWithStatuses
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PartialPayment
 import co.kandalabs.comandaai.features.attendance.domain.models.request.CreatePartialPaymentRequest
+import co.kandalabs.comandaai.features.attendance.domain.models.request.CreateUserRequest
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PaymentSummaryResponse
 import co.kandalabs.comandaai.features.attendance.data.models.TableMigrationResponse
 import co.kandalabs.comandaai.features.attendance.presentation.screens.partialPaymentDetails.PartialPaymentDetails
+import co.kandalabs.comandaai.features.attendance.domain.models.model.User
 
 internal interface CommanderApi {
     companion object {
@@ -85,4 +87,25 @@ internal interface CommanderApi {
 
     @PATCH("api/v1/bills/partial-payments/{paymentId}/cancel")
     suspend fun cancelPartialPayment(@Path("paymentId") paymentId: Int)
+
+    @POST("api/v1/users")
+    suspend fun createUser(@Body request: CreateUserRequest): User
+
+    @GET("api/v1/users")
+    suspend fun getUsers(
+        @de.jensklingenberg.ktorfit.http.Query("page") page: Int = 1,
+        @de.jensklingenberg.ktorfit.http.Query("size") size: Int = 20
+    ): co.kandalabs.comandaai.features.attendance.domain.models.model.PaginatedResponse<User>
+
+    @GET("api/v1/users/{id}")
+    suspend fun getUserById(@Path("id") id: Int): User
+
+    @PUT("api/v1/users/{id}")
+    suspend fun updateUser(
+        @Path("id") id: Int,
+        @Body request: co.kandalabs.comandaai.features.attendance.domain.models.request.UpdateUserRequest
+    ): User
+
+    @de.jensklingenberg.ktorfit.http.DELETE("api/v1/users/{id}")
+    suspend fun deleteUser(@Path("id") id: Int)
 }

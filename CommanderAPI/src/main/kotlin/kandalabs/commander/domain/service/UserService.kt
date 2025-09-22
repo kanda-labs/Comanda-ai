@@ -27,11 +27,11 @@ class UserService(private val userRepository: UserRepository) {
         return userRepository.findByName(name)
     }
     
-    suspend fun createUser(user: User): Result<User> {
+    suspend fun createUser(user: User, password: String): Result<User> {
         logger.info { "Creating new user with name: ${user.name}" }
         return try {
-            validateUserForCreation(user)
-            Result.success(userRepository.create(user))
+            validateUserForCreation(user, password)
+            Result.success(userRepository.create(user, password))
         } catch (e: Exception) {
             logger.error(e) { "Failed to create user: ${e.message}" }
             Result.failure(e)
@@ -78,7 +78,7 @@ class UserService(private val userRepository: UserRepository) {
                 size > 100 -> 100
                 else -> size
             }
-            
+
             val users = userRepository.findAllPaginated(validPage, validSize)
             val totalCount = userRepository.count()
             Result.success(Pair(users, totalCount))
@@ -87,9 +87,22 @@ class UserService(private val userRepository: UserRepository) {
             Result.failure(e)
         }
     }
+
+    suspend fun validateCredentials(userName: String, password: String): User? {
+        logger.info { "Validating credentials for userName: $userName" }
+        return try {
+            userRepository.validateCredentials(userName, password)
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to validate credentials: ${e.message}" }
+            null
+        }
+    }
     
-    private fun validateUserForCreation(user: User) {
+    private fun validateUserForCreation(user: User, password: String) {
         require(user.name.isNotBlank()) { "User name cannot be blank" }
+        require(user.userName.isNotBlank()) { "User userName cannot be blank" }
+        require(password.isNotBlank()) { "Password cannot be blank" }
+        require(password.length >= 6) { "Password must be at least 6 characters long" }
         if (user.email != null) {
             require(isValidEmail(user.email)) { "Invalid email format" }
         }

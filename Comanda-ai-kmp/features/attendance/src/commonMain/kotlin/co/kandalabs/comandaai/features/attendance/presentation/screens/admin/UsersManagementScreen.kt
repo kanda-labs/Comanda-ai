@@ -1,27 +1,51 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.admin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
+import co.kandalabs.comandaai.core.session.UserRole
+import co.kandalabs.comandaai.features.attendance.domain.models.model.User
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 
@@ -30,51 +54,171 @@ public object UsersManagementScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.current
+        val viewModel = rememberScreenModel<UsersListViewModel>()
 
-        UsersManagementScreenContent(
-            onNavigateBack = { navigator?.pop() }
-        )
+        val uiState by viewModel.uiState.collectAsState()
+
+        LaunchedEffect(Unit) {
+            viewModel.loadUsers()
+        }
+
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing),
+            topBar = {
+                ComandaAiTopAppBar(
+                    title = "Gerenciar Usuários",
+                    onBackOrClose = { navigator?.pop() },
+                    icon = Icons.Default.ArrowBack
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { navigator?.push(CreateUserScreen) },
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Adicionar usuário"
+                    )
+                }
+            }
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                when {
+                    uiState.isLoading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    uiState.users.isEmpty() -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Nenhum usuário cadastrado",
+                                style = ComandaAiTypography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(ComandaAiSpacing.Medium.value),
+                            verticalArrangement = Arrangement.spacedBy(ComandaAiSpacing.Small.value)
+                        ) {
+                            items(
+                                items = uiState.users,
+                                key = { it.id ?: 0 }
+                            ) { user ->
+                                UserCard(
+                                    user = user,
+                                    onClick = {
+                                        navigator?.push(UserDetailsScreen(user.id ?: 0))
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun UsersManagementScreenContent(
-    onNavigateBack: () -> Unit
+private fun UserCard(
+    user: User,
+    onClick: () -> Unit
 ) {
-    Column(
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-    ) {
-        ComandaAiTopAppBar(
-            title = "Gerenciar Usuários",
-            onBackOrClose = onNavigateBack,
-            icon = Icons.Default.ArrowBack
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
         )
-
-        Column(
+    ) {
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(ComandaAiSpacing.Large.value),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .fillMaxWidth()
+                .padding(ComandaAiSpacing.Medium.value),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Gerenciamento de Usuários",
-                style = ComandaAiTypography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
-            )
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
 
-            Text(
-                text = "Esta funcionalidade será implementada em breve.\n\nPermitirá:\n• Criar novos usuários\n• Editar dados de usuários\n• Definir roles e permissões\n• Gerenciar acesso ao sistema\n• Visualizar atividades dos usuários",
-                style = ComandaAiTypography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = ComandaAiSpacing.Medium.value)
-            )
+            Spacer(modifier = Modifier.size(ComandaAiSpacing.Medium.value))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = user.name,
+                    style = ComandaAiTypography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = getRoleDisplayName(user.role),
+                    style = ComandaAiTypography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (!user.active) {
+                Card(
+                    shape = RoundedCornerShape(4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = "Inativo",
+                        style = ComandaAiTypography.labelSmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.padding(
+                            horizontal = ComandaAiSpacing.Small.value,
+                            vertical = 4.dp
+                        )
+                    )
+                }
+            }
         }
+    }
+}
+
+private fun getRoleDisplayName(role: UserRole): String {
+    return when (role) {
+        UserRole.ADMIN -> "Administrador"
+        UserRole.MANAGER -> "Gerente"
+        UserRole.WAITER -> "Garçom"
+        UserRole.KITCHEN -> "Cozinha"
+        else -> "Usuário"
     }
 }

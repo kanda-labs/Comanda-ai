@@ -59,18 +59,19 @@ class UserRepositoryImpl(
         }
     }
     
-    override suspend fun create(user: User): User {
+    override suspend fun create(user: User, password: String): User {
         logger.debug { "Creating new user: $user" }
         return transaction {
             val insertStatement = userTable.insert {
                 it[name] = user.name
                 it[userName] = user.userName
                 it[email] = user.email
+                it[this.password] = password
                 it[active] = user.active
                 it[createdAt] = user.createdAt.toEpochMilliseconds()
                 it[role] = user.role.name
             }
-            
+
             val generatedId = insertStatement[userTable.id]
             user.copy(id = generatedId)
         }
@@ -119,6 +120,15 @@ class UserRepositoryImpl(
         logger.debug { "Counting total users" }
         return transaction {
             userTable.selectAll().count()
+        }
+    }
+
+    override suspend fun validateCredentials(userName: String, password: String): User? {
+        logger.debug { "Validating credentials for userName: $userName" }
+        return transaction {
+            userTable.selectAll().where { (userTable.userName eq userName) and (userTable.password eq password) }
+                .map { it.toUser() }
+                .singleOrNull()
         }
     }
     

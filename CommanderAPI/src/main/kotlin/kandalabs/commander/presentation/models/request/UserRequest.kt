@@ -11,6 +11,7 @@ data class CreateUserRequest(
     val name: String,
     val userName: String,
     val email: String? = null,
+    val password: String,
     val active: Boolean = true,
     val role: UserRole = UserRole.WAITER
 )

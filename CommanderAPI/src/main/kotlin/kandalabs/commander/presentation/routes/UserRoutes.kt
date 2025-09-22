@@ -22,12 +22,20 @@ private val logger = KotlinLogging.logger {}
 /**
  * Validates user request data
  */
-private fun validateUserRequest(name: String, userName: String, email: String?) {
+private fun validateUserRequest(name: String, userName: String, email: String?, password: String? = null) {
     if (name.isBlank()) {
         throw IllegalArgumentException("Name cannot be empty")
     }
     if (userName.isBlank()) {
         throw IllegalArgumentException("UserName cannot be empty")
+    }
+    if (password != null) {
+        if (password.isBlank()) {
+            throw IllegalArgumentException("Password cannot be empty")
+        }
+        if (password.length < 6) {
+            throw IllegalArgumentException("Password must be at least 6 characters long")
+        }
     }
     if (email != null && email.isBlank()) {
         throw IllegalArgumentException("Email cannot be empty")
@@ -127,7 +135,7 @@ fun Route.userRoutes(userService: UserService) {
                 try {
                     val request = call.receive<CreateUserRequest>()
 
-                    validateUserRequest(request.name, request.userName, request.email)
+                    validateUserRequest(request.name, request.userName, request.email, request.password)
 
                     logger.info { "Creating user with name: ${request.name}" }
 
@@ -141,7 +149,7 @@ fun Route.userRoutes(userService: UserService) {
                         createdAt = System.currentTimeMillis().toLocalDateTime(),
                     )
 
-                    userService.createUser(user)
+                    userService.createUser(user, request.password)
                         .fold(
                             onSuccess = { createdUser ->
                                 call.respond(HttpStatusCode.Created, createdUser)

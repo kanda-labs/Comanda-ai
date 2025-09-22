@@ -50,27 +50,11 @@ fun Route.authRoutes(userService: UserService) {
                 }
                 
                 logger.info { "Login attempt for username: ${request.username}" }
-                
-                // For demo purposes, we'll create a simple authentication
-                // In production, you would validate against database with hashed passwords
-                val users = userService.getAllUsers()
-                val user = users.find { it.userName == request.username }
-                
-                // Demo password validation - in production use proper password hashing
-                val validPassword = when (user?.userName) {
-                    "admin" -> request.password == "123456"
-                    "lueny" -> request.password == "123456"
-                    "leonardo" -> request.password == "123456"
-                    "leila" -> request.password == "123456"
-                    "rennan" -> request.password == "123456"
-                    "maykon" -> request.password == "123456"
-                    "cacau" -> request.password == "123456"
-                    "vivi" -> request.password == "123456"
-                    "jessica" -> request.password == "123456"
-                    else -> false
-                }
-                
-                if (user != null && validPassword) {
+
+                // Validate credentials against database
+                val user = userService.validateCredentials(request.username, request.password)
+
+                if (user != null) {
                     val token = JwtConfig.generateToken(user)
                     
                     val response = LoginResponse(
