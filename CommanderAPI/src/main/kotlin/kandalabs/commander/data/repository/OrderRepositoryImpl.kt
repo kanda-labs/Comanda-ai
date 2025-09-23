@@ -255,7 +255,23 @@ class OrderRepositoryImpl(
                     it[updatedAt] = currentTime
                 } get orderTable.id
 
-                createOrderRequest.items.map { item ->
+                // Group items by itemId and sum their counts to avoid constraint violations
+                val groupedItems = createOrderRequest.items.groupBy { it.itemId }
+                    .map { (itemId, items) ->
+                        val firstItem = items.first()
+                        val totalCount = items.sumOf { it.count }
+                        val combinedObservation = items.mapNotNull { it.observation }
+                            .distinct()
+                            .joinToString("; ")
+                            .takeIf { it.isNotEmpty() }
+
+                        firstItem.copy(
+                            count = totalCount,
+                            observation = combinedObservation
+                        )
+                    }
+
+                groupedItems.map { item ->
                     OrderItemTable.insert {
                         it[OrderItemTable.orderId] = orderId
                         it[OrderItemTable.name] = item.name

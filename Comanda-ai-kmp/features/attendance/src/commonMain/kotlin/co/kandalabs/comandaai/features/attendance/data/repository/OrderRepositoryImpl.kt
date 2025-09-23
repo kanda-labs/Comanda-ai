@@ -41,8 +41,8 @@ internal class OrderRepositoryImpl(
             )
         }.onFailure { error ->
             logger.e(
-                 error,
-                "Error creating order: $error",
+                error,
+                "Error creating order: $error \n data: tableId = $tableId, billId = $billId userName = $userName, items = $items",
             )
         }
 
