@@ -8,11 +8,13 @@ import io.ktor.server.routing.*
 import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.BillStatus
 import kandalabs.commander.domain.model.PartialPayment
+import kandalabs.commander.domain.model.PaymentMethod
 import kandalabs.commander.domain.model.TableStatus
 import kandalabs.commander.domain.service.BillService
 import kandalabs.commander.domain.service.TableService
 import kandalabs.commander.presentation.models.request.CreateBillRequest
 import kandalabs.commander.presentation.models.request.CreatePartialPaymentRequest
+import kandalabs.commander.presentation.models.request.ProcessTablePaymentRequest
 import kandalabs.commander.presentation.models.response.PartialPaymentDetailsResponse
 
 fun Route.billRoutes(billService: BillService, tableService: TableService) {
@@ -104,12 +106,21 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
 
         post("/table/{tableId}/payment") {
             val tableId = call.parameters["tableId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
-            val success = billService.processTablePayment(tableId.toInt())
-            if (success) {
-                call.respond(HttpStatusCode.OK, mapOf("message" to "Payment processed successfully"))
-            } else {
-                call.respond(HttpStatusCode.NotFound, mapOf("error" to "Table or bill not found"))
-            }
+
+            runCatching {
+                val request = call.receive<ProcessTablePaymentRequest>()
+                val success = billService.processTablePayment(tableId.toInt(), request.finalizedByUserId)
+                if (success) {
+                    call.respond(HttpStatusCode.OK, mapOf("message" to "Payment processed successfully"))
+                } else {
+                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "Table or bill not found"))
+                }
+            }.fold(
+                onSuccess = { },
+                onFailure = { exception ->
+                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid request: ${exception.message}"))
+                }
+            )
         }
 
         post("/table/{tableId}/partial-payment") {
@@ -134,7 +145,7 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
                     createdAt = localDateTimeNow()
                 )
                 
-                val createdPayment = billService.createPartialPayment(partialPayment)
+                val createdPayment = billService.createPartialPayment(partialPayment, request.createdByUserId)
                 call.respond(HttpStatusCode.Created, createdPayment)
             }.fold(
                 onSuccess = { },
@@ -186,6 +197,37 @@ fun Route.billRoutes(billService: BillService, tableService: TableService) {
                 onSuccess = { },
                 onFailure = { exception ->
                     call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to cancel partial payment: ${exception.message}"))
+                }
+            )
+        }
+
+        get("/partial-payments/user/{userId}") {
+            val userId = call.parameters["userId"] ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "User ID is required"))
+
+            runCatching {
+                val startDate = call.request.queryParameters["startDate"]?.toLongOrNull()
+                val endDate = call.request.queryParameters["endDate"]?.toLongOrNull()
+                val paymentMethodParam = call.request.queryParameters["paymentMethod"]
+                val paymentMethod = paymentMethodParam?.let {
+                    try {
+                        PaymentMethod.valueOf(it.uppercase())
+                    } catch (e: IllegalArgumentException) {
+                        return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid payment method: $it"))
+                    }
+                }
+
+                val partialPayments = billService.getPartialPaymentsByUserId(
+                    userId = userId.toInt(),
+                    startDate = startDate,
+                    endDate = endDate,
+                    paymentMethod = paymentMethod
+                )
+
+                call.respond(HttpStatusCode.OK, partialPayments)
+            }.fold(
+                onSuccess = { },
+                onFailure = { exception ->
+                    call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to get partial payments: ${exception.message}"))
                 }
             )
         }

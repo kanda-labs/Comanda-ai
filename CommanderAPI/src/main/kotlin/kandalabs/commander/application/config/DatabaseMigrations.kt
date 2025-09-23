@@ -24,6 +24,7 @@ object DatabaseMigrations {
         migration006_AddUniqueBillConstraint()
         migration007_AddReceivedByToPartialPayments()
         migration008_AddStatusToPartialPayments()
+        migration009_AddUserIdColumns()
 
         logger.info { "All database migrations completed successfully" }
     }
@@ -276,6 +277,43 @@ object DatabaseMigrations {
                     logger.info { "Added status column to partial_payments table" }
                 } catch (migrationError: Exception) {
                     logger.error(migrationError) { "Failed to add status column: ${migrationError.message}" }
+                    throw migrationError
+                }
+            }
+        }
+    }
+
+    /**
+     * Migration 009: Add user ID columns to bills and partial_payments tables
+     */
+    private fun migration009_AddUserIdColumns() {
+        logger.info { "Running migration 009: Add user ID columns to bills and partial_payments tables" }
+
+        transaction {
+            // Add finalized_by_user_id to bills table
+            try {
+                exec("SELECT finalized_by_user_id FROM bills LIMIT 1")
+                logger.info { "finalized_by_user_id column already exists in bills table, skipping" }
+            } catch (e: Exception) {
+                try {
+                    exec("ALTER TABLE bills ADD COLUMN finalized_by_user_id INTEGER")
+                    logger.info { "Added finalized_by_user_id column to bills table" }
+                } catch (migrationError: Exception) {
+                    logger.error(migrationError) { "Failed to add finalized_by_user_id column: ${migrationError.message}" }
+                    throw migrationError
+                }
+            }
+
+            // Add created_by_user_id to partial_payments table
+            try {
+                exec("SELECT created_by_user_id FROM partial_payments LIMIT 1")
+                logger.info { "created_by_user_id column already exists in partial_payments table, skipping" }
+            } catch (e: Exception) {
+                try {
+                    exec("ALTER TABLE partial_payments ADD COLUMN created_by_user_id INTEGER")
+                    logger.info { "Added created_by_user_id column to partial_payments table" }
+                } catch (migrationError: Exception) {
+                    logger.error(migrationError) { "Failed to add created_by_user_id column: ${migrationError.message}" }
                     throw migrationError
                 }
             }

@@ -108,9 +108,13 @@ internal class TablesRepositoryImp(
         }
     }
 
-    override suspend fun processTablePayment(tableId: Int): ComandaAiResult<Unit> {
+    override suspend fun processTablePayment(tableId: Int, finalizedByUserId: Int?): ComandaAiResult<Unit> {
         return safeRunCatching {
-            commanderApi.processTablePayment(tableId)
+            requireNotNull(finalizedByUserId) { "User ID is required to finalize payment" }
+            val request = co.kandalabs.comandaai.features.attendance.domain.models.request.ProcessTablePaymentRequest(
+                finalizedByUserId = finalizedByUserId
+            )
+            commanderApi.processTablePayment(tableId, request)
         }.onFailure { error ->
             println("Error processing table payment: $error")
         }
@@ -122,15 +126,18 @@ internal class TablesRepositoryImp(
         amountInCentavos: Long,
         description: String?,
         paymentMethod: PaymentMethod?,
-        receivedBy: String?
+        receivedBy: String?,
+        createdByUserId: Int?
     ): ComandaAiResult<PartialPayment> {
         return safeRunCatching {
+            requireNotNull(createdByUserId) { "User ID is required to create partial payment" }
             val request = CreatePartialPaymentRequest(
                 paidBy = paidBy,
                 amountInCentavos = amountInCentavos,
                 description = description,
                 paymentMethod = paymentMethod,
-                receivedBy = receivedBy
+                receivedBy = receivedBy,
+                createdByUserId = createdByUserId
             )
             commanderApi.createPartialPayment(tableId, request)
         }.onFailure { error ->
@@ -181,6 +188,24 @@ internal class TablesRepositoryImp(
             commanderApi.cancelPartialPayment(paymentId)
         }.onFailure { error ->
             println("Error canceling partial payment: $error")
+        }
+    }
+
+    override suspend fun getPaymentHistory(
+        userId: Int,
+        startDate: Long?,
+        endDate: Long?,
+        paymentMethod: PaymentMethod?
+    ): ComandaAiResult<List<PartialPayment>> {
+        return safeRunCatching {
+            commanderApi.getPaymentHistory(
+                userId = userId,
+                startDate = startDate,
+                endDate = endDate,
+                paymentMethod = paymentMethod?.name
+            )
+        }.onFailure { error ->
+            println("Error getting payment history for user $userId: $error")
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -55,6 +56,7 @@ import comandaai.features.attendance.generated.resources.Res
 import comandaai.features.attendance.generated.resources.golden_loading
 import org.jetbrains.compose.resources.painterResource
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.TableDetailsScreen
+import co.kandalabs.comandaai.features.attendance.presentation.screens.paymentHistory.PaymentHistoryScreen
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
 import co.kandalabs.comandaai.features.attendance.domain.models.model.TableStatus
@@ -87,6 +89,9 @@ public object TablesScreen : Screen {
             onClick = { table: Table ->
                 navigator?.push(TableDetailsScreen(tableId = table.id ?: 0, tableNumber = table.number))
             },
+            onPaymentHistoryClick = {
+                navigator?.push(PaymentHistoryScreen)
+            },
             onUserAvatarClick = {
                 scope.launch {
                     userSession = viewModel.getUserSession()
@@ -110,6 +115,7 @@ private fun TablesScreenContent(
     retry: () -> Unit,
     onRefresh: () -> Unit,
     onClick: (Table) -> Unit,
+    onPaymentHistoryClick: () -> Unit,
     onUserAvatarClick: () -> Unit,
     onDismissUserModal: () -> Unit,
     onLogout: () -> Unit
@@ -135,6 +141,15 @@ private fun TablesScreenContent(
                 ComandaAiTopAppBar(
                     title = state.title,
                     actions = {
+                        IconButton(
+                            onClick = onPaymentHistoryClick
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.History,
+                                contentDescription = "Histórico de Pagamentos",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
                         IconButton(
                             onClick = onRefresh
                         ) {
@@ -268,6 +283,7 @@ private fun TablesScreenPreview() {
             retry = {},
             onRefresh = {},
             onClick = {},
+            onPaymentHistoryClick = {},
             onUserAvatarClick = {},
             onDismissUserModal = {},
             onLogout = {}

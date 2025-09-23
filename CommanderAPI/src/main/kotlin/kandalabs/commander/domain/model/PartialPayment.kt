@@ -24,5 +24,6 @@ data class PartialPayment(
     val paymentMethod: PaymentMethod? = null,
     val receivedBy: String? = null, // Nome da pessoa que recebeu o pagamento
     val status: PartialPaymentStatus = PartialPaymentStatus.PAID,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val createdByUserId: Int? = null
 )

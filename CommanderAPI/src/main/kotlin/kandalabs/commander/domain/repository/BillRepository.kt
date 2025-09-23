@@ -3,6 +3,7 @@ package kandalabs.commander.domain.repository
 import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.BillStatus
 import kandalabs.commander.domain.model.PartialPayment
+import kandalabs.commander.domain.model.PaymentMethod
 import kandalabs.commander.domain.model.PaymentSummaryResponse
 
 interface BillRepository {
@@ -12,9 +13,15 @@ interface BillRepository {
     suspend fun getBillPaymentSummary(tableId: Int): PaymentSummaryResponse?
     suspend fun createBill(bill: Bill): Bill
     suspend fun updateBill(id: Int, bill: Bill): Bill?
-    suspend fun processTablePayment(tableId: Int): Boolean
-    suspend fun createPartialPayment(partialPayment: PartialPayment): PartialPayment
+    suspend fun processTablePayment(tableId: Int, finalizedByUserId: Int?): Boolean
+    suspend fun createPartialPayment(partialPayment: PartialPayment, createdByUserId: Int?): PartialPayment
     suspend fun getPartialPayments(tableId: Int): List<PartialPayment>
+    suspend fun getPartialPaymentsByUserId(
+        userId: Int,
+        startDate: Long? = null,
+        endDate: Long? = null,
+        paymentMethod: PaymentMethod? = null
+    ): List<PartialPayment>
     suspend fun getPartialPaymentDetails(paymentId: Int): PartialPayment?
     suspend fun cancelPartialPayment(paymentId: Int): Boolean
     suspend fun deleteBill(id: Int): Boolean

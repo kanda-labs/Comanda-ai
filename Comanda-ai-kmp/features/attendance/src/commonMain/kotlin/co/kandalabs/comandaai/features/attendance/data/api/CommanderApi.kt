@@ -74,13 +74,27 @@ internal interface CommanderApi {
     suspend fun updateBill(@Path("id") id: Int, @Body bill: Bill): Bill
 
     @POST("api/v1/bills/table/{tableId}/payment")
-    suspend fun processTablePayment(@Path("tableId") tableId: Int)
+    suspend fun processTablePayment(
+        @Path("tableId") tableId: Int,
+        @Body request: co.kandalabs.comandaai.features.attendance.domain.models.request.ProcessTablePaymentRequest
+    )
     
     @POST("api/v1/bills/table/{tableId}/partial-payment")
-    suspend fun createPartialPayment(@Path("tableId") tableId: Int, @Body request: CreatePartialPaymentRequest): PartialPayment
+    suspend fun createPartialPayment(
+        @Path("tableId") tableId: Int,
+        @Body request: CreatePartialPaymentRequest
+    ): PartialPayment
     
     @GET("api/v1/bills/table/{tableId}/partial-payments")
     suspend fun getPartialPayments(@Path("tableId") tableId: Int): List<PartialPayment>
+
+    @GET("api/v1/bills/partial-payments/user/{userId}")
+    suspend fun getPaymentHistory(
+        @Path("userId") userId: Int,
+        @de.jensklingenberg.ktorfit.http.Query("startDate") startDate: Long? = null,
+        @de.jensklingenberg.ktorfit.http.Query("endDate") endDate: Long? = null,
+        @de.jensklingenberg.ktorfit.http.Query("paymentMethod") paymentMethod: String? = null
+    ): List<PartialPayment>
     
     @POST("api/v1/tables/{originId}/migrate/{destinationId}")
     suspend fun migrateTable(@Path("originId") originId: Int, @Path("destinationId") destinationId: Int): TableMigrationResponse

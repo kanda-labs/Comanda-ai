@@ -22,6 +22,7 @@ object BillTable : SQLTable("bills") {
     val tableNumber = integer("table_number").nullable()
     val status = varchar("status", 32)
     val createdAt = long("created_at")
+    val finalizedByUserId = integer("finalized_by_user_id").nullable()
     override val primaryKey = PrimaryKey(id)
 }
 
@@ -88,6 +89,7 @@ object PartialPaymentTable : SQLTable("partial_payments") {
     val receivedBy = varchar("received_by", 255).nullable() // Nome da pessoa que recebeu o pagamento
     val status = varchar("status", 50).default("PAID")
     val createdAt = long("created_at")
+    val createdByUserId = integer("created_by_user_id").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

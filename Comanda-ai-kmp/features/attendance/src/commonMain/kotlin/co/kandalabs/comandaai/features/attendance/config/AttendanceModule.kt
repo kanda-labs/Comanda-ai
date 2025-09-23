@@ -25,6 +25,7 @@ import co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSele
 import co.kandalabs.comandaai.features.attendance.presentation.screens.order.OrderScreenModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.ordercontrol.OrderControlViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.payment.PaymentSummaryViewModel
+import co.kandalabs.comandaai.features.attendance.presentation.screens.paymentHistory.PaymentHistoryViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.partialPaymentDetails.PartialPaymentDetailsViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.TablesDetailsViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.listing.TablesViewModel
@@ -193,6 +194,13 @@ object AttendanceModule {
             UserDetailsViewModel(
                 getUserByIdUseCase = instance(),
                 updateUserUseCase = instance()
+            )
+        }
+
+        bindProvider<PaymentHistoryViewModel> {
+            PaymentHistoryViewModel(
+                repository = instance<TablesRepository>(),
+                sessionManager = instance()
             )
         }
 

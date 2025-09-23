@@ -9,5 +9,6 @@ data class CreatePartialPaymentRequest(
     val amountInCentavos: Long,
     val description: String? = null,
     val paymentMethod: PaymentMethod? = null,
-    val receivedBy: String? = null
+    val receivedBy: String? = null,
+    val createdByUserId: Int
 )

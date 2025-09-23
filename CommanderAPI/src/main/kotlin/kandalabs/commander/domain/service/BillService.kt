@@ -3,6 +3,7 @@ package kandalabs.commander.domain.service
 import kandalabs.commander.domain.model.Bill
 import kandalabs.commander.domain.model.BillStatus
 import kandalabs.commander.domain.model.PartialPayment
+import kandalabs.commander.domain.model.PaymentMethod
 import kandalabs.commander.domain.model.PaymentSummaryResponse
 import kandalabs.commander.domain.repository.BillRepository
 
@@ -32,16 +33,25 @@ class BillService(private val billRepository: BillRepository) {
         return billRepository.updateBill(id, bill)
     }
 
-    suspend fun processTablePayment(tableId: Int): Boolean {
-        return billRepository.processTablePayment(tableId)
+    suspend fun processTablePayment(tableId: Int, finalizedByUserId: Int?): Boolean {
+        return billRepository.processTablePayment(tableId, finalizedByUserId)
     }
 
-    suspend fun createPartialPayment(partialPayment: PartialPayment): PartialPayment {
-        return billRepository.createPartialPayment(partialPayment)
+    suspend fun createPartialPayment(partialPayment: PartialPayment, createdByUserId: Int?): PartialPayment {
+        return billRepository.createPartialPayment(partialPayment, createdByUserId)
     }
 
     suspend fun getPartialPayments(tableId: Int): List<PartialPayment> {
         return billRepository.getPartialPayments(tableId)
+    }
+
+    suspend fun getPartialPaymentsByUserId(
+        userId: Int,
+        startDate: Long? = null,
+        endDate: Long? = null,
+        paymentMethod: PaymentMethod? = null
+    ): List<PartialPayment> {
+        return billRepository.getPartialPaymentsByUserId(userId, startDate, endDate, paymentMethod)
     }
 
     suspend fun getPartialPaymentDetails(paymentId: Int): PartialPayment? {

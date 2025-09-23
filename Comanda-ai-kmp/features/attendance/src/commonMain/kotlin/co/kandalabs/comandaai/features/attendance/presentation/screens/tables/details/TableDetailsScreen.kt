@@ -47,6 +47,7 @@ import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.de
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.component.TableDetailsOrders
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.migration.TableMigrationSelection
 import co.kandalabs.comandaai.sdk.getOrThrow
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
@@ -192,7 +193,7 @@ private fun TableDetailsScreenContent(
     action: (TableDetailsAction) -> Unit,
     onOrderClick: (Order) -> Unit
 ) {
-    MaterialTheme {
+    ComandaAiTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background

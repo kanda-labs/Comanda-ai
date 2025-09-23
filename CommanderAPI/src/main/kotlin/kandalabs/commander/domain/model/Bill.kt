@@ -10,7 +10,8 @@ data class Bill(
     val tableNumber: Int?,
     val orders: List<OrderResponse>,
     val status: BillStatus,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val finalizedByUserId: Int? = null
 )
 
 enum class BillStatus { PAID, PARTIALLY_PAID, SCAM, OPEN, CANCELED }

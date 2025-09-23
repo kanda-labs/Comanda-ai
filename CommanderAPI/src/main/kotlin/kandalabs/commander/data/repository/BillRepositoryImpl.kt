@@ -270,11 +270,10 @@ class BillRepositoryImpl(
         }
     }
 
-    override suspend fun processTablePayment(tableId: Int): Boolean {
+    override suspend fun processTablePayment(tableId: Int, finalizedByUserId: Int?): Boolean {
         logger.info { "Processing payment for table id: $tableId" }
         return transaction {
             runCatching {
-                // Find bill for this table (OPEN or PARTIALLY_PAID)
                 val billRow = billTable.selectAll()
                     .where { 
                         (billTable.tableId eq tableId) and 
@@ -290,9 +289,10 @@ class BillRepositoryImpl(
                 val billId = billRow[billTable.id]
                 logger.info { "Found bill $billId for table $tableId, updating to PAID" }
 
-                // Update bill status to PAID
+                // Update bill status to PAID and set finalizedByUserId
                 val billUpdated = billTable.update({ billTable.id eq billId }) {
                     it[status] = BillStatus.PAID.name
+                    it[billTable.finalizedByUserId] = finalizedByUserId
                 }
                 logger.info { "Bill update result: $billUpdated rows affected" }
 
@@ -332,7 +332,7 @@ class BillRepositoryImpl(
         }
     }
 
-    override suspend fun createPartialPayment(partialPayment: PartialPayment): PartialPayment {
+    override suspend fun createPartialPayment(partialPayment: PartialPayment, createdByUserId: Int?): PartialPayment {
         logger.debug { "Creating partial payment for table id: ${partialPayment.tableId}" }
         return transaction {
             // Insert partial payment record
@@ -346,6 +346,7 @@ class BillRepositoryImpl(
                 it[receivedBy] = partialPayment.receivedBy
                 it[status] = partialPayment.status.name
                 it[createdAt] = System.currentTimeMillis()
+                it[partialPaymentTable.createdByUserId] = createdByUserId
             }
             val generatedId = insertStatement[partialPaymentTable.id]
 
@@ -455,6 +456,45 @@ class BillRepositoryImpl(
         return partialPaymentTable.selectAll()
             .where { partialPaymentTable.billId eq billId }
             .sumOf { it[partialPaymentTable.amountInCentavos] }
+    }
+
+    override suspend fun getPartialPaymentsByUserId(
+        userId: Int,
+        startDate: Long?,
+        endDate: Long?,
+        paymentMethod: PaymentMethod?
+    ): List<PartialPayment> {
+        logger.debug { "Getting partial payments for user id: $userId with filters - startDate: $startDate, endDate: $endDate, paymentMethod: $paymentMethod" }
+        return transaction {
+            runCatching {
+                var query = partialPaymentTable.selectAll()
+                    .where { partialPaymentTable.createdByUserId eq userId }
+
+                startDate?.let { start ->
+                    query = query.andWhere { partialPaymentTable.createdAt greaterEq start }
+                }
+
+                endDate?.let { end ->
+                    query = query.andWhere { partialPaymentTable.createdAt lessEq end }
+                }
+
+                paymentMethod?.let { method ->
+                    query = query.andWhere { partialPaymentTable.paymentMethod eq method.name }
+                }
+
+                query.orderBy(partialPaymentTable.createdAt, SortOrder.DESC)
+                    .map { it.toPartialPayment() }
+            }.fold(
+                onSuccess = { payments ->
+                    logger.info { "Found ${payments.size} partial payments for user $userId" }
+                    payments
+                },
+                onFailure = { error ->
+                    logger.error(error) { "Error getting partial payments for user $userId" }
+                    emptyList()
+                }
+            )
+        }
     }
 
     override suspend fun deleteBill(id: Int): Boolean {

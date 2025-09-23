@@ -10,5 +10,11 @@ data class CreateBillRequest(
 
 @Serializable
 data class UpdateBillRequest(
-    val status: String
+    val status: String,
+    val finalizedByUserId: Int? = null
+)
+
+@Serializable
+data class ProcessTablePaymentRequest(
+    val finalizedByUserId: Int
 )

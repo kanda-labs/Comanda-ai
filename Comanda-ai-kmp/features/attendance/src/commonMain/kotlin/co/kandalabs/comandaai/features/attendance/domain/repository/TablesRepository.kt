@@ -18,18 +18,25 @@ interface TablesRepository {
     suspend fun getBillByTableId(tableId: Int): Bill
     suspend fun getPaymentSummary(tableId: Int): ComandaAiResult<PaymentSummaryResponse>
     suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Long): ComandaAiResult<Unit>
-    suspend fun processTablePayment(tableId: Int): ComandaAiResult<Unit>
+    suspend fun processTablePayment(tableId: Int, finalizedByUserId: Int?): ComandaAiResult<Unit>
     suspend fun createPartialPayment(
         tableId: Int,
         paidBy: String,
         amountInCentavos: Long,
         description: String? = null,
         paymentMethod: PaymentMethod? = null,
-        receivedBy: String? = null
+        receivedBy: String? = null,
+        createdByUserId: Int? = null
     ): ComandaAiResult<PartialPayment>
     suspend fun reopenTable(tableId: Int, billId: Int): Table
     suspend fun migrateTable(originTableId: Int, destinationTableId: Int): ComandaAiResult<Pair<Table, Table>>
     suspend fun getFreeTables(): ComandaAiResult<List<Table>>
     suspend fun getPartialPaymentDetails(paymentId: Int): ComandaAiResult<PartialPaymentDetails>
     suspend fun cancelPartialPayment(paymentId: Int): ComandaAiResult<Unit>
+    suspend fun getPaymentHistory(
+        userId: Int,
+        startDate: Long? = null,
+        endDate: Long? = null,
+        paymentMethod: PaymentMethod? = null
+    ): ComandaAiResult<List<PartialPayment>>
 }

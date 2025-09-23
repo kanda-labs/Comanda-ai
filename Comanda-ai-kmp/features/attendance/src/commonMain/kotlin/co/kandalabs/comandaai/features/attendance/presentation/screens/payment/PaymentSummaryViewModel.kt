@@ -45,9 +45,13 @@ internal class PaymentSummaryViewModel(
         screenModelScope.launch {
             updateState { it.copy(isProcessingPayment = true) }
             
-            repository.processTablePayment(tableId).fold(
+            // Get user ID from session for finalizedByUserId
+            val session = sessionManager.getSession()
+            val finalizedByUserId = session?.userId
+            
+            repository.processTablePayment(tableId, finalizedByUserId).fold(
                 onSuccess = { 
-                    println("Payment processed successfully for table $tableId")
+                    println("Payment processed successfully for table $tableId by user $finalizedByUserId")
                     updateState {
                         onFinish()
                         it.copy(
@@ -91,7 +95,8 @@ internal class PaymentSummaryViewModel(
                 amountInCentavos = amountInCentavos,
                 description = description,
                 paymentMethod = paymentMethod,
-                receivedBy = receivedBy // Waiter who received the payment
+                receivedBy = receivedBy, // Waiter who received the payment
+                createdByUserId = session?.userId // User who created the partial payment
             ).fold(
                 onSuccess = {
                     println("Partial payment created successfully - paid by: ${paidBy ?: "Cliente"}, received by: $receivedBy")
