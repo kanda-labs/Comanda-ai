@@ -25,6 +25,7 @@ object DatabaseMigrations {
         migration007_AddReceivedByToPartialPayments()
         migration008_AddStatusToPartialPayments()
         migration009_AddUserIdColumns()
+        migration010_AddPasswordToUsers()
 
         logger.info { "All database migrations completed successfully" }
     }
@@ -314,6 +315,30 @@ object DatabaseMigrations {
                     logger.info { "Added created_by_user_id column to partial_payments table" }
                 } catch (migrationError: Exception) {
                     logger.error(migrationError) { "Failed to add created_by_user_id column: ${migrationError.message}" }
+                    throw migrationError
+                }
+            }
+        }
+    }
+
+    /**
+     * Migration 010: Add password column to users table
+     */
+    private fun migration010_AddPasswordToUsers() {
+        logger.info { "Running migration 010: Add password column to users table" }
+
+        transaction {
+            try {
+                // Try to select with password column to check if it exists
+                exec("SELECT password FROM users LIMIT 1")
+                logger.info { "password column already exists in users table, skipping migration" }
+            } catch (e: Exception) {
+                // Column doesn't exist, add it
+                try {
+                    exec("ALTER TABLE users ADD COLUMN password VARCHAR(255) NOT NULL DEFAULT '123456'")
+                    logger.info { "Added password column to users table with default password '123456'" }
+                } catch (migrationError: Exception) {
+                    logger.error(migrationError) { "Failed to add password column: ${migrationError.message}" }
                     throw migrationError
                 }
             }

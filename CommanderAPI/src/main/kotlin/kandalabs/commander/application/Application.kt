@@ -63,7 +63,7 @@ fun main() {
     try {
         DatabaseConfig.init()
         val port = System.getenv("PORT")?.toIntOrNull() ?: 8081
-        val host = System.getenv("HOST") ?: "192.168.2.200"
+        val host = System.getenv("HOST") ?: "192.168.2.218"
 
         logger.info { "Starting server on $host:$port" }
 
