@@ -34,6 +34,9 @@ internal interface CommanderApi {
     @GET("api/v1/tables")
     suspend fun getTables(): List<Table>
 
+    @GET("api/v1/tables/home")
+    suspend fun getTablesHome(): List<Table>
+
     @GET("api/v1/tables/{id}")
     suspend fun getTable(@Path("id") id: Int): Table
 

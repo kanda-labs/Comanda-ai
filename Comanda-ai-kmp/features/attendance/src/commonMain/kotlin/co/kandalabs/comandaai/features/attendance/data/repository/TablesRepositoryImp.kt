@@ -23,7 +23,7 @@ internal class TablesRepositoryImp(
 ) : TablesRepository {
     override suspend fun getTables(): ComandaAiResult<List<Table>> =
         safeRunCatching {
-            commanderApi.getTables()
+            commanderApi.getTablesHome()
         }.onFailure { error ->
             println(error)
         }
@@ -162,7 +162,7 @@ internal class TablesRepositoryImp(
 
     override suspend fun getFreeTables(): ComandaAiResult<List<Table>> {
         return safeRunCatching {
-            commanderApi.getTables().filter { it.status == TableStatus.FREE }
+            commanderApi.getTablesHome().filter { it.status == TableStatus.FREE }
         }.onFailure { error ->
             println("Error fetching free tables: $error")
         }

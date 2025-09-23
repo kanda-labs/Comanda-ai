@@ -3,12 +3,21 @@ package kandalabs.commander.domain.service
 import kandalabs.commander.domain.repository.TableRepository
 import kandalabs.commander.domain.model.Table
 import kandalabs.commander.domain.model.TableStatus
+import kandalabs.commander.presentation.models.response.HomeTableResponse
 
 class TableService(private val tableRepository: TableRepository) {
 
     suspend fun getAllTables(): Result<List<Table>> {
         return try {
             Result.success(tableRepository.getAllTables())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getHomeTables(): Result<List<HomeTableResponse>> {
+        return try {
+            Result.success(tableRepository.getHomeTables())
         } catch (e: Exception) {
             Result.failure(e)
         }

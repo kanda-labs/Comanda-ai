@@ -5,6 +5,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import kandalabs.commander.domain.model.TableStatus
 import kandalabs.commander.domain.repository.TableRepository
+import kandalabs.commander.presentation.models.response.HomeTableResponse
 import kandalabs.commander.data.model.sqlModels.TableTable
 import kandalabs.commander.data.model.sqlModels.OrderTable
 import kandalabs.commander.data.model.sqlModels.PartialPaymentTable
@@ -43,14 +44,28 @@ class TableRepositoryImpl(
                     )
                 }
         }
-        
+
         // Fetch orders for each table outside transaction
         return tablesWithBasicInfo.map { table ->
             val orders = table.billId?.let { billId ->
                 orderRepository.getOrdersByBillId(billId)
             } ?: emptyList()
-            
+
             table.copy(orders = orders)
+        }
+    }
+
+    override suspend fun getHomeTables(): List<HomeTableResponse> {
+        logger.debug { "Fetching all tables (lightweight)" }
+        return transaction {
+            tableTable.selectAll()
+                .map { row ->
+                    HomeTableResponse(
+                        id = row[tableTable.id],
+                        number = row[tableTable.number],
+                        status = TableStatus.valueOf(row[tableTable.status])
+                    )
+                }
         }
     }
 

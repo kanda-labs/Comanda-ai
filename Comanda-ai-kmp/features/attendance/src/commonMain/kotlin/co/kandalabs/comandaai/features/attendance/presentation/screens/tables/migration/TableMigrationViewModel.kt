@@ -23,7 +23,7 @@ class TableMigrationViewModel(
     private val _state = MutableStateFlow(TableMigrationState())
     val state: StateFlow<TableMigrationState> = _state.asStateFlow()
 
-    fun loadFreeTables() {
+    fun loadTables() {
         screenModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
             
@@ -83,7 +83,7 @@ class TableMigrationViewModel(
                             error = errorMessage
                         )
                         // Refresh free tables to show current state
-                        loadFreeTables()
+                        loadTables()
                     }
                 )
         }

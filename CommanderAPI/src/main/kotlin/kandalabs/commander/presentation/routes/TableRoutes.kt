@@ -1,7 +1,6 @@
 package kandalabs.commander.presentation.routes
 
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -28,6 +27,35 @@ private val logger = KotlinLogging.logger {}
  */
 fun Route.tableRoutes(tableService: TableService, orderService: OrderService) {
     route("/tables") {
+            get("home") {
+                try {
+                    logger.info { "Fetching all tables for home screen" }
+                    tableService.getHomeTables()
+                        .fold(
+                            onSuccess = { tables ->
+                                call.respond(HttpStatusCode.OK, tables)
+                            },
+                            onFailure = { error ->
+                                logger.error(error) { "Error fetching tables for home screen" }
+                                val errorResponse = ErrorResponse(
+                                    status = HttpStatusCode.InternalServerError.value,
+                                    message = "Error fetching tables: ${error.message}",
+                                    path = call.request.path()
+                                )
+                                call.respond(HttpStatusCode.InternalServerError, errorResponse)
+                            }
+                        )
+                } catch (e: Exception) {
+                    logger.error(e) { "Unexpected error fetching tables for home screen" }
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.InternalServerError.value,
+                        message = "Unexpected error: ${e.message}",
+                        path = call.request.path()
+                    )
+                    call.respond(HttpStatusCode.InternalServerError, errorResponse)
+                }
+            }
+
             // Get all tables
             get {
                 try {
