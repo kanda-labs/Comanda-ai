@@ -47,7 +47,13 @@ try_installer() {
     ((TOTAL_ATTEMPTS++))
     
     # Executar jpackage com timeout de 5 minutos
-    if timeout 300 jpackage \
+    # Use gtimeout on macOS (from coreutils), timeout on Linux
+    TIMEOUT_CMD="timeout"
+    if command -v gtimeout &> /dev/null; then
+        TIMEOUT_CMD="gtimeout"
+    fi
+
+    if $TIMEOUT_CMD 300 jpackage \
         --input build/libs \
         --main-jar CommanderAPI-fat.jar \
         --main-class kandalabs.commander.application.ApplicationKt \
@@ -93,19 +99,29 @@ if [[ "$OS" == "Darwin" ]]; then
         "--mac-package-identifier" "co.kandalabs.commander.api"
 fi
 
-# 3. Linux DEB - funciona em macOS e Linux com ferramentas adequadas
-try_installer "deb" "🐧" "Linux DEB" \
-    "--linux-package-name" "commanderapi" \
-    "--linux-app-category" "Development" \
-    "--linux-shortcut" \
-    "--linux-menu-group" "Development"
+# 3. Linux DEB - tentar criar sem opções específicas do Linux no macOS
+if [[ "$OS" == "Linux" ]]; then
+    try_installer "deb" "🐧" "Linux DEB" \
+        "--linux-package-name" "commanderapi" \
+        "--linux-app-category" "Development" \
+        "--linux-shortcut" \
+        "--linux-menu-group" "Development"
+else
+    # No macOS, criar DEB sem opções --linux-*
+    try_installer "deb" "🐧" "Linux DEB (básico)"
+fi
 
-# 4. Linux RPM - funciona em macOS e Linux com ferramentas adequadas
-try_installer "rpm" "🐧" "Linux RPM" \
-    "--linux-package-name" "commanderapi" \
-    "--linux-app-category" "Development" \
-    "--linux-shortcut" \
-    "--linux-menu-group" "Development"
+# 4. Linux RPM - tentar criar sem opções específicas do Linux no macOS
+if [[ "$OS" == "Linux" ]]; then
+    try_installer "rpm" "🐧" "Linux RPM" \
+        "--linux-package-name" "commanderapi" \
+        "--linux-app-category" "Development" \
+        "--linux-shortcut" \
+        "--linux-menu-group" "Development"
+else
+    # No macOS, criar RPM sem opções --linux-*
+    try_installer "rpm" "🐧" "Linux RPM (básico)"
+fi
 
 # 5. Windows MSI - geralmente não funciona fora do Windows
 if [[ "$OS" == MINGW* ]] || [[ "$OS" == MSYS* ]] || [[ "$OS" == CYGWIN* ]]; then
