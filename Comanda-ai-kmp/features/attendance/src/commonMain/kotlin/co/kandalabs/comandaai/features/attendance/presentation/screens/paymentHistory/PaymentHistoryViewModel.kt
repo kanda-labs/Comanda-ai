@@ -130,7 +130,8 @@ internal class PaymentHistoryViewModel(
                     appliedStartHour = currentState.tempStartHour,
                     appliedStartMinute = currentState.tempStartMinute,
                     appliedEndHour = currentState.tempEndHour,
-                    appliedEndMinute = currentState.tempEndMinute
+                    appliedEndMinute = currentState.tempEndMinute,
+                    isFiltersExpanded = false
                 )
             }
         }
