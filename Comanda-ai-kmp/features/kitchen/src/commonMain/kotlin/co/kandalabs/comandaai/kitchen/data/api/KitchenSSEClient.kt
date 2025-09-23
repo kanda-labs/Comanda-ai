@@ -1,6 +1,6 @@
 package co.kandalabs.comandaai.kitchen.data.api
 
-import co.kandalabs.comandaai.sdk.logger.ComandaAiLogger
+import co.kandalabs.comandaai.core.logger.ComandaAiLogger
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
 import co.kandalabs.comandaai.network.HttpClientFactory
 import co.kandalabs.comandaai.network.HttpClientType
@@ -21,18 +21,6 @@ class KitchenSSEClient(
     private val baseUrl: String,
     private val logger: ComandaAiLogger
 ) {
-    
-    // Test method to check if connection works
-    suspend fun testConnection(): Result<String> {
-        return try {
-            HttpClientFactory.withSafeHttpClient(HttpClientType.API) { httpClient ->
-                val response = httpClient.get("${baseUrl}api/v1/kitchen/orders")
-                Result.success("Connection test successful: ${response.status}")
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
     
     fun connectToKitchenEvents(): Flow<KitchenEvent> = flow {
         logger.d("Starting Kitchen SSE connection to: ${baseUrl}api/v1/kitchen/events")

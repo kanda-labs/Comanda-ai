@@ -1,5 +1,6 @@
 package co.kandalabs.comandaai.features.attendance.data.repository
 
+import co.kandalabs.comandaai.core.logger.ComandaAiLogger
 import co.kandalabs.comandaai.sdk.coroutinesResult.ComandaAiResult
 import co.kandalabs.comandaai.sdk.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Order
@@ -14,6 +15,7 @@ import kotlinx.serialization.Serializable
 
 internal class OrderRepositoryImpl(
     private val commanderApi: CommanderApi,
+    private val logger: ComandaAiLogger,
 ) : OrderRepository {
     override suspend fun createOrder(
         tableId: Int,
@@ -27,7 +29,7 @@ internal class OrderRepositoryImpl(
                     tableId = tableId,
                     billId = billId,
                     userName = userName,
-                    items = items.map { 
+                    items = items.map {
                         CreateOrderItemDto(
                             itemId = it.itemId,
                             name = it.name,
@@ -38,37 +40,40 @@ internal class OrderRepositoryImpl(
                 )
             )
         }.onFailure { error ->
-            println("Error creating order: $error")
+            logger.e(
+                 error,
+                "Error creating order: $error",
+            )
         }
-    
+
     override suspend fun getAllOrders(): ComandaAiResult<List<Order>> =
         safeRunCatching {
             commanderApi.getAllOrders()
         }.onFailure { error ->
             println("Error getting all orders: $error")
         }
-    
+
     override suspend fun getOrderById(orderId: Int): ComandaAiResult<Order> =
         safeRunCatching {
             commanderApi.getOrderById(orderId)
         }.onFailure { error ->
             println("Error getting order by id: $error")
         }
-    
+
     override suspend fun getOrderByIdWithStatuses(orderId: Int): ComandaAiResult<OrderWithStatuses> =
         safeRunCatching {
             commanderApi.getOrderByIdWithStatuses(orderId)
         }.onFailure { error ->
             println("Error getting order by id with statuses: $error")
         }
-    
+
     override suspend fun updateOrder(orderId: Int, order: Order): ComandaAiResult<Order> =
         safeRunCatching {
             commanderApi.updateOrder(orderId, order)
         }.onFailure { error ->
             println("Error updating order: $error")
         }
-    
+
     override suspend fun updateOrderWithIndividualStatuses(
         orderId: Int,
         order: Order,
@@ -80,19 +85,19 @@ internal class OrderRepositoryImpl(
             println("[OrderRepository] Order ID: $orderId")
             println("[OrderRepository] Individual statuses: $individualStatuses")
             println("[OrderRepository] Updated by: $updatedBy")
-            
+
             val request = UpdateOrderWithStatusesRequest(
                 order = order,
                 individualStatuses = individualStatuses,
                 updatedBy = updatedBy
             )
-            
+
             println("[OrderRepository] Request payload: $request")
-            
+
             val response = commanderApi.updateOrderWithIndividualStatuses(orderId, request)
-            
+
             println("[OrderRepository] Response received: $response")
-            
+
             response
         }.onFailure { error ->
             println("[OrderRepository] Error updating order with individual statuses: $error")

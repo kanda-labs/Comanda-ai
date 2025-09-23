@@ -20,7 +20,7 @@ import kotlinx.datetime.toLocalDateTime
 
 internal class TablesRepositoryImp(
     private val commanderApi: CommanderApi,
-): TablesRepository {
+) : TablesRepository {
     override suspend fun getTables(): ComandaAiResult<List<Table>> =
         safeRunCatching {
             commanderApi.getTables()
@@ -56,28 +56,25 @@ internal class TablesRepositoryImp(
         }
     }
 
-    override suspend fun closeTable(tableId: Int): ComandaAiResult<Unit> {
-        return safeRunCatching {
-            // First get current table to preserve billId
-            val currentTable = commanderApi.getTable(tableId)
-            commanderApi.updateTable(
-                id = tableId,
-                request = UpdateTableRequest(
-                    billId = currentTable.billId, // Preserve current billId
-                    status = TableStatus.ON_PAYMENT
-                )
+    override suspend fun closeTable(tableId: Int, billId: Int): Table {
+        return commanderApi.updateTable(
+            id = tableId,
+            request = UpdateTableRequest(
+                billId = billId,
+                status = TableStatus.ON_PAYMENT
             )
-            Unit // Convert Table return to Unit
-        }.onFailure { error ->
-            println("Error closing table: $error")
-        }
+        )
     }
 
     override suspend fun getBillByTableId(tableId: Int): Bill {
-        return  commanderApi.getBillByTableId(tableId)
+        return commanderApi.getBillByTableId(tableId)
     }
 
-    override suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Long): ComandaAiResult<Unit> {
+    override suspend fun finishTablePayment(
+        tableId: Int,
+        billId: Int,
+        totalAmount: Long
+    ): ComandaAiResult<Unit> {
         return safeRunCatching {
             val updatedBill = Bill(
                 id = billId,
@@ -88,7 +85,7 @@ internal class TablesRepositoryImp(
                 createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             )
             commanderApi.updateBill(billId, updatedBill)
-            
+
             // Then mark table as FREE and clear billId (null removes the link)
             commanderApi.updateTable(
                 id = tableId,
@@ -141,24 +138,20 @@ internal class TablesRepositoryImp(
         }
     }
 
-    override suspend fun reopenTable(tableId: Int): ComandaAiResult<Unit> {
-        return safeRunCatching {
-            // Get current table to preserve billId
-            val currentTable = commanderApi.getTable(tableId)
-            commanderApi.updateTable(
-                id = tableId,
-                request = UpdateTableRequest(
-                    billId = currentTable.billId, // Preserve current billId
-                    status = TableStatus.OCCUPIED
-                )
+    override suspend fun reopenTable(tableId: Int, billId: Int): Table {
+        return commanderApi.updateTable(
+            id = tableId,
+            request = UpdateTableRequest(
+                billId = billId,
+                status = TableStatus.OCCUPIED
             )
-            Unit
-        }.onFailure { error ->
-            println("Error reopening table: $error")
-        }
+        )
     }
 
-    override suspend fun migrateTable(originTableId: Int, destinationTableId: Int): ComandaAiResult<Pair<Table, Table>> {
+    override suspend fun migrateTable(
+        originTableId: Int,
+        destinationTableId: Int
+    ): ComandaAiResult<Pair<Table, Table>> {
         return safeRunCatching {
             val response = commanderApi.migrateTable(originTableId, destinationTableId)
             Pair(response.originTable, response.destinationTable)

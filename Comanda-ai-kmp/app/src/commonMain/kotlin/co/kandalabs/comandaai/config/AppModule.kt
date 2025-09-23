@@ -1,10 +1,10 @@
 package co.kandalabs.comandaai.config
 
 import co.kandalabs.comandaai.config.sqldelight.createDatabase
+import co.kandalabs.comandaai.core.di.sdkModule
+import co.kandalabs.comandaai.core.logger.ComandaAiLogger
 import co.kandalabs.comandaai.sdk.cache.CacheManager
 import co.kandalabs.comandaai.sdk.cache.CacheManagerImpl
-import co.kandalabs.comandaai.sdk.logger.ComandaAiLogger
-import co.kandalabs.comandaai.sdk.logger.ComandaAiLoggerImpl
 import co.kandalabs.comandaai.presentation.screens.splash.SplashViewModel
 import co.kandalabs.comandaai.sqldelight.db.ComandaAiDatabase
 import de.jensklingenberg.ktorfit.Ktorfit
@@ -25,6 +25,7 @@ import org.kodein.di.instance
 
 object AppModule {
     val appModule = DI.Module("appModule") {
+        import(sdkModule)
         
         // Database
         bindSingleton<ComandaAiDatabase> {
@@ -34,11 +35,6 @@ object AppModule {
         // Cache
         bindSingleton<CacheManager> {
             CacheManagerImpl()
-        }
-
-        // Logger
-        bindSingleton<ComandaAiLogger> {
-            ComandaAiLoggerImpl()
         }
 
         // JSON

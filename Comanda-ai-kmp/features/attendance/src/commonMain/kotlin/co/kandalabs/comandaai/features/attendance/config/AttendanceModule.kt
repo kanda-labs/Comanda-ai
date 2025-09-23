@@ -31,6 +31,7 @@ import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.li
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.migration.TableMigrationViewModel
 import co.kandalabs.comandaai.sdk.session.SessionManager
 import de.jensklingenberg.ktorfit.Ktorfit
+import io.ktor.util.logging.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.kodein.di.DI
@@ -57,7 +58,9 @@ object AttendanceModule {
 
         bindSingleton<OrderRepository> {
             OrderRepositoryImpl(
-                commanderApi = instance()
+                commanderApi = instance(),
+                logger = instance()
+
             )
         }
 

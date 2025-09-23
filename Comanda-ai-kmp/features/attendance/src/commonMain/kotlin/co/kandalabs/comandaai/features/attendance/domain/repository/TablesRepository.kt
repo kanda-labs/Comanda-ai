@@ -14,7 +14,7 @@ interface TablesRepository {
     suspend fun getTableById(id: Int): ComandaAiResult<Table>
     suspend fun getTableOrders(id: Int): ComandaAiResult<List<Order>>
     suspend fun openTable(tableId: Int, tableNumber: Int): ComandaAiResult<Unit>
-    suspend fun closeTable(tableId: Int): ComandaAiResult<Unit>
+    suspend fun closeTable(tableId: Int, billId: Int): Table
     suspend fun getBillByTableId(tableId: Int): Bill
     suspend fun getPaymentSummary(tableId: Int): ComandaAiResult<PaymentSummaryResponse>
     suspend fun finishTablePayment(tableId: Int, billId: Int, totalAmount: Long): ComandaAiResult<Unit>
@@ -27,7 +27,7 @@ interface TablesRepository {
         paymentMethod: PaymentMethod? = null,
         receivedBy: String? = null
     ): ComandaAiResult<PartialPayment>
-    suspend fun reopenTable(tableId: Int): ComandaAiResult<Unit>
+    suspend fun reopenTable(tableId: Int, billId: Int): Table
     suspend fun migrateTable(originTableId: Int, destinationTableId: Int): ComandaAiResult<Pair<Table, Table>>
     suspend fun getFreeTables(): ComandaAiResult<List<Table>>
     suspend fun getPartialPaymentDetails(paymentId: Int): ComandaAiResult<PartialPaymentDetails>

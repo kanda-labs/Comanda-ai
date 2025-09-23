@@ -4,7 +4,6 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Table
 import co.kandalabs.comandaai.features.attendance.domain.repository.TablesRepository
-import co.kandalabs.comandaai.features.attendance.domain.models.enum.PaymentMethod
 import co.kandalabs.comandaai.sdk.coroutinesResult.safeRunCatching
 import co.kandalabs.comandaai.core.session.UserRole
 import co.kandalabs.comandaai.sdk.session.SessionManager
@@ -15,35 +14,6 @@ internal class TablesDetailsViewModel(
     private val sessionManager: SessionManager,
 ) : StateScreenModel<TableDetailsScreenState>(TableDetailsScreenState()) {
 
-    fun setupDetails(table: Table) {
-        screenModelScope.launch {
-            mutableState.emit(TableDetailsScreenState(isLoading = true))
-
-            safeRunCatching {
-                val userSession = sessionManager.getSession()
-                val updatedTable = table.id?.let { tableId ->
-                    repository.getTableById(tableId).fold(
-                        onSuccess = { it },
-                        onFailure = { table }
-                    )
-                } ?: table
-                TableDetailsScreenState(
-                    table = updatedTable,
-                    userSession = userSession,
-                    isLoading = false
-                )
-            }.fold(
-                onSuccess = { tableDetailsScreenState ->
-                    mutableState.emit(tableDetailsScreenState)
-                },
-                onFailure = { error ->
-                    mutableState.emit(
-                        TableDetailsScreenState(isLoading = false, error = error)
-                    )
-                }
-            )
-        }
-    }
 
     fun openTable(table: Table) {
         screenModelScope.launch {
@@ -62,13 +32,13 @@ internal class TablesDetailsViewModel(
             }.fold(
                 onSuccess = {
                     // Fetch updated table data from server to reflect status change
-                    refreshTableData(tableId)
+                    setupDetailsById(tableId)
                 },
                 onFailure = { error ->
                     mutableState.emit(
                         state.value.copy(
                             isLoading = false,
-                            error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException
+                            error = error
                         )
                     )
                 }
@@ -76,45 +46,33 @@ internal class TablesDetailsViewModel(
         }
     }
 
-    private fun refreshTableData(tableId: Int) {
-        screenModelScope.launch {
-            mutableState.emit(state.value.copy(isLoading = true))
-
-            repository.getTableById(tableId).fold(
-                onSuccess = { updatedTable ->
-                    setupDetails(updatedTable)
-                },
-                onFailure = { error ->
-                    mutableState.emit(
-                        state.value.copy(
-                            isLoading = false,
-                            error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException
-                        )
-                    )
-                }
-            )
-        }
-    }
 
     fun closeTable(table: Table, navigateToPayments: () -> Unit) {
         screenModelScope.launch {
             val tableId = table.id ?: return@launch
+            val billId = table.billId ?: return@launch
             safeRunCatching {
-                repository.closeTable(tableId)
+                repository.closeTable(tableId, billId)
             }.fold(
-                onSuccess = {
-                    refreshTableData(tableId)
-
+                onSuccess = { updatedTable ->
                     if (sessionManager.getSession()?.role == UserRole.MANAGER) {
                         navigateToPayments()
                     } else {
-                        mutableState.emit(state.value.copy(showCloseTableConfirmation = false))
+                        val userSession = sessionManager.getSession()
+                        mutableState.emit(
+                            TableDetailsScreenState(
+                                table = updatedTable,
+                                userSession = userSession,
+                                isLoading = false,
+                                showCloseTableConfirmation = false
+                            )
+                        )
                     }
                 },
                 onFailure = { error ->
                     mutableState.emit(
                         state.value.copy(
-                            error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException,
+                            error = error,
                             showCloseTableConfirmation = false
                         )
                     )
@@ -153,29 +111,32 @@ internal class TablesDetailsViewModel(
         if (currentTable != null) {
             val tableId = currentTable.id
             if (tableId != null) {
-                println("🔄 TableDetailsViewModel: Refreshing data for table $tableId")
                 setupDetailsById(tableId)
-            } else {
-                println("⚠️ TableDetailsViewModel: Table ID is null, cannot refresh")
             }
-        } else {
-            println("⚠️ TableDetailsViewModel: Current table is null, cannot refresh")
         }
     }
 
     fun reopenTable(table: Table) {
         screenModelScope.launch {
             val tableId = table.id ?: return@launch
+            val billId = table.billId ?: return@launch
             safeRunCatching {
-                repository.reopenTable(tableId)
+                repository.reopenTable(tableId, billId)
             }.fold(
-                onSuccess = {
-                    // Fetch updated table data from server to reflect status change
-                    refreshTableData(tableId)
+                onSuccess = { updatedTable ->
+                    // Use returned data directly instead of making new API call
+                    val userSession = sessionManager.getSession()
+                    mutableState.emit(
+                        TableDetailsScreenState(
+                            table = updatedTable,
+                            userSession = userSession,
+                            isLoading = false
+                        )
+                    )
                 },
                 onFailure = { error ->
                     mutableState.emit(
-                        state.value.copy(error = error as? co.kandalabs.comandaai.sdk.error.ComandaAiException)
+                        state.value.copy(error = error)
                     )
                 }
             )
