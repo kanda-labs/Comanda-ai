@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import co.kandalabs.comandaai.core.utils.CurrencyFormatter
 
 data class OrderItemData(
     val name: String,
@@ -57,7 +58,7 @@ fun ComandaAiOrderItemCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = formatPrice(item.value),
+                    text = CurrencyFormatter.formatCents(item.value),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
@@ -86,12 +87,3 @@ fun ComandaAiOrderItemCard(
     }
 }
 
-private fun formatPrice(valueInCents: Int): String {
-    val valueInReais = valueInCents / 100.0
-    val formatted = (valueInReais * 100).toInt().let { cents ->
-        val reais = cents / 100
-        val centavos = cents % 100
-        "$reais,${centavos.toString().padStart(2, '0')}"
-    }
-    return "R$ $formatted"
-}

@@ -4,6 +4,7 @@ import co.kandalabs.comandaai.sdk.error.ComandaAiException
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PaymentSummaryResponse
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PartialPayment
 import co.kandalabs.comandaai.tokens.ComandaAiColors
+import co.kandalabs.comandaai.core.utils.CurrencyFormatter
 
 internal data class PaymentSummaryScreenState(
     val isLoading: Boolean = true,
@@ -37,7 +38,7 @@ internal data class PaymentSummaryScreenState(
                 name = itemName,
                 quantity = totalQuantity,
                 price = firstItem.priceFormatted,
-                total = formatCurrency(totalPrice),
+                total = CurrencyFormatter.formatCents(totalPrice),
                 observation = items.mapNotNull { it.observation }.distinct().joinToString("; ").takeIf { it.isNotBlank() }
             )
         } ?: emptyList()
@@ -55,11 +56,6 @@ internal data class PaymentSummaryScreenState(
             )
         } ?: emptyList()
     
-    private fun formatCurrency(amountInCentavos: Long): String {
-        val reais = amountInCentavos / 100
-        val centavos = amountInCentavos % 100
-        return "R$ $reais,${centavos.toString().padStart(2, '0')}"
-    }
     
     private fun parseColor(colorHex: String): ComandaAiColors {
         return when (colorHex) {

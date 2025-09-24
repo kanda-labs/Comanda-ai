@@ -20,7 +20,43 @@ internal class ItemsRepositoryImp(
             safeRunCatching {
                api.getItems()
             }.onFailure { error ->
-                logger.e(error, "Error retrieving breeds -> ${error.message}")
+                logger.e(error, "Error retrieving items -> ${error.message}")
+            }
+        }
+
+    override suspend fun getItemById(id: Int): ComandaAiResult<Item> =
+        withContext(dispatcher) {
+            safeRunCatching {
+                api.getItemById(id)
+            }.onFailure { error ->
+                logger.e(error, "Error retrieving item by id -> ${error.message}")
+            }
+        }
+
+    override suspend fun createItem(item: Item): ComandaAiResult<Item> =
+        withContext(dispatcher) {
+            safeRunCatching {
+                api.createItem(item)
+            }.onFailure { error ->
+                logger.e(error, "Error creating item -> ${error.message}")
+            }
+        }
+
+    override suspend fun updateItem(id: Int, item: Item): ComandaAiResult<Item> =
+        withContext(dispatcher) {
+            safeRunCatching {
+                api.updateItem(id, item)
+            }.onFailure { error ->
+                logger.e(error, "Error updating item -> ${error.message}")
+            }
+        }
+
+    override suspend fun deleteItem(id: Int): ComandaAiResult<Unit> =
+        withContext(dispatcher) {
+            safeRunCatching {
+                api.deleteItem(id)
+            }.onFailure { error ->
+                logger.e(error, "Error deleting item -> ${error.message}")
             }
         }
 }

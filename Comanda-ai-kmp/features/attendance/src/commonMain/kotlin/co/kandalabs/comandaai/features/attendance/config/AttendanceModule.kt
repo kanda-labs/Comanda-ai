@@ -21,6 +21,8 @@ import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.Adm
 import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.UsersManagementViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.UsersListViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.UserDetailsViewModel
+import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.ItemsManagementViewModel
+import co.kandalabs.comandaai.features.attendance.presentation.screens.admin.ItemFormViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSelection.BreedsListingViewModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.order.OrderScreenModel
 import co.kandalabs.comandaai.features.attendance.presentation.screens.ordercontrol.OrderControlViewModel
@@ -201,6 +203,20 @@ object AttendanceModule {
             PaymentHistoryViewModel(
                 repository = instance<TablesRepository>(),
                 sessionManager = instance()
+            )
+        }
+
+        bindProvider<ItemsManagementViewModel> {
+            ItemsManagementViewModel(
+                itemsRepository = instance(),
+                logger = instance()
+            )
+        }
+
+        bindProvider<ItemFormViewModel> {
+            ItemFormViewModel(
+                itemsRepository = instance(),
+                logger = instance()
             )
         }
 

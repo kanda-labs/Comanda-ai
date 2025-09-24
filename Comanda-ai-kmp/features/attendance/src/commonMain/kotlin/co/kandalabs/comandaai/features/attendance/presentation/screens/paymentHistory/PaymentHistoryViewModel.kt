@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import co.kandalabs.comandaai.features.attendance.domain.repository.TablesRepository
 import co.kandalabs.comandaai.features.attendance.domain.models.enum.PaymentMethod
 import co.kandalabs.comandaai.sdk.session.SessionManager
+import co.kandalabs.comandaai.core.utils.CurrencyFormatter
 import kotlinx.coroutines.launch
 
 internal class PaymentHistoryViewModel(
@@ -39,7 +40,7 @@ internal class PaymentHistoryViewModel(
             ).fold(
                 onSuccess = { payments ->
                     val totalAmount = payments.sumOf { it.amountInCentavos }
-                    val totalAmountFormatted = formatCurrency(totalAmount)
+                    val totalAmountFormatted = CurrencyFormatter.formatCents(totalAmount)
 
                     updateState {
                         it.copy(
@@ -165,11 +166,6 @@ internal class PaymentHistoryViewModel(
         loadPaymentHistory()
     }
 
-    private fun formatCurrency(amountInCentavos: Long): String {
-        val reais = amountInCentavos / 100
-        val centavos = amountInCentavos % 100
-        return "R$ $reais,${centavos.toString().padStart(2, '0')}"
-    }
 
     private suspend fun updateState(transform: (PaymentHistoryScreenState) -> PaymentHistoryScreenState) {
         mutableState.emit(transform(state.value))

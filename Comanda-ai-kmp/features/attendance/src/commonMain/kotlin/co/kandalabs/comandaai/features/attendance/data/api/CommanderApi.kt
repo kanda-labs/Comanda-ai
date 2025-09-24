@@ -31,6 +31,18 @@ internal interface CommanderApi {
     @GET("api/v1/items")
     suspend fun getItems(): List<Item>
 
+    @GET("api/v1/items/{id}")
+    suspend fun getItemById(@Path("id") id: Int): Item
+
+    @POST("api/v1/items")
+    suspend fun createItem(@Body item: Item): Item
+
+    @PUT("api/v1/items/{id}")
+    suspend fun updateItem(@Path("id") id: Int, @Body item: Item): Item
+
+    @de.jensklingenberg.ktorfit.http.DELETE("api/v1/items/{id}")
+    suspend fun deleteItem(@Path("id") id: Int)
+
     @GET("api/v1/tables")
     suspend fun getTables(): List<Table>
 
