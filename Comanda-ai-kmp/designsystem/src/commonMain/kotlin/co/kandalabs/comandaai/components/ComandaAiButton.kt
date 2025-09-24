@@ -6,7 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,31 +32,31 @@ fun ComandaAiButton(
     val buttonColors: ButtonColors =
         when (variant) {
             ComandaAiButtonVariant.Primary -> ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                containerColor = ComandaAiTheme.colorScheme.primary,
+                contentColor = ComandaAiTheme.colorScheme.onPrimary,
+                disabledContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                disabledContentColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
             )
 
             ComandaAiButtonVariant.Secondary -> ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                containerColor = ComandaAiTheme.colorScheme.blue200,
+                contentColor = ComandaAiTheme.colorScheme.onSecondary,
+                disabledContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                disabledContentColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
             )
             
             ComandaAiButtonVariant.Destructive -> ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                containerColor = ComandaAiTheme.colorScheme.error,
+                contentColor = ComandaAiTheme.colorScheme.onError,
+                disabledContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                disabledContentColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
             )
         }
 
     val textColor = when (variant) {
-        ComandaAiButtonVariant.Primary -> MaterialTheme.colorScheme.onPrimary
-        ComandaAiButtonVariant.Secondary -> MaterialTheme.colorScheme.onSecondary
-        ComandaAiButtonVariant.Destructive -> MaterialTheme.colorScheme.onError
+        ComandaAiButtonVariant.Primary -> ComandaAiTheme.colorScheme.onPrimary
+        ComandaAiButtonVariant.Secondary -> ComandaAiTheme.colorScheme.onSecondary
+        ComandaAiButtonVariant.Destructive -> ComandaAiTheme.colorScheme.onError
     }
 
     Button(
@@ -86,7 +86,7 @@ fun ComandaAiTextButton(
         content = {
             Text(
                 text = text,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.padding(ComandaAiSpacing.xXSmall.value)
             )
         }

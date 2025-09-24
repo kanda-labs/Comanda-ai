@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,15 +29,15 @@ fun UserAvatar(
         modifier = modifier
             .size(40.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+            .background(ComandaAiTheme.colorScheme.primary.copy(alpha = 0.1f))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         if (!userName.isNullOrEmpty()) {
             Text(
                 text = userName.first().uppercaseChar().toString(),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
+                style = ComandaAiTheme.typography.titleMedium,
+                color = ComandaAiTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
         } else {
@@ -44,7 +45,7 @@ fun UserAvatar(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Avatar do usuário",
                 modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = ComandaAiTheme.colorScheme.primary
             )
         }
     }

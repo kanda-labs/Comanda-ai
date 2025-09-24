@@ -1,5 +1,6 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.order
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.safeDrawing
@@ -9,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +31,6 @@ fun OrderScreenContent(
     tableNumber: String,
     screenModel: OrderScreenModel,
     onBackClick: () -> Unit,
-    onSubmitOrder: () -> Unit,
     onOrderSuccess: () -> Unit,
     onShowFeedback: (isSuccess: Boolean, message: String) -> Unit,
     onNavigateToConfirmation: () -> Unit,
@@ -43,16 +44,12 @@ fun OrderScreenContent(
     val isLoading by screenModel.isLoading.collectAsState()
     val error by screenModel.error.collectAsState()
     val orderSubmitted by screenModel.orderSubmitted.collectAsState()
-    val showConfirmationModal by screenModel.showConfirmationModal.collectAsState()
-    val selectedItemsWithCount by screenModel.selectedItemsWithCount.collectAsState()
     val orderSubmissionState by screenModel.orderSubmissionState.collectAsState()
-    val orderSubmissionError by screenModel.orderSubmissionError.collectAsState()
     val showObservationModal by screenModel.showObservationModal.collectAsState()
     val selectedItemForObservation by screenModel.selectedItemForObservation.collectAsState()
     val currentObservationForSelectedItem by screenModel.currentObservationForSelectedItem.collectAsState()
     val selectedItemHasQuantity by screenModel.selectedItemHasQuantity.collectAsState()
     
-    // Handle order submission success
     LaunchedEffect(orderSubmitted) {
         if (orderSubmitted) {
             screenModel.resetOrderSubmitted()
@@ -60,7 +57,6 @@ fun OrderScreenContent(
         }
     }
     
-    // Handle order submission error
     error?.let { errorMessage ->
         LaunchedEffect(errorMessage) {
             onShowFeedback(false, errorMessage)
@@ -82,6 +78,7 @@ fun OrderScreenContent(
                 if (canSubmit) {
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
+                        color = ComandaAiTheme.colorScheme.gray300,
                         shadowElevation = 8.dp
                     ) {
                         ComandaAiButton(
@@ -99,13 +96,14 @@ fun OrderScreenContent(
         Column(
             modifier = modifier
                 .fillMaxSize()
+                .background(ComandaAiTheme.colorScheme.background )
                 .padding(paddingValues)
         ) {
             // Subtitle
             Text(
                 text = "Fazer pedido",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = ComandaAiTheme.typography.titleMedium,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
             
@@ -132,8 +130,8 @@ fun OrderScreenContent(
                     itemsWithCount.isEmpty() -> {
                         Text(
                             text = "Nenhum item encontrado nesta categoria",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = ComandaAiTheme.typography.bodyMedium,
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }

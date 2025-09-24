@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.domain.ItemCategory
+import co.kandalabs.comandaai.tokens.ComandaAiColors
 
 @Composable
 fun CategoryTabs(
@@ -45,16 +47,27 @@ private fun CategoryTab(
         ItemCategory.SNACK -> "Petiscos"
         ItemCategory.PROMOTIONAL -> "Promoções"
     }
-    
+    val color = if (isSelected)
+        FilterChipDefaults.filterChipColors(
+            containerColor = ComandaAiTheme.colorScheme.primary,
+            labelColor = ComandaAiTheme.colorScheme.onPrimary
+        )
+    else
+        FilterChipDefaults.filterChipColors(
+            containerColor = ComandaAiTheme.colorScheme.secondary,
+            labelColor = ComandaAiTheme.colorScheme.onSecondary
+        )
+
     FilterChip(
         selected = isSelected,
         onClick = onClick,
-        label = { 
+        label = {
             Text(
                 text = displayName,
-                style = MaterialTheme.typography.labelMedium
-            ) 
+                style = ComandaAiTheme.typography.labelMedium
+            )
         },
+        colors = color,
         modifier = modifier
     )
 }

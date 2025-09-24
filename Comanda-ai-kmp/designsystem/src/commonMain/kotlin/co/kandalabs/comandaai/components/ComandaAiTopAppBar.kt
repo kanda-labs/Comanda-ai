@@ -7,10 +7,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,7 +35,7 @@ fun ComandaAiTopAppBar(
                 modifier = Modifier.fillMaxWidth()
                     .padding(end = if (icon != null) ButtonSizeOffset else 0.dp),
                 text = title,
-                style = MaterialTheme.typography.displayMedium,
+                style = ComandaAiTheme.typography.displayMedium,
                 textAlign = TextAlign.Center
             )
         },
@@ -45,7 +45,7 @@ fun ComandaAiTopAppBar(
                     Icon(
                         contentDescription = ActionButtonDescription,
                         imageVector = safeIcon,
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = ComandaAiTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -54,8 +54,8 @@ fun ComandaAiTopAppBar(
             actions()
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground
+            containerColor = ComandaAiTheme.colorScheme.background,
+            titleContentColor = ComandaAiTheme.colorScheme.onBackground
         )
     )
 }

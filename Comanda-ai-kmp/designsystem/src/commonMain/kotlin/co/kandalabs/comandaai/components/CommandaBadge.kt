@@ -20,16 +20,16 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  * Um componente Badge genérico para exibir labels de status.
  * 
  * @param text O texto a ser exibido no badge
- * @param containerColor A cor de fundo do badge (padrão: ComandaAiColors.Primary)
- * @param contentColor A cor do texto no badge (padrão: ComandaAiColors.OnPrimary)
+ * @param containerColor A cor de fundo do badge (padrão: ComandaAiTheme.colorScheme.primary)
+ * @param contentColor A cor do texto no badge (padrão: ComandaAiTheme.colorScheme.onPrimary)
  * @param textStyle O estilo do texto no badge (padrão: ComandaAiTypography.bodyMedium)
  * @param modifier Modificador opcional para personalização adicional
  */
 @Composable
 fun CommandaBadge(
     text: String,
-    containerColor: Color = ComandaAiColors.Primary.value,
-    contentColor: Color = ComandaAiColors.OnPrimary.value,
+    containerColor: Color = ComandaAiTheme.colorScheme.primary,
+    contentColor: Color = ComandaAiTheme.colorScheme.onPrimary,
     textStyle: TextStyle = LocalComandaAiTypography.current.bodyMedium,
     modifier: Modifier = Modifier
 ) {
@@ -56,8 +56,8 @@ private fun CommandaBadgePreview() {
     ComandaAiTheme {
         CommandaBadge(
             text = "Aberto",
-            containerColor = ComandaAiColors.Green500.value,
-            contentColor = ComandaAiColors.Surface.value
+            containerColor = ComandaAiTheme.colorScheme.green500,
+            contentColor = ComandaAiTheme.colorScheme.surface
         )
     }
 }
@@ -78,8 +78,8 @@ private fun CommandaBadgeWarningPreview() {
     ComandaAiTheme {
         CommandaBadge(
             text = "Pendente",
-            containerColor = ComandaAiColors.Yellow600.value,
-            contentColor = ComandaAiColors.Gray900.value
+            containerColor = ComandaAiTheme.colorScheme.yellow600,
+            contentColor = ComandaAiTheme.colorScheme.gray900
         )
     }
 }
@@ -90,8 +90,8 @@ private fun CommandaBadgeErrorPreview() {
     ComandaAiTheme {
         CommandaBadge(
             text = "Erro",
-            containerColor = ComandaAiColors.Error.value,
-            contentColor = ComandaAiColors.OnError.value
+            containerColor = ComandaAiTheme.colorScheme.error,
+            contentColor = ComandaAiTheme.colorScheme.onError
         )
     }
 }

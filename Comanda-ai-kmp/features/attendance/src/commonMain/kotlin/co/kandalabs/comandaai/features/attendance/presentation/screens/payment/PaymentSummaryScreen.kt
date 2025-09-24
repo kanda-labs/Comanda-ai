@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Card
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -140,7 +141,7 @@ private fun PaymentSummaryScreenContent(
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = ComandaAiTheme.colorScheme.background
         ) {
             when {
                 state.isLoading -> ComandaAiLoadingView(
@@ -166,7 +167,7 @@ private fun PaymentSummaryScreenContent(
                     Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
                     Text(
                         text = state.contentTitle,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = ComandaAiTheme.colorScheme.onBackground,
                         style = ComandaAiTypography.labelLarge,
                         modifier = Modifier.padding(horizontal = ComandaAiSpacing.Medium.value)
                     )
@@ -181,7 +182,7 @@ private fun PaymentSummaryScreenContent(
                     Text(
                         "Itens da conta",
                         modifier = Modifier.padding(horizontal = ComandaAiSpacing.Medium.value),
-                        color = ComandaAiColors.Gray700.value,
+                        color = ComandaAiTheme.colorScheme.gray700,
                         style = ComandaAiTypography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
@@ -196,7 +197,7 @@ private fun PaymentSummaryScreenContent(
                                 Text(
                                     text = "Nenhum item encontrado para esta mesa",
                                     style = ComandaAiTypography.bodyLarge,
-                                    color = ComandaAiColors.Gray600.value,
+                                    color = ComandaAiTheme.colorScheme.gray600,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(ComandaAiSpacing.Medium.value),
@@ -216,7 +217,7 @@ private fun PaymentSummaryScreenContent(
                                 Text(
                                     "Pagamentos realizados",
                                     style = ComandaAiTypography.titleMedium,
-                                    color = ComandaAiColors.Gray700.value,
+                                    color = ComandaAiTheme.colorScheme.gray700,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
@@ -263,7 +264,7 @@ private fun PaymentSummaryScreenContent(
 private fun CompiledItemCard(item: PaymentItemState) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = ComandaAiTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -280,7 +281,7 @@ private fun CompiledItemCard(item: PaymentItemState) {
                         text = item.quantityText,
                         style = ComandaAiTypography.bodyMedium,
                         fontWeight = FontWeight.Medium,
-                        color = ComandaAiColors.Gray600.value
+                        color = ComandaAiTheme.colorScheme.gray600
                     )
                     Text(
                         text = " ${item.name}",
@@ -295,7 +296,7 @@ private fun CompiledItemCard(item: PaymentItemState) {
                         Text(
                             text = "Obs: $obs",
                             style = ComandaAiTypography.bodySmall,
-                            color = ComandaAiColors.Gray500.value
+                            color = ComandaAiTheme.colorScheme.gray500
                         )
                     }
                 }
@@ -305,13 +306,13 @@ private fun CompiledItemCard(item: PaymentItemState) {
                 Text(
                     text = item.formattedPrice,
                     style = ComandaAiTypography.bodyMedium,
-                    color = ComandaAiColors.Gray600.value
+                    color = ComandaAiTheme.colorScheme.gray600
                 )
                 Text(
                     text = item.formattedTotal,
                     style = ComandaAiTypography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = ComandaAiColors.Primary.value
+                    color = ComandaAiTheme.colorScheme.primary
                 )
             }
         }
@@ -326,7 +327,7 @@ private fun PaymentSummarySection(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = ComandaAiSpacing.Medium.value),
-        colors = CardDefaults.cardColors(containerColor = ComandaAiColors.Surface.value),
+        colors = CardDefaults.cardColors(containerColor = ComandaAiTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -343,13 +344,13 @@ private fun PaymentSummarySection(
                 Text(
                     text = "Total da conta:",
                     style = ComandaAiTypography.bodyLarge,
-                    color = ComandaAiColors.OnSurface.value
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
                 Text(
                     text = state.totalAmountPresentation,
                     style = ComandaAiTypography.bodyLarge,
                     fontWeight = FontWeight.Medium,
-                    color = ComandaAiColors.OnSurface.value
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
             }
 
@@ -363,19 +364,19 @@ private fun PaymentSummarySection(
                     Text(
                         text = "Já foi pago:",
                         style = ComandaAiTypography.bodyMedium,
-                        color = ComandaAiColors.Green500.value
+                        color = ComandaAiTheme.colorScheme.green500
                     )
                     Text(
                         text = state.totalPaidPresentation,
                         style = ComandaAiTypography.bodyMedium,
                         fontWeight = FontWeight.Medium,
-                        color = ComandaAiColors.Green500.value
+                        color = ComandaAiTheme.colorScheme.green500
                     )
                 }
 
                 Spacer(modifier = Modifier.height(ComandaAiSpacing.xSmall.value))
                 HorizontalDivider(
-                    color = ComandaAiColors.Gray300.value,
+                    color = ComandaAiTheme.colorScheme.gray300,
                     modifier = Modifier.padding(vertical = ComandaAiSpacing.xSmall.value)
                 )
 
@@ -388,13 +389,13 @@ private fun PaymentSummarySection(
                         text = "Falta pagar:",
                         style = ComandaAiTypography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (state.isFullyPaid) ComandaAiColors.Green500.value else ComandaAiColors.Primary.value
+                        color = if (state.isFullyPaid) ComandaAiTheme.colorScheme.green500 else ComandaAiTheme.colorScheme.primary
                     )
                     Text(
                         text = state.remainingAmountPresentation,
                         style = ComandaAiTypography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (state.isFullyPaid) ComandaAiColors.Green500.value else ComandaAiColors.Primary.value
+                        color = if (state.isFullyPaid) ComandaAiTheme.colorScheme.green500 else ComandaAiTheme.colorScheme.primary
                     )
                 }
             }
@@ -411,7 +412,7 @@ private fun PartialPaymentCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = ComandaAiColors.Green50.value),
+        colors = CardDefaults.cardColors(containerColor = ComandaAiTheme.colorScheme.green50),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
@@ -426,7 +427,7 @@ private fun PartialPaymentCard(
                 text = payment.displayDescription,
                 style = ComandaAiTypography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = ComandaAiColors.OnSurface.value,
+                color = ComandaAiTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)
             )
 
@@ -438,13 +439,13 @@ private fun PartialPaymentCard(
                     text = payment.amount,
                     style = ComandaAiTypography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = ComandaAiColors.Green500.value
+                    color = ComandaAiTheme.colorScheme.green500
                 )
 
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "Ver detalhes",
-                    tint = ComandaAiColors.Gray500.value,
+                    tint = ComandaAiTheme.colorScheme.gray500,
                     modifier = Modifier
                         .padding(start = ComandaAiSpacing.Small.value)
                         .size(20.dp)
@@ -463,12 +464,12 @@ private fun PaymentSummaryBottom(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(ComandaAiTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(ComandaAiSpacing.Large.value)
         ) {
-            HorizontalDivider(color = ComandaAiColors.Gray300.value)
+            HorizontalDivider(color = ComandaAiTheme.colorScheme.gray300)
 
             Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
 
@@ -477,7 +478,7 @@ private fun PaymentSummaryBottom(
                     text = "✅ Conta totalmente paga!",
                     style = ComandaAiTypography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = ComandaAiColors.Green500.value,
+                    color = ComandaAiTheme.colorScheme.green500,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )

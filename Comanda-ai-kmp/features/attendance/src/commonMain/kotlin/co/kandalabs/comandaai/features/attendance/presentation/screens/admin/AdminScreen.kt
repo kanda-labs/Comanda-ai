@@ -52,6 +52,7 @@ import co.kandalabs.comandaai.sdk.session.UserSession
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.listing.components.UserProfileModal
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.components.ComandaAiLoadingView
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import org.jetbrains.compose.resources.painterResource
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import comandaai.features.attendance.generated.resources.Res
@@ -140,7 +141,7 @@ private fun AdminScreenContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(ComandaAiTheme.colorScheme.background)
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
                 ComandaAiTopAppBar(
@@ -216,7 +217,7 @@ private fun AdminOptionCard(
             .clip(RoundedCornerShape(ComandaAiSpacing.Medium.value))
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = ComandaAiTheme.colorScheme.primaryContainer
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -230,7 +231,7 @@ private fun AdminOptionCard(
             Icon(
                 imageVector = option.icon,
                 contentDescription = option.title,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                tint = ComandaAiTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.padding(bottom = ComandaAiSpacing.Small.value)
             )
             
@@ -238,14 +239,14 @@ private fun AdminOptionCard(
                 text = option.title,
                 style = ComandaAiTypography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = ComandaAiTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center
             )
             
             Text(
                 text = option.description,
                 style = ComandaAiTypography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                color = ComandaAiTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = ComandaAiSpacing.xXSmall.value)
             )
@@ -260,7 +261,7 @@ private fun UnauthorizedView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(ComandaAiTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .padding(ComandaAiSpacing.Large.value),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -270,14 +271,14 @@ private fun UnauthorizedView(
             text = "Acesso Negado",
             style = ComandaAiTypography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.error,
+            color = ComandaAiTheme.colorScheme.error,
             textAlign = TextAlign.Center
         )
         
         Text(
             text = "Apenas administradores e gerentes podem acessar esta área.",
             style = ComandaAiTypography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = ComandaAiTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(
                 top = ComandaAiSpacing.Medium.value,
@@ -288,14 +289,14 @@ private fun UnauthorizedView(
         IconButton(
             onClick = onNavigateBack,
             modifier = Modifier.background(
-                MaterialTheme.colorScheme.primaryContainer,
+                ComandaAiTheme.colorScheme.primaryContainer,
                 RoundedCornerShape(ComandaAiSpacing.Medium.value)
             )
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Voltar",
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = ComandaAiTheme.colorScheme.onPrimaryContainer
             )
         }
     }
@@ -309,7 +310,7 @@ private fun SimpleErrorView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(ComandaAiTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .padding(ComandaAiSpacing.Large.value),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -319,14 +320,14 @@ private fun SimpleErrorView(
             text = "Erro",
             style = ComandaAiTypography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.error,
+            color = ComandaAiTheme.colorScheme.error,
             textAlign = TextAlign.Center
         )
         
         Text(
             text = errorMessage,
             style = ComandaAiTypography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = ComandaAiTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(
                 top = ComandaAiSpacing.Medium.value,
@@ -337,13 +338,13 @@ private fun SimpleErrorView(
         IconButton(
             onClick = onRetry,
             modifier = Modifier.background(
-                MaterialTheme.colorScheme.primaryContainer,
+                ComandaAiTheme.colorScheme.primaryContainer,
                 RoundedCornerShape(ComandaAiSpacing.Medium.value)
             )
         ) {
             Text(
                 text = "Tentar novamente",
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = ComandaAiTheme.colorScheme.onPrimaryContainer
             )
         }
     }

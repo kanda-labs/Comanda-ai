@@ -1,17 +1,31 @@
 package co.kandalabs.comandaai.auth.presentation.login
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -23,13 +37,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -73,7 +85,7 @@ private fun LoginScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ComandaAiColors.Background.value)
+            .background(ComandaAiTheme.colorScheme.background)
             .padding(ComandaAiSpacing.Medium.value)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,9 +96,9 @@ private fun LoginScreenContent(
         // Logo/Title
         Text(
             text = "ComandaAi!",
-            style = MaterialTheme.typography.headlineLarge,
+            style = ComandaAiTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            color = ComandaAiColors.Primary.value,
+            color = ComandaAiTheme.colorScheme.primary,
             textAlign = TextAlign.Center
         )
 
@@ -95,8 +107,8 @@ private fun LoginScreenContent(
         // Subtitle
         Text(
             text = "Faça login para continuar",
-            style = MaterialTheme.typography.bodyLarge,
-            color = ComandaAiColors.Gray700.value,
+            style = ComandaAiTheme.typography.bodyLarge,
+            color = ComandaAiTheme.colorScheme.gray700,
             textAlign = TextAlign.Center
         )
 
@@ -115,8 +127,8 @@ private fun LoginScreenContent(
                 state.usernameError?.let { error ->
                     Text(
                         text = error,
-                        color = ComandaAiColors.Error.value,
-                        style = MaterialTheme.typography.bodySmall
+                        color = ComandaAiTheme.colorScheme.error,
+                        style = ComandaAiTheme.typography.bodySmall
                     )
                 }
             },
@@ -129,16 +141,16 @@ private fun LoginScreenContent(
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = ComandaAiColors.Primary.value,
-                unfocusedBorderColor = ComandaAiColors.Gray400.value,
-                errorBorderColor = ComandaAiColors.Error.value,
-                focusedLabelColor = ComandaAiColors.Primary.value,
-                unfocusedLabelColor = ComandaAiColors.Gray600.value,
-                errorLabelColor = ComandaAiColors.Error.value,
-                focusedTextColor = ComandaAiColors.OnBackground.value,
-                unfocusedTextColor = ComandaAiColors.OnBackground.value,
-                focusedPlaceholderColor = ComandaAiColors.Gray500.value,
-                unfocusedPlaceholderColor = ComandaAiColors.Gray500.value
+                focusedBorderColor = ComandaAiTheme.colorScheme.primary,
+                unfocusedBorderColor = ComandaAiTheme.colorScheme.gray400,
+                errorBorderColor = ComandaAiTheme.colorScheme.error,
+                focusedLabelColor = ComandaAiTheme.colorScheme.primary,
+                unfocusedLabelColor = ComandaAiTheme.colorScheme.gray600,
+                errorLabelColor = ComandaAiTheme.colorScheme.error,
+                focusedTextColor = ComandaAiTheme.colorScheme.onBackground,
+                unfocusedTextColor = ComandaAiTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = ComandaAiTheme.colorScheme.gray500,
+                unfocusedPlaceholderColor = ComandaAiTheme.colorScheme.gray500
             )
         )
 
@@ -157,8 +169,8 @@ private fun LoginScreenContent(
                 state.passwordError?.let { error ->
                     Text(
                         text = error,
-                        color = ComandaAiColors.Error.value,
-                        style = MaterialTheme.typography.bodySmall
+                        color = ComandaAiTheme.colorScheme.error,
+                        style = ComandaAiTheme.typography.bodySmall
                     )
                 }
             },
@@ -170,8 +182,8 @@ private fun LoginScreenContent(
                 TextButton(onClick = onTogglePasswordVisibility) {
                     Text(
                         text = if (state.isPasswordVisible) "Ocultar" else "Mostrar",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = ComandaAiColors.Primary.value
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.primary
                     )
                 }
             },
@@ -189,16 +201,16 @@ private fun LoginScreenContent(
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = ComandaAiColors.Primary.value,
-                unfocusedBorderColor = ComandaAiColors.Gray400.value,
-                errorBorderColor = ComandaAiColors.Error.value,
-                focusedLabelColor = ComandaAiColors.Primary.value,
-                unfocusedLabelColor = ComandaAiColors.Gray600.value,
-                errorLabelColor = ComandaAiColors.Error.value,
-                focusedTextColor = ComandaAiColors.OnBackground.value,
-                unfocusedTextColor = ComandaAiColors.OnBackground.value,
-                focusedPlaceholderColor = ComandaAiColors.Gray500.value,
-                unfocusedPlaceholderColor = ComandaAiColors.Gray500.value
+                focusedBorderColor = ComandaAiTheme.colorScheme.primary,
+                unfocusedBorderColor = ComandaAiTheme.colorScheme.gray400,
+                errorBorderColor = ComandaAiTheme.colorScheme.error,
+                focusedLabelColor = ComandaAiTheme.colorScheme.primary,
+                unfocusedLabelColor = ComandaAiTheme.colorScheme.gray600,
+                errorLabelColor = ComandaAiTheme.colorScheme.error,
+                focusedTextColor = ComandaAiTheme.colorScheme.onBackground,
+                unfocusedTextColor = ComandaAiTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = ComandaAiTheme.colorScheme.gray500,
+                unfocusedPlaceholderColor = ComandaAiTheme.colorScheme.gray500
             )
         )
 
@@ -219,14 +231,14 @@ private fun LoginScreenContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = ComandaAiColors.Error.value.copy(alpha = 0.1f)
+                    containerColor = ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f)
                 ),
                 shape = RoundedCornerShape(ComandaAiSpacing.Small.value)
             ) {
                 Text(
                     text = error.message,
-                    color = ComandaAiColors.Error.value,
-                    style = MaterialTheme.typography.bodyMedium,
+                    color = ComandaAiTheme.colorScheme.error,
+                    style = ComandaAiTheme.typography.bodyMedium,
                     modifier = Modifier.padding(ComandaAiSpacing.Medium.value),
                     textAlign = TextAlign.Center
                 )
@@ -245,7 +257,7 @@ private fun LoginScreenContent(
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
-                color = ComandaAiColors.Primary.value
+                color = ComandaAiTheme.colorScheme.primary
             )
         }
     }

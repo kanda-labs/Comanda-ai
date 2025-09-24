@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Icon
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +51,7 @@ internal fun TimePicker(
             .clip(RoundedCornerShape(4.dp))
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
+                color = ComandaAiTheme.colorScheme.outline,
                 shape = RoundedCornerShape(4.dp)
             )
             .clickable { onShowTimePicker() }
@@ -61,20 +62,20 @@ internal fun TimePicker(
         Column {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = ComandaAiTheme.typography.bodySmall,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                style = ComandaAiTheme.typography.bodyLarge,
+                color = ComandaAiTheme.colorScheme.onSurface
             )
         }
 
         Icon(
             imageVector = Icons.Default.Schedule,
             contentDescription = "Selecionar hora",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = ComandaAiTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -162,9 +163,9 @@ private fun TimeSelector(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.titleMedium,
+            style = ComandaAiTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = ComandaAiTheme.colorScheme.onSurface
         )
 
         Row(
@@ -186,16 +187,16 @@ private fun TimeSelector(
                 modifier = Modifier
                     .size(80.dp)
                     .background(
-                        MaterialTheme.colorScheme.primaryContainer,
+                        ComandaAiTheme.colorScheme.primaryContainer,
                         RoundedCornerShape(16.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = value.toString().padStart(2, '0'),
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = ComandaAiTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = ComandaAiTheme.colorScheme.onPrimaryContainer
                 )
             }
 
@@ -230,7 +231,7 @@ private fun AnimatedButton(
             .size(56.dp)
             .scale(scale)
             .background(
-                MaterialTheme.colorScheme.primary,
+                ComandaAiTheme.colorScheme.primary,
                 CircleShape
             )
             .clickable {
@@ -243,7 +244,7 @@ private fun AnimatedButton(
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.onPrimary,
+            tint = ComandaAiTheme.colorScheme.onPrimary,
             modifier = Modifier.size(24.dp)
         )
     }

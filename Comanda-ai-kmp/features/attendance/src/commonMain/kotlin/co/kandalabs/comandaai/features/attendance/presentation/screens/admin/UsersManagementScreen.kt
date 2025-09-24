@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -76,7 +77,7 @@ public object UsersManagementScreen : Screen {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = { navigator?.push(CreateUserScreen) },
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = ComandaAiTheme.colorScheme.primary
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -89,7 +90,7 @@ public object UsersManagementScreen : Screen {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(ComandaAiTheme.colorScheme.background)
             ) {
                 when {
                     uiState.isLoading -> {
@@ -108,7 +109,7 @@ public object UsersManagementScreen : Screen {
                             Text(
                                 text = "Nenhum usuário cadastrado",
                                 style = ComandaAiTypography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = ComandaAiTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -149,7 +150,7 @@ private fun UserCard(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = ComandaAiTheme.colorScheme.surface
         )
     ) {
         Row(
@@ -162,13 +163,13 @@ private fun UserCard(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
+                    .background(ComandaAiTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = ComandaAiTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -182,12 +183,12 @@ private fun UserCard(
                     text = user.name,
                     style = ComandaAiTypography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
                 Text(
                     text = getRoleDisplayName(user.role),
                     style = ComandaAiTypography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -195,13 +196,13 @@ private fun UserCard(
                 Card(
                     shape = RoundedCornerShape(4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
+                        containerColor = ComandaAiTheme.colorScheme.errorContainer
                     )
                 ) {
                     Text(
                         text = "Inativo",
                         style = ComandaAiTypography.labelSmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        color = ComandaAiTheme.colorScheme.onErrorContainer,
                         modifier = Modifier.padding(
                             horizontal = ComandaAiSpacing.Small.value,
                             vertical = 4.dp

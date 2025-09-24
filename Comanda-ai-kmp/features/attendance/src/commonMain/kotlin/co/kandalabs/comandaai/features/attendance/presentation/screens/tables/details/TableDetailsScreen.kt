@@ -196,7 +196,7 @@ private fun TableDetailsScreenContent(
     ComandaAiTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = ComandaAiTheme.colorScheme.background
         ) {
             if (state.isLoading) {
                 ComandaAiLoadingView(
@@ -225,7 +225,7 @@ private fun TableDetailsScreenContent(
                                     Icon(
                                         imageVector = Icons.Default.SwapHoriz,
                                         contentDescription = "Migrar mesa",
-                                        tint = MaterialTheme.colorScheme.onBackground
+                                        tint = ComandaAiTheme.colorScheme.onBackground
                                     )
                                 }
                             }
@@ -243,7 +243,7 @@ private fun TableDetailsScreenContent(
                     ) {
                         Text(
                             text = state.contentTitle,
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = ComandaAiTheme.colorScheme.onBackground,
                             style = ComandaAiTypography.labelLarge,
                             modifier = Modifier.weight(2f)
                         )
@@ -265,7 +265,7 @@ private fun TableDetailsScreenContent(
                         "Pedidos",
                         modifier = Modifier
                             .padding(horizontal = ComandaAiSpacing.Medium.value),
-                        color = ComandaAiColors.Gray700.value,
+                        color = ComandaAiTheme.colorScheme.gray700,
                         style = ComandaAiTypography.titleMedium
                     )
 

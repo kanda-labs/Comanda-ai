@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Card
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -153,7 +154,7 @@ private fun TableMigrationScreenContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(ComandaAiTheme.colorScheme.background)
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
                 ComandaAiTopAppBar(
@@ -167,7 +168,7 @@ private fun TableMigrationScreenContent(
                 Text(
                     text = "Selecione o novo número de mesa",
                     style = ComandaAiTypography.titleMedium,
-                    color = ComandaAiColors.Gray700.value,
+                    color = ComandaAiTheme.colorScheme.gray700,
                     modifier = Modifier
                         .padding(horizontal = ComandaAiSpacing.Medium.value)
                 )
@@ -211,13 +212,13 @@ private fun TableMigrationScreenContent(
                 title = {
                     Text(
                         text = "Erro na migração",
-                        style = MaterialTheme.typography.headlineSmall
+                        style = ComandaAiTheme.typography.headlineSmall
                     )
                 },
                 text = {
                     Text(
                         text = errorMessage,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = ComandaAiTheme.typography.bodyMedium
                     )
                 },
                 confirmButton = {
@@ -250,7 +251,7 @@ private fun FreeTableItem(
             .aspectRatio(1f)
             .clip(RoundedCornerShape(8.dp)),
         colors = CardDefaults.cardColors(
-            containerColor = ComandaAiColors.Green100.value
+            containerColor = ComandaAiTheme.colorScheme.green100
         )
     ) {
         Box(
@@ -261,7 +262,7 @@ private fun FreeTableItem(
         ) {
             Text(
                 text = table.number.toString(),
-                color = ComandaAiColors.Green800.value,
+                color = ComandaAiTheme.colorScheme.green800,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 style = ComandaAiTypography.displayLarge
@@ -303,14 +304,14 @@ private fun TableMigrationConfirmationModal(
             Text(
                 text = "Você está prestes a migrar a conta da mesa ${originTable.number} para a mesa ${destinationTable.number}.",
                 style = ComandaAiTypography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = ComandaAiTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = ComandaAiSpacing.Medium.value)
             )
             
             Text(
                 text = "Esta ação não pode ser desfeita.",
                 style = ComandaAiTypography.bodyMedium,
-                color = ComandaAiColors.Gray600.value
+                color = ComandaAiTheme.colorScheme.gray600
             )
         }
     }

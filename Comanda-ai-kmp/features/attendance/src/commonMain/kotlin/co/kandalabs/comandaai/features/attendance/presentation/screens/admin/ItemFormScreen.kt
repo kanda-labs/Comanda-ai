@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +24,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -51,7 +49,6 @@ import co.kandalabs.comandaai.components.ComandaAiTopAppBar
 import co.kandalabs.comandaai.domain.ItemCategory
 import co.kandalabs.comandaai.theme.ComandaAiTheme
 import co.kandalabs.comandaai.theme.ComandaAiTypography
-import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 
 data class ItemFormScreen(val itemId: Int?) : Screen {
@@ -88,7 +85,7 @@ data class ItemFormScreen(val itemId: Int?) : Screen {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .background(MaterialTheme.colorScheme.background)
+                        .background(ComandaAiTheme.colorScheme.background)
                 ) {
                     when {
                         uiState.isLoading -> {
@@ -119,7 +116,7 @@ data class ItemFormScreen(val itemId: Int?) : Screen {
                                     uiState.nameError?.let {
                                         Text(
                                             text = it,
-                                            color = MaterialTheme.colorScheme.error,
+                                            color = ComandaAiTheme.colorScheme.error,
                                             style = ComandaAiTypography.bodySmall,
                                             modifier = Modifier.padding(top = 4.dp)
                                         )
@@ -148,7 +145,7 @@ data class ItemFormScreen(val itemId: Int?) : Screen {
                                     uiState.priceError?.let {
                                         Text(
                                             text = it,
-                                            color = MaterialTheme.colorScheme.error,
+                                            color = ComandaAiTheme.colorScheme.error,
                                             style = ComandaAiTypography.bodySmall,
                                             modifier = Modifier.padding(top = 4.dp)
                                         )
@@ -156,7 +153,7 @@ data class ItemFormScreen(val itemId: Int?) : Screen {
 
                                     Text(
                                         text = "💡 Dica: Defina o preço como R$ 0,00 para desativar o item",
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                                         style = ComandaAiTypography.bodySmall,
                                         modifier = Modifier.padding(top = 4.dp)
                                     )
@@ -200,7 +197,7 @@ data class ItemFormScreen(val itemId: Int?) : Screen {
                                     uiState.categoryError?.let {
                                         Text(
                                             text = it,
-                                            color = MaterialTheme.colorScheme.error,
+                                            color = ComandaAiTheme.colorScheme.error,
                                             style = ComandaAiTypography.bodySmall,
                                             modifier = Modifier.padding(top = 4.dp)
                                         )
@@ -211,12 +208,12 @@ data class ItemFormScreen(val itemId: Int?) : Screen {
                                         Card(
                                             modifier = Modifier.fillMaxWidth(),
                                             colors = CardDefaults.cardColors(
-                                                containerColor = MaterialTheme.colorScheme.errorContainer
+                                                containerColor = ComandaAiTheme.colorScheme.errorContainer
                                             )
                                         ) {
                                             Text(
                                                 text = error,
-                                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                                color = ComandaAiTheme.colorScheme.onErrorContainer,
                                                 style = ComandaAiTypography.bodyMedium,
                                                 modifier = Modifier.padding(ComandaAiSpacing.Medium.value)
                                             )
@@ -274,7 +271,7 @@ data class ItemFormScreen(val itemId: Int?) : Screen {
                         Text(
                             text = "Tem certeza que deseja deletar este item? Esta ação não pode ser desfeita.",
                             style = ComandaAiTypography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = ComandaAiTheme.colorScheme.onSurface
                         )
 
                         Column(

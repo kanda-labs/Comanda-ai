@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Card
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -98,7 +99,7 @@ private fun PartialPaymentDetailsScreenContent(
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = ComandaAiTheme.colorScheme.background
         ) {
             if (state.isLoading) {
                 ComandaAiLoadingView(
@@ -132,7 +133,7 @@ private fun PartialPaymentDetailsScreenContent(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
+                                containerColor = ComandaAiTheme.colorScheme.surface
                             ),
                             shape = RoundedCornerShape(12.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -146,12 +147,12 @@ private fun PartialPaymentDetailsScreenContent(
                                 PaymentDetailRow(
                                     label = "Valor",
                                     value = state.payment?.amountFormatted ?: "",
-                                    valueColor = ComandaAiColors.Green500.value,
+                                    valueColor = ComandaAiTheme.colorScheme.green500,
                                     isHighlighted = true
                                 )
 
                                 Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
-                                HorizontalDivider(color = ComandaAiColors.Gray300.value)
+                                HorizontalDivider(color = ComandaAiTheme.colorScheme.gray300)
                                 Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
 
                                 // Paid By
@@ -246,7 +247,7 @@ private fun PartialPaymentDetailsScreenContent(
 private fun PaymentDetailRow(
     label: String,
     value: String,
-    valueColor: Color = ComandaAiColors.OnSurface.value,
+    valueColor: Color = ComandaAiTheme.colorScheme.onSurface,
     isHighlighted: Boolean = false
 ) {
     Row(
@@ -257,7 +258,7 @@ private fun PaymentDetailRow(
         Text(
             text = label,
             style = ComandaAiTypography.bodyMedium,
-            color = ComandaAiColors.Gray600.value
+            color = ComandaAiTheme.colorScheme.gray600
         )
 
         Text(
@@ -300,7 +301,7 @@ private fun CancelPaymentConfirmationModal(
         Text(
             text = "Cancelar pagamento de $amount?",
             style = ComandaAiTypography.bodyMedium,
-            color = ComandaAiColors.Gray700.value,
+            color = ComandaAiTheme.colorScheme.gray700,
             modifier = Modifier.padding(20.dp)
         )
     }

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DropdownMenuItem
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -114,7 +115,7 @@ data class UserDetailsScreen(val userId: Int) : Screen {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(ComandaAiTheme.colorScheme.background)
                 .windowInsetsPadding(WindowInsets.safeDrawing)
         ) {
             ComandaAiTopAppBar(
@@ -245,7 +246,7 @@ data class UserDetailsScreen(val userId: Int) : Screen {
                                 Text(
                                     text = if (isActive) "Ativo" else "Inativo",
                                     style = ComandaAiTypography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = ComandaAiTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Switch(

@@ -3,9 +3,9 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.tables.d
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -42,8 +42,8 @@ internal fun CloseTableConfirmationModal(
     ) {
         Text(
             text = "Tem certeza que deseja fechar a conta da Mesa ${tableNumber.toString().padStart(2, '0')}?",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
+            style = ComandaAiTheme.typography.bodyLarge,
+            color = ComandaAiTheme.colorScheme.onSurface,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp, vertical = 16.dp)

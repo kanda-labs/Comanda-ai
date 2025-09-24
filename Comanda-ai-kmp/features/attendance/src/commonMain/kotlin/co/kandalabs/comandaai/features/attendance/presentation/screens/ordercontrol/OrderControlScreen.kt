@@ -29,6 +29,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -170,10 +171,10 @@ private fun OrderControlScreenContent(
     onDismissDeliverAllModal: () -> Unit,
     onDismissCancelOrderModal: () -> Unit
 ) {
-    MaterialTheme {
+    ComandaAiTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = ComandaAiTheme.colorScheme.background
         ) {
             if (state.isLoading) {
                 ComandaAiLoadingView(
@@ -204,16 +205,16 @@ private fun OrderControlScreenContent(
                         state.order?.let { order ->
                             val (statusContainerColor, statusContentColor) = when (order.status) {
                                 OrderStatus.DELIVERED -> Pair(
-                                    ComandaAiColors.Green500.value,
-                                    ComandaAiColors.OnSurface.value
+                                    ComandaAiTheme.colorScheme.green500,
+                                    ComandaAiTheme.colorScheme.onSurface
                                 )
                                 OrderStatus.PENDING -> Pair(
-                                    ComandaAiColors.Yellow500.value,
-                                    ComandaAiColors.OnSurface.value
+                                    ComandaAiTheme.colorScheme.yellow500,
+                                    ComandaAiTheme.colorScheme.onSurface
                                 )
                                 OrderStatus.CANCELED -> Pair(
-                                    ComandaAiColors.Error.value,
-                                    ComandaAiColors.OnError.value
+                                    ComandaAiTheme.colorScheme.error,
+                                    ComandaAiTheme.colorScheme.onError
                                 )
                             }
 
@@ -233,7 +234,7 @@ private fun OrderControlScreenContent(
 
                                 Text(
                                     "Criado por: ${state.createdBy}",
-                                    color = ComandaAiColors.Surface.value,
+                                    color = ComandaAiTheme.colorScheme.surface,
                                     style = ComandaAiTypography.titleMedium
                                 )
 
@@ -253,7 +254,7 @@ private fun OrderControlScreenContent(
                             "Itens do pedido:",
                             modifier = Modifier
                                 .padding(horizontal = ComandaAiSpacing.Medium.value),
-                            color = ComandaAiColors.Gray700.value,
+                            color = ComandaAiTheme.colorScheme.gray700,
                             style = ComandaAiTypography.titleMedium
                         )
 
@@ -269,8 +270,8 @@ private fun OrderControlScreenContent(
                                 ) {
                                     Text(
                                         text = "Nenhum item neste pedido",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        style = ComandaAiTheme.typography.bodyMedium,
+                                        color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -309,7 +310,7 @@ private fun OrderControlScreenContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.BottomCenter)
-                            .background(MaterialTheme.colorScheme.background)
+                            .background(ComandaAiTheme.colorScheme.background)
                             .padding(ComandaAiSpacing.Medium.value),
                         verticalArrangement = Arrangement.spacedBy(ComandaAiSpacing.Small.value)
                     ) {
@@ -393,7 +394,7 @@ private fun OrderControlScreenContent(
         ) {
             Text(
                 text = "Tem certeza que deseja entregar todos os itens deste pedido?",
-                style = MaterialTheme.typography.bodyMedium,
+                style = ComandaAiTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -404,8 +405,8 @@ private fun OrderControlScreenContent(
             
             Text(
                 text = "Esta ação não pode ser desfeita.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = ComandaAiTheme.typography.bodySmall,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -434,7 +435,7 @@ private fun OrderControlScreenContent(
         ) {
             Text(
                 text = "Tem certeza que deseja cancelar este pedido?",
-                style = MaterialTheme.typography.bodyMedium,
+                style = ComandaAiTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -445,8 +446,8 @@ private fun OrderControlScreenContent(
             
             Text(
                 text = "Todos os itens serão cancelados e esta ação não pode ser desfeita.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = ComandaAiTheme.typography.bodySmall,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -471,18 +472,18 @@ private fun OrderControlItemAccordion(
 ) {
     val (containerColor, contentColor) = when (item.status) {
         ItemStatus.DELIVERED -> Pair(
-            ComandaAiColors.Green500.value,
-            ComandaAiColors.OnSurface.value
+            ComandaAiTheme.colorScheme.green500,
+            ComandaAiTheme.colorScheme.onSurface
         )
 
         ItemStatus.PENDING -> Pair(
-            ComandaAiColors.Yellow500.value,
-            ComandaAiColors.OnSurface.value
+            ComandaAiTheme.colorScheme.yellow500,
+            ComandaAiTheme.colorScheme.onSurface
         )
 
         ItemStatus.CANCELED -> Pair(
-            ComandaAiColors.Error.value,
-            ComandaAiColors.OnError.value
+            ComandaAiTheme.colorScheme.error,
+            ComandaAiTheme.colorScheme.onError
         )
     }
 
@@ -497,7 +498,7 @@ private fun OrderControlItemAccordion(
             .fillMaxWidth()
             .clickable { onItemClick(item) },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = ComandaAiTheme.colorScheme.surfaceVariant
         )
     ) {
         Column {
@@ -514,20 +515,20 @@ private fun OrderControlItemAccordion(
                 ) {
                     Text(
                         text = item.name,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = ComandaAiTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = "Quantidade: ${item.count}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                     item.observation?.let { observation ->
                         Text(
                             text = "Obs: $observation",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            style = ComandaAiTheme.typography.bodySmall,
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
                     }
                 }
@@ -556,7 +557,7 @@ private fun OrderControlItemAccordion(
                             Icon(
                                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                 contentDescription = if (isExpanded) "Recolher" else "Expandir",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = ComandaAiTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -578,14 +579,14 @@ private fun OrderControlItemAccordion(
                     ) {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 8.dp),
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                            color = ComandaAiTheme.colorScheme.outline.copy(alpha = 0.3f)
                         )
 
                         Text(
                             text = "Itens individuais:",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = ComandaAiTheme.typography.bodySmall,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -626,18 +627,18 @@ private fun IndividualItemRow(
 ) {
     val (containerColor, contentColor) = when (individualStatus) {
         ItemStatus.DELIVERED -> Pair(
-            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
-            ComandaAiColors.Green500.value
+            ComandaAiTheme.colorScheme.green500.copy(alpha = 0.1f),
+            ComandaAiTheme.colorScheme.green500
         )
 
         ItemStatus.PENDING -> Pair(
-            ComandaAiColors.Blue500.value.copy(alpha = 0.1f),
-            ComandaAiColors.Blue500.value
+            ComandaAiTheme.colorScheme.blue500.copy(alpha = 0.1f),
+            ComandaAiTheme.colorScheme.blue500
         )
 
         ItemStatus.CANCELED -> Pair(
-            ComandaAiColors.Error.value.copy(alpha = 0.1f),
-            ComandaAiColors.Error.value
+            ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f),
+            ComandaAiTheme.colorScheme.error
         )
     }
 
@@ -664,14 +665,14 @@ private fun IndividualItemRow(
         ) {
             Text(
                 text = "${item.name} #$index",
-                style = MaterialTheme.typography.bodySmall,
+                style = ComandaAiTheme.typography.bodySmall,
                 color = contentColor,
                 fontWeight = FontWeight.Medium
             )
 
             Text(
                 text = statusText,
-                style = MaterialTheme.typography.bodySmall,
+                style = ComandaAiTheme.typography.bodySmall,
                 color = contentColor,
                 fontWeight = FontWeight.Medium
             )
@@ -689,18 +690,18 @@ private fun OrderControlItem(
 ) {
     val (containerColor, contentColor) = when (item.status) {
         ItemStatus.DELIVERED -> Pair(
-            ComandaAiColors.Green500.value,
-            ComandaAiColors.OnSurface.value
+            ComandaAiTheme.colorScheme.green500,
+            ComandaAiTheme.colorScheme.onSurface
         )
 
         ItemStatus.PENDING -> Pair(
-            ComandaAiColors.Yellow500.value,
-            ComandaAiColors.OnSurface.value
+            ComandaAiTheme.colorScheme.yellow500,
+            ComandaAiTheme.colorScheme.onSurface
         )
 
         ItemStatus.CANCELED -> Pair(
-            ComandaAiColors.Error.value,
-            ComandaAiColors.OnError.value
+            ComandaAiTheme.colorScheme.error,
+            ComandaAiTheme.colorScheme.onError
         )
     }
 
@@ -713,7 +714,7 @@ private fun OrderControlItem(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = ComandaAiTheme.colorScheme.surfaceVariant
         )
     ) {
         Row(
@@ -728,20 +729,20 @@ private fun OrderControlItem(
             ) {
                 Text(
                     text = item.name,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = ComandaAiTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = "Quantidade: ${item.count}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    style = ComandaAiTheme.typography.bodySmall,
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
                 item.observation?.let { observation ->
                     Text(
                         text = "Obs: $observation",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
             }
@@ -795,22 +796,22 @@ private fun StatusSelectionModal(
         ) {
             Text(
                 text = "Item: ${item.name}",
-                style = MaterialTheme.typography.bodyMedium,
+                style = ComandaAiTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = ComandaAiTheme.colorScheme.onSurface
             )
 
             Text(
                 text = "Status atual: $currentStatusText",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = ComandaAiTheme.typography.bodySmall,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
 
             Text(
                 text = "Selecione o novo status:",
-                style = MaterialTheme.typography.bodyMedium,
+                style = ComandaAiTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = ComandaAiTheme.colorScheme.onSurface
             )
 
             Column(
@@ -825,18 +826,18 @@ private fun StatusSelectionModal(
 
                     val (bgColor, textColor) = when (status) {
                         ItemStatus.DELIVERED -> Pair(
-                            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Green500.value
+                            ComandaAiTheme.colorScheme.green500.copy(alpha = 0.1f),
+                            ComandaAiTheme.colorScheme.green500
                         )
 
                         ItemStatus.PENDING -> Pair(
-                            ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Yellow500.value
+                            ComandaAiTheme.colorScheme.yellow500.copy(alpha = 0.1f),
+                            ComandaAiTheme.colorScheme.yellow500
                         )
 
                         ItemStatus.CANCELED -> Pair(
-                            ComandaAiColors.Error.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Error.value
+                            ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f),
+                            ComandaAiTheme.colorScheme.error
                         )
                     }
 
@@ -855,7 +856,7 @@ private fun StatusSelectionModal(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = ComandaAiTheme.typography.bodyMedium,
                             color = textColor,
                             fontWeight = FontWeight.Medium,
                             textAlign = TextAlign.Center
@@ -904,22 +905,22 @@ private fun IndividualItemStatusModal(
         ) {
             Text(
                 text = "Item: ${item.name} #${individualIndex + 1}",
-                style = MaterialTheme.typography.bodyMedium,
+                style = ComandaAiTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = ComandaAiTheme.colorScheme.onSurface
             )
 
             Text(
                 text = "Status atual: $currentStatusText",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = ComandaAiTheme.typography.bodySmall,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
 
             Text(
                 text = "Selecione o novo status:",
-                style = MaterialTheme.typography.bodyMedium,
+                style = ComandaAiTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = ComandaAiTheme.colorScheme.onSurface
             )
 
             Column(
@@ -934,18 +935,18 @@ private fun IndividualItemStatusModal(
 
                     val (bgColor, textColor) = when (status) {
                         ItemStatus.DELIVERED -> Pair(
-                            ComandaAiColors.Green500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Green500.value
+                            ComandaAiTheme.colorScheme.green500.copy(alpha = 0.1f),
+                            ComandaAiTheme.colorScheme.green500
                         )
 
                         ItemStatus.PENDING -> Pair(
-                            ComandaAiColors.Yellow500.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Yellow500.value
+                            ComandaAiTheme.colorScheme.yellow500.copy(alpha = 0.1f),
+                            ComandaAiTheme.colorScheme.yellow500
                         )
 
                         ItemStatus.CANCELED -> Pair(
-                            ComandaAiColors.Error.value.copy(alpha = 0.1f),
-                            ComandaAiColors.Error.value
+                            ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f),
+                            ComandaAiTheme.colorScheme.error
                         )
                     }
 
@@ -964,7 +965,7 @@ private fun IndividualItemStatusModal(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = ComandaAiTheme.typography.bodyMedium,
                             color = textColor,
                             fontWeight = FontWeight.Medium,
                             textAlign = TextAlign.Center

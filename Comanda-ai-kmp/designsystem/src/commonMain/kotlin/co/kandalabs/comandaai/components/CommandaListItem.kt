@@ -44,7 +44,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ComandaAiListItem(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    backgroundColor: Color = ComandaAiTheme.colorScheme.surface,
     onClick: (() -> Unit)? = null,
     showDivider: Boolean = true,
     startSlot: @Composable (RowScope.() -> Unit)? = null,
@@ -57,7 +57,7 @@ fun ComandaAiListItem(
         Modifier
     }
 
-    val dividerColor = remember { ComandaAiColors.Gray300.value }
+    val dividerColor = ComandaAiTheme.colorScheme.gray300
 
     Column(
         modifier = modifier
@@ -104,20 +104,20 @@ private fun CommandaListItemPreview() {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Título do Item",
-                        style = MaterialTheme.typography.titleMedium
+                        style = ComandaAiTheme.typography.titleMedium
                     )
                     Text(
                         text = "Subtítulo com descrição",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
             trailingSlot = {
                 CommandaBadge(
                     text = "Novo",
-                    containerColor = ComandaAiColors.Green500.value,
-                    contentColor = ComandaAiColors.Surface.value
+                    containerColor = ComandaAiTheme.colorScheme.green500,
+                    contentColor = ComandaAiTheme.colorScheme.surface
                 )
 
                 Icon(
@@ -126,7 +126,7 @@ private fun CommandaListItemPreview() {
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .size(24.dp),
-                    tint = ComandaAiColors.Gray400.value
+                    tint = ComandaAiTheme.colorScheme.gray400
                 )
             }
         )
@@ -144,13 +144,13 @@ private fun CommandaListItemWithStartIconPreview() {
                     modifier = Modifier
                         .size(40.dp)
                         .clip(MaterialTheme.shapes.small)
-                        .background(ComandaAiColors.Primary.value),
+                        .background(ComandaAiTheme.colorScheme.primary),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "1",
-                        color = ComandaAiColors.Surface.value,
-                        style = MaterialTheme.typography.titleMedium
+                        color = ComandaAiTheme.colorScheme.surface,
+                        style = ComandaAiTheme.typography.titleMedium
                     )
                 }
             },
@@ -162,12 +162,12 @@ private fun CommandaListItemWithStartIconPreview() {
                 ) {
                     Text(
                         text = "Mesa 1",
-                        style = MaterialTheme.typography.titleMedium
+                        style = ComandaAiTheme.typography.titleMedium
                     )
                     Text(
                         text = "2 pedidos ativos",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
@@ -176,7 +176,7 @@ private fun CommandaListItemWithStartIconPreview() {
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Ver detalhes",
                     modifier = Modifier.size(24.dp),
-                    tint = ComandaAiColors.Gray400.value
+                    tint = ComandaAiTheme.colorScheme.gray400
                 )
             }
         )

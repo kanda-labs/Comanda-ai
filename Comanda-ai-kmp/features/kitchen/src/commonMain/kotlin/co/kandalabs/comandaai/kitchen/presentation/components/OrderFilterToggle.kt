@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,8 +31,8 @@ fun OrderFilterToggle(
         Surface(
             modifier = Modifier.fillMaxWidth(0.8f),
             shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+            color = ComandaAiTheme.colorScheme.surfaceVariant,
+            border = BorderStroke(1.dp, ComandaAiTheme.colorScheme.outline.copy(alpha = 0.3f))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -67,7 +68,7 @@ private fun FilterButton(
         modifier = modifier.clickable { onClick() },
         shape = MaterialTheme.shapes.medium,
         color = if (isSelected) {
-            MaterialTheme.colorScheme.primary
+            ComandaAiTheme.colorScheme.primary
         } else {
             Color.Transparent
         }
@@ -75,11 +76,11 @@ private fun FilterButton(
         Text(
             text = text,
             modifier = Modifier.padding(vertical = 12.dp),
-            style = MaterialTheme.typography.labelLarge,
+            style = ComandaAiTheme.typography.labelLarge,
             color = if (isSelected) {
-                MaterialTheme.colorScheme.onPrimary
+                ComandaAiTheme.colorScheme.onPrimary
             } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
+                ComandaAiTheme.colorScheme.onSurfaceVariant
             },
             fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
             textAlign = TextAlign.Center

@@ -29,7 +29,7 @@ internal data class TableDetailsScreenState(
     val badge: TableDetailsScreenBadge? = when (table?.status) {
         TableStatus.OCCUPIED -> TableDetailsScreenBadge(
             text = table.status.presentationName,
-            color = ComandaAiColors.Yellow500,
+            color = ComandaAiColors.Secondary,
             textColor = ComandaAiColors.OnSurface
         )
 
@@ -41,7 +41,7 @@ internal data class TableDetailsScreenState(
 
         TableStatus.FREE -> TableDetailsScreenBadge(
             text = table.status.presentationName,
-            color = ComandaAiColors.Green500,
+            color = ComandaAiColors.Primary,
             textColor = ComandaAiColors.OnSurface
         )
 
@@ -126,13 +126,13 @@ internal data class OrdersDetailsState(
     val ordersPresentation: List<OrdersDetailsItemState> = orders.map {
         val (color, textColor) = when (it.status) {
             OrderStatus.DELIVERED -> Pair(
-                ComandaAiColors.Green500,
-                ComandaAiColors.OnSurface
+                ComandaAiColors.Primary,           // Verde para pedidos entregues
+                ComandaAiColors.OnPrimary
             )
 
             OrderStatus.PENDING -> Pair(
-                ComandaAiColors.Yellow500,
-                ComandaAiColors.OnSurface
+                ComandaAiColors.Yellow,            // Amarelo para pedidos pendentes
+                ComandaAiColors.OnYellow
             )
 
             OrderStatus.CANCELED -> Pair(

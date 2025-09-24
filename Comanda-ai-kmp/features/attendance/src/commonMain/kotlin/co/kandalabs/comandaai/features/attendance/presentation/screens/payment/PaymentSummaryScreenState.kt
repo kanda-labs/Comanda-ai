@@ -55,16 +55,6 @@ internal data class PaymentSummaryScreenState(
                 createdAt = payment.createdAt
             )
         } ?: emptyList()
-    
-    
-    private fun parseColor(colorHex: String): ComandaAiColors {
-        return when (colorHex) {
-            "#4CAF50" -> ComandaAiColors.Green500
-            "#2196F3" -> ComandaAiColors.Blue500
-            "#F44336" -> ComandaAiColors.Error
-            else -> ComandaAiColors.OnSurface
-        }
-    }
 }
 
 internal data class PaymentItemState(
@@ -88,10 +78,4 @@ internal data class PartialPaymentState(
     val createdAt: kotlinx.datetime.LocalDateTime
 ) {
     val displayDescription: String = description ?: "Pagamento parcial de $paidBy"
-    val timeAgo: String = formatTimeAgo(createdAt)
-    
-    private fun formatTimeAgo(dateTime: kotlinx.datetime.LocalDateTime): String {
-        // Implementação simples - em uma implementação real, seria melhor usar uma biblioteca
-        return "Hoje" // Placeholder - implementar formatação de tempo adequada
-    }
 }

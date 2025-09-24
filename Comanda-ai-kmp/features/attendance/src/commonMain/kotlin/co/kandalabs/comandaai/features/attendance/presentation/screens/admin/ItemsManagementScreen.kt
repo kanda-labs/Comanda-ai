@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,12 +31,12 @@ import androidx.compose.ui.text.style.TextAlign
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
-import co.kandalabs.comandaai.components.CommandaBadge
 import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiListItem
 import co.kandalabs.comandaai.components.ComandaAiModalPresentationMode
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
+import co.kandalabs.comandaai.components.CommandaBadge
 import co.kandalabs.comandaai.core.utils.CurrencyFormatter
 import co.kandalabs.comandaai.domain.Item
 import co.kandalabs.comandaai.domain.ItemCategory
@@ -112,7 +111,7 @@ private fun ItemsManagementScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
+                .background(ComandaAiTheme.colorScheme.background)
         ) {
             when {
                 uiState.isLoading -> {
@@ -131,7 +130,7 @@ private fun ItemsManagementScreenContent(
                         Text(
                             text = uiState.error,
                             style = ComandaAiTypography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
+                            color = ComandaAiTheme.colorScheme.error,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -151,8 +150,8 @@ private fun ItemsManagementScreenContent(
                                 containerColor = if (uiState.selectedCategory != null)
                                     getCategoryColor(uiState.selectedCategory!!)
                                 else
-                                    ComandaAiColors.Gray300.value,
-                                contentColor = ComandaAiColors.Surface.value,
+                                    ComandaAiTheme.colorScheme.gray300,
+                                contentColor = ComandaAiTheme.colorScheme.surface,
                                 modifier = Modifier.clickable { onCategoryFilterClick() }
                             )
                         }
@@ -167,7 +166,7 @@ private fun ItemsManagementScreenContent(
                                 Text(
                                     text = "Nenhum item encontrado",
                                     style = ComandaAiTypography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = ComandaAiTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         } else {
@@ -261,20 +260,20 @@ private fun ItemCard(
                 Text(
                     text = item.name,
                     style = ComandaAiTypography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
                 item.description?.let { desc ->
                     Text(
                         text = desc,
                         style = ComandaAiTypography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Text(
                     text = CurrencyFormatter.formatCents(item.value),
                     style = ComandaAiTypography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = ComandaAiColors.Primary.value
+                    color = ComandaAiTheme.colorScheme.primary
                 )
             }
         },
@@ -282,7 +281,7 @@ private fun ItemCard(
             CommandaBadge(
                 text = getCategoryDisplayName(item.category),
                 containerColor = getCategoryColor(item.category),
-                contentColor = ComandaAiColors.Surface.value
+                contentColor = ComandaAiTheme.colorScheme.surface
             )
         }
     )
@@ -297,11 +296,12 @@ private fun getCategoryDisplayName(category: ItemCategory): String {
     }
 }
 
+@Composable
 private fun getCategoryColor(category: ItemCategory): androidx.compose.ui.graphics.Color {
     return when (category) {
-        ItemCategory.SKEWER -> ComandaAiColors.Yellow600.value
-        ItemCategory.DRINK -> ComandaAiColors.Blue500.value
-        ItemCategory.SNACK -> ComandaAiColors.Green500.value
-        ItemCategory.PROMOTIONAL -> ComandaAiColors.Primary.value
+        ItemCategory.SKEWER -> ComandaAiTheme.colorScheme.yellow600
+        ItemCategory.DRINK -> ComandaAiTheme.colorScheme.blue500
+        ItemCategory.SNACK -> ComandaAiTheme.colorScheme.green500
+        ItemCategory.PROMOTIONAL -> ComandaAiTheme.colorScheme.primary
     }
 }

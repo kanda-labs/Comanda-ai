@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -134,7 +135,7 @@ private fun TablesScreenContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(ComandaAiTheme.colorScheme.background)
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
 
@@ -147,7 +148,7 @@ private fun TablesScreenContent(
                             Icon(
                                 imageVector = Icons.Default.History,
                                 contentDescription = "Histórico de Pagamentos",
-                                tint = MaterialTheme.colorScheme.onBackground
+                                tint = ComandaAiTheme.colorScheme.onBackground
                             )
                         }
                         IconButton(
@@ -156,7 +157,7 @@ private fun TablesScreenContent(
                             Icon(
                                 imageVector = Icons.Default.Refresh,
                                 contentDescription = "Atualizar",
-                                tint = MaterialTheme.colorScheme.onBackground
+                                tint = ComandaAiTheme.colorScheme.onBackground
                             )
                         }
                     }
@@ -183,7 +184,7 @@ private fun TablesScreenContent(
                         Text(
                             text = "Olá, ${userSession.name}!",
                             style = ComandaAiTypography.titleMedium,
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = ComandaAiTheme.colorScheme.onBackground,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.padding(start = 6.dp)
                         )
@@ -246,7 +247,7 @@ private fun TableItem(
         ) {
             Text(
                 text = tablePresentation.number,
-                color = tablePresentation.textColor,
+                color = tablePresentation.textColor.value,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 style = ComandaAiTypography.displayLarge

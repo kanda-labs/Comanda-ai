@@ -25,6 +25,7 @@ import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.features.attendance.domain.models.model.Order
 import co.kandalabs.comandaai.features.attendance.domain.models.model.OrderStatus
+import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.TableDetailsScreenBadge
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -38,7 +39,7 @@ internal fun OrderListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        backgroundColor = MaterialTheme.colorScheme.surface,
+        backgroundColor = ComandaAiTheme.colorScheme.surface,
         showDivider = isLastItem.not(),
         contentSlot = {
             Row(
@@ -52,13 +53,13 @@ internal fun OrderListItem(
                 ) {
                     Text(
                         text = order.id,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = ComandaAiTheme.typography.titleMedium,
+                        color = ComandaAiTheme.colorScheme.onSurface
                     )
                     Text(
                         text = order.time,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.onSurface
                     )
                 }
 
@@ -76,7 +77,7 @@ internal fun OrderListItem(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Ver detalhes",
                     modifier = Modifier.size(ComandaAiSpacing.Large.value),
-                    tint = ComandaAiColors.Gray400.value
+                    tint = ComandaAiTheme.colorScheme.gray400
                 )
             }
         }
@@ -95,7 +96,7 @@ private fun CommandaBadge(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelMedium,
+            style = ComandaAiTheme.typography.labelMedium,
             modifier = Modifier.padding(horizontal = ComandaAiSpacing.Small.value)
         )
     }
@@ -109,10 +110,10 @@ internal fun OrderListItemPreview() {
             order = OrdersDetailsItemState(
                 id = "Nº 1",
                 time = "Realizado às 12:00",
-                status = co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.TableDetailsScreenBadge(
+                status = TableDetailsScreenBadge(
                     text = "Aberto",
-                    color = ComandaAiColors.Green500,
-                    textColor = ComandaAiColors.Surface,
+                    color = ComandaAiColors.Tertiary,
+                    textColor = ComandaAiColors.OnTertiary,
                 ),
                 order = Order(
                     id = 1,

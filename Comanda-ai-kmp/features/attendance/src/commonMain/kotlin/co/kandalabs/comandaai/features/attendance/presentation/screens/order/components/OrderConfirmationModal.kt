@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +58,7 @@ fun OrderConfirmationModal(
                         .fillMaxHeight(0.8f) // Max 80% of screen height
                         .clickable(enabled = false) { }, // Prevent clicks from propagating to background
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                    color = MaterialTheme.colorScheme.surface,
+                    color = ComandaAiTheme.colorScheme.surface,
                     shadowElevation = 16.dp
                 ) {
                 Column(
@@ -76,7 +77,7 @@ fun OrderConfirmationModal(
                                 .width(40.dp)
                                 .height(4.dp)
                                 .background(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                    color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                                     shape = RoundedCornerShape(2.dp)
                                 )
                         )
@@ -87,9 +88,9 @@ fun OrderConfirmationModal(
                     // Header
                     Text(
                         text = "Confirmar Pedido",
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = ComandaAiTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = ComandaAiTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -106,8 +107,8 @@ fun OrderConfirmationModal(
                         ) {
                             Text(
                                 text = "Nenhum item selecionado",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = ComandaAiTheme.typography.bodyMedium,
+                                color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -117,8 +118,8 @@ fun OrderConfirmationModal(
                         ) {
                             Text(
                                 text = "Itens selecionados:",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
+                                style = ComandaAiTheme.typography.titleMedium,
+                                color = ComandaAiTheme.colorScheme.onSurface,
                                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
                             )
                             
@@ -143,7 +144,7 @@ fun OrderConfirmationModal(
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
                         shadowElevation = 4.dp,
-                        color = MaterialTheme.colorScheme.surface
+                        color = ComandaAiTheme.colorScheme.surface
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth()
@@ -155,7 +156,7 @@ fun OrderConfirmationModal(
                                         .fillMaxWidth()
                                         .padding(horizontal = 24.dp, vertical = 12.dp),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                                        containerColor = ComandaAiTheme.colorScheme.primaryContainer
                                     )
                                 ) {
                                     Row(
@@ -167,15 +168,15 @@ fun OrderConfirmationModal(
                                     ) {
                                         Text(
                                             text = "Total:",
-                                            style = MaterialTheme.typography.titleMedium,
+                                            style = ComandaAiTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                            color = ComandaAiTheme.colorScheme.onPrimaryContainer
                                         )
                                         Text(
                                             text = "$totalItems ${if (totalItems == 1) "item" else "itens"}",
-                                            style = MaterialTheme.typography.titleMedium,
+                                            style = ComandaAiTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                            color = ComandaAiTheme.colorScheme.onPrimaryContainer
                                         )
                                     }
                                 }
@@ -222,7 +223,7 @@ private fun OrderConfirmationItem(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = ComandaAiTheme.colorScheme.surfaceVariant
         )
     ) {
         Row(
@@ -237,24 +238,24 @@ private fun OrderConfirmationItem(
             ) {
                 Text(
                     text = itemWithCount.item.name,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = ComandaAiTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
                 itemWithCount.item.description?.let { description ->
                     Text(
                         text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
             }
             
             Text(
                 text = "${itemWithCount.count}x",
-                style = MaterialTheme.typography.titleMedium,
+                style = ComandaAiTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = ComandaAiTheme.colorScheme.primary
             )
         }
     }

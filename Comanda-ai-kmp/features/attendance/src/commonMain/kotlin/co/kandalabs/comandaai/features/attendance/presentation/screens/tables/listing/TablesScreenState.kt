@@ -21,15 +21,16 @@ internal data class TablePresentation(
 ) {
     val number: String = buildString { if (table.number < 10) append("0") }.plus(table.number)
     val backGroundColor: ComandaAiColors = when (table.status) {
-        TableStatus.OCCUPIED -> ComandaAiColors.Yellow500
-        TableStatus.ON_PAYMENT -> ComandaAiColors.Secondary
-        TableStatus.FREE -> ComandaAiColors.Green500
+        TableStatus.OCCUPIED -> ComandaAiColors.Yellow        // Mesas ocupadas em amarelo
+        TableStatus.ON_PAYMENT -> ComandaAiColors.Orange      // Mesas em pagamento em laranja
+        TableStatus.FREE -> ComandaAiColors.Primary           // Mesas livres em verde
     }
     val textColor = when (backGroundColor) {
-        ComandaAiColors.Yellow500 -> Color.Black
-        ComandaAiColors.Secondary -> Color.Black
-        ComandaAiColors.Green500 -> Color.White
-        else -> Color.Black
+        ComandaAiColors.Primary -> ComandaAiColors.OnPrimary          // Branco sobre verde
+        ComandaAiColors.Yellow -> ComandaAiColors.OnYellow            // Branco sobre amarelo
+        ComandaAiColors.Orange -> ComandaAiColors.OnOrange            // Branco sobre laranja
+        ComandaAiColors.Secondary -> ComandaAiColors.OnSecondary      // Branco sobre secundário
+        else -> ComandaAiColors.OnSurface                             // Padrão
     }
 
 }

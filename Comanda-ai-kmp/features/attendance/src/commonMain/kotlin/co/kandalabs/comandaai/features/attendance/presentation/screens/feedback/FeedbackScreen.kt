@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,9 +89,9 @@ private fun FeedbackContent(
         // Title
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineMedium,
+            style = ComandaAiTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = ComandaAiTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
         
@@ -99,8 +100,8 @@ private fun FeedbackContent(
         // Message
         Text(
             text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = ComandaAiTheme.typography.bodyLarge,
+            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -120,8 +121,8 @@ private fun FeedbackContent(
         if (isSuccess) {
             Text(
                 text = "Voltando automaticamente...",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                style = ComandaAiTheme.typography.bodySmall,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
         }

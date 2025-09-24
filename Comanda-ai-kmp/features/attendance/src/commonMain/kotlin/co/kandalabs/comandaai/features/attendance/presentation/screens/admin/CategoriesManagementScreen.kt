@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +42,7 @@ private fun CategoriesManagementScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(ComandaAiTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
         ComandaAiTopAppBar(
@@ -64,14 +62,14 @@ private fun CategoriesManagementScreenContent(
                 text = "Gerenciamento de Categorias",
                 style = ComandaAiTypography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = ComandaAiTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
 
             Text(
                 text = "Esta funcionalidade será implementada em breve.\n\nPermitirá:\n• Criar novas categorias\n• Editar categorias existentes\n• Remover categorias\n• Organizar items por categoria",
                 style = ComandaAiTypography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                color = ComandaAiTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = ComandaAiSpacing.Medium.value)
             )

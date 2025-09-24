@@ -1,8 +1,30 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.order.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -13,6 +35,8 @@ import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.components.ComandaAiModalPresentationMode
 import co.kandalabs.comandaai.domain.Item
 import co.kandalabs.comandaai.domain.ItemCategory
+import co.kandalabs.comandaai.theme.ComandaAiTheme
+import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 
@@ -29,7 +53,6 @@ fun ObservationModal(
     if (isVisible && item != null) {
         var observation by remember(item.id) { mutableStateOf(currentObservation ?: "") }
 
-        // Espetinho-specific options
         val isSkewer = item.category == ItemCategory.SKEWER
         var takeaway by remember(item.id) { mutableStateOf(false) }
         var vinaigrette by remember(item.id) { mutableStateOf(true) }
@@ -39,17 +62,14 @@ fun ObservationModal(
 
         val meatDonenessOptions = listOf("Mal passado", "Ao ponto", "Bem passado")
 
-        // Function to build complete observation text
         fun buildCompleteObservation(): String {
             val parts = mutableListOf<String>()
 
-            // Add manual observation if not empty
             val manualObs = observation.trim()
             if (manualObs.isNotEmpty()) {
                 parts.add(manualObs)
             }
 
-            // Add espetinho-specific options if item is skewer and options differ from defaults
             if (isSkewer) {
                 if (takeaway) parts.add("Para viagem")
                 if (!vinaigrette) parts.add("Sem vinagrete")
@@ -60,168 +80,214 @@ fun ObservationModal(
             return parts.joinToString(", ")
         }
 
-        ComandaAiBottomSheetModal(
-            isVisible = true,
-            title = "Observação",
-            onDismiss = onDismiss,
-            modifier = modifier,
-            presentationMode = ComandaAiModalPresentationMode.Full      ,
-            dismissOnBackgroundClick = true,
-            dismissOnDrag = true,
-            actions = {
-                // Back button (secondary, first)
-                ComandaAiButton(
-                    text = "Voltar",
-                    onClick = onDismiss,
-                    variant = ComandaAiButtonVariant.Secondary
-                )
+        ComandaAiTheme {
+            ComandaAiBottomSheetModal(
+                isVisible = true,
+                title = "Observação",
+                onDismiss = onDismiss,
+                modifier = modifier,
+                presentationMode = ComandaAiModalPresentationMode.Full,
+                dismissOnBackgroundClick = true,
+                dismissOnDrag = true,
+                actions = {
+                    // Back button (secondary, first)
+                    ComandaAiButton(
+                        text = "Voltar",
+                        onClick = onDismiss,
+                        variant = ComandaAiButtonVariant.Secondary
+                    )
 
-                // Add/Save button (primary, second)
-                ComandaAiButton(
-                    text = if (hasItemsSelected) "Salvar" else "Adicionar",
-                    onClick = {
-                        onAddWithObservation(buildCompleteObservation())
-                        observation = ""
-                        // Reset espetinho options to defaults
-                        if (isSkewer) {
-                            takeaway = false
-                            vinaigrette = true
-                            farofa = true
-                            meatDoneness = "Ao ponto"
+                    // Add/Save button (primary, second)
+                    ComandaAiButton(
+                        text = if (hasItemsSelected) "Salvar" else "Adicionar",
+                        onClick = {
+                            onAddWithObservation(buildCompleteObservation())
+                            observation = ""
+                            // Reset espetinho options to defaults
+                            if (isSkewer) {
+                                takeaway = false
+                                vinaigrette = true
+                                farofa = true
+                                meatDoneness = "Ao ponto"
+                            }
                         }
-                    }
-                )
-            }
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-verticalArrangement = Arrangement.spacedBy(16.dp)
+                    )
+                }
             ) {
-                // Item name
-                Text(
-                    text = item.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                // Observation text field
-                OutlinedTextField(
-                    value = observation,
-                    onValueChange = { observation = it },
-                    label = { Text("Observações adicionais") },
-                    placeholder = { Text("Ex: Sem cebola, bem temperado, etc.") },
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-
-                // Espetinho-specific options
-                if (isSkewer) {
+                        .padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Item name
                     Text(
-                        text = "Opções do Espetinho",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(top = 8.dp)
+                        text = item.name,
+                        style = ComandaAiTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = ComandaAiTheme.colorScheme.onSurface
                     )
 
-                    // Takeaway switch
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Para viagem",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
+                    // Observation text field
+                    OutlinedTextField(
+                        value = observation,
+                        onValueChange = { observation = it },
+                        label = { Text("Observações adicionais") },
+                        placeholder = { Text("Ex: Sem cebola, bem temperado, etc.") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedLabelColor = ComandaAiTheme.colorScheme.gray500,
+                            cursorColor = ComandaAiTheme.colorScheme.gray900,
+                            focusedBorderColor = ComandaAiTheme.colorScheme.primary,
+                            focusedLabelColor = ComandaAiTheme.colorScheme.primary,
+                            focusedContainerColor = ComandaAiTheme.colorScheme.gray100,
+                            unfocusedContainerColor = ComandaAiTheme.colorScheme.gray100,
+                            unfocusedBorderColor = ComandaAiTheme.colorScheme.gray300,
+                            disabledPlaceholderColor = ComandaAiTheme.colorScheme.gray500,
+                            focusedPlaceholderColor = ComandaAiTheme.colorScheme.gray500,
+                            focusedTextColor = ComandaAiTheme.colorScheme.gray700
                         )
-                        Switch(
-                            checked = takeaway,
-                            onCheckedChange = { takeaway = it }
-                        )
-                    }
-
-                    // Vinaigrette switch
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Vinagrete",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Switch(
-                            checked = vinaigrette,
-                            onCheckedChange = { vinaigrette = it }
-                        )
-                    }
-
-                    // Farofa switch
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Farofa",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Switch(
-                            checked = farofa,
-                            onCheckedChange = { farofa = it }
-                        )
-                    }
-
-                    // Meat doneness dropdown
-                    Text(
-                        text = "Ponto da carne",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                     )
 
-                    ExposedDropdownMenuBox(
-                        expanded = meatDonenessExpanded,
-                        onExpandedChange = { meatDonenessExpanded = !meatDonenessExpanded },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        OutlinedTextField(
-                            value = meatDoneness,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = meatDonenessExpanded) },
-                            modifier = Modifier
-                                .menuAnchor()
-                                .fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                focusedLabelColor = MaterialTheme.colorScheme.primary
-                            )
+                    // Espetinho-specific options
+                    if (isSkewer) {
+                        val switchColors = SwitchDefaults.colors(
+                            checkedThumbColor = ComandaAiTheme.colorScheme.gray300,
+                            checkedTrackColor = ComandaAiTheme.colorScheme.primary,
+                            uncheckedThumbColor = ComandaAiTheme.colorScheme.gray300,
+                            uncheckedIconColor = ComandaAiTheme.colorScheme.secondary,
+                        )
+                        Text(
+                            text = "Opções do Espetinho",
+                            style = ComandaAiTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = ComandaAiTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(top = 8.dp)
                         )
 
-                        ExposedDropdownMenu(
-                            expanded = meatDonenessExpanded,
-                            onDismissRequest = { meatDonenessExpanded = false }
+                        // Takeaway switch
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            meatDonenessOptions.forEach { option ->
-                                DropdownMenuItem(
-                                    text = { Text(option) },
-                                    onClick = {
-                                        meatDoneness = option
-                                        meatDonenessExpanded = false
-                                    }
+
+                            Text(
+                                text = "Para viagem",
+                                style = ComandaAiTheme.typography.bodyLarge,
+                                color = ComandaAiTheme.colorScheme.onSurface
+                            )
+                            Switch(
+                                checked = takeaway,
+                                onCheckedChange = { takeaway = it },
+                                colors = switchColors
+                            )
+                        }
+
+                        // Vinaigrette switch
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Vinagrete",
+                                style = ComandaAiTheme.typography.bodyLarge,
+                                color = ComandaAiTheme.colorScheme.onSurface
+                            )
+                            Switch(
+                                checked = vinaigrette,
+                                onCheckedChange = { vinaigrette = it },
+                                colors = switchColors
+                            )
+                        }
+
+                        // Farofa switch
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Farofa",
+                                style = ComandaAiTheme.typography.bodyLarge,
+                                color = ComandaAiTheme.colorScheme.onSurface
+                            )
+                            Switch(
+                                checked = farofa,
+                                onCheckedChange = { farofa = it },
+                                colors = switchColors
+                            )
+                        }
+
+                        // Meat doneness dropdown
+                        Text(
+                            text = "Ponto da carne",
+                            style = ComandaAiTheme.typography.bodyLarge,
+                            color = ComandaAiTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                        )
+
+                        ExposedDropdownMenuBox(
+                            expanded = meatDonenessExpanded,
+                            onExpandedChange = { meatDonenessExpanded = !meatDonenessExpanded },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            OutlinedTextField(
+                                value = meatDoneness,
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = meatDonenessExpanded) },
+                                modifier = Modifier
+                                    .menuAnchor()
+                                    .fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = ComandaAiTheme.colorScheme.primary,
+                                    focusedLabelColor = ComandaAiTheme.colorScheme.primary,
+                                    focusedContainerColor = ComandaAiTheme.colorScheme.gray100,
+                                    unfocusedBorderColor = ComandaAiTheme.colorScheme.gray500,
+                                    unfocusedContainerColor = ComandaAiTheme.colorScheme.gray100,
+                                    focusedTextColor = ComandaAiTheme.colorScheme.gray700,
+                                    unfocusedTextColor = ComandaAiTheme.colorScheme.gray700,
+                                    focusedTrailingIconColor = ComandaAiTheme.colorScheme.gray700,
+                                    unfocusedTrailingIconColor = ComandaAiTheme.colorScheme.gray700,
                                 )
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = meatDonenessExpanded,
+                                onDismissRequest = { meatDonenessExpanded = false },
+                                containerColor = ComandaAiTheme.colorScheme.gray100,
+                            ) {
+                                meatDonenessOptions.forEachIndexed { index, option ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Column(
+                                                verticalArrangement = Arrangement.Center,
+                                                modifier = Modifier.fillMaxSize()
+                                            ) {
+                                                Text(option, modifier = Modifier.padding(top = ComandaAiSpacing.Medium.value))
+                                                if (index != meatDonenessOptions.lastIndex)
+                                                    HorizontalDivider(
+                                                        color = ComandaAiTheme.colorScheme.gray500,
+                                                        modifier = Modifier.padding(top = ComandaAiSpacing.Medium.value)
+                                                    )
+                                                else
+                                                    Spacer(Modifier.padding(bottom = ComandaAiSpacing.Medium.value))
+                                            }
+                                        },
+                                        colors = MenuDefaults.itemColors(
+                                            textColor = ComandaAiTheme.colorScheme.gray700,
+                                            disabledTextColor = ComandaAiTheme.colorScheme.gray300,
+                                        ),
+                                        onClick = {
+                                            meatDoneness = option
+                                            meatDonenessExpanded = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }

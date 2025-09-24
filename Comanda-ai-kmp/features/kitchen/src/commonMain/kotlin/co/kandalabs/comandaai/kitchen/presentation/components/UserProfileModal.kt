@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -95,7 +96,7 @@ internal fun UserProfileModal(
                         },
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = ComandaAiTheme.colorScheme.surface
                     )
                 ) {
                     Column(
@@ -110,7 +111,7 @@ internal fun UserProfileModal(
                                 .width(40.dp)
                                 .height(4.dp)
                                 .background(
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                    ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                     RoundedCornerShape(2.dp)
                                 )
                         )
@@ -122,14 +123,14 @@ internal fun UserProfileModal(
                             modifier = Modifier
                                 .size(80.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                                .background(ComandaAiTheme.colorScheme.primary.copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
                             if (userName?.isNotEmpty() == true) {
                                 Text(
                                     text = userName.first().uppercaseChar().toString(),
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    style = ComandaAiTheme.typography.headlineLarge,
+                                    color = ComandaAiTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold
                                 )
                             } else {
@@ -137,7 +138,7 @@ internal fun UserProfileModal(
                                     imageVector = Icons.Default.Person,
                                     contentDescription = "Avatar do usuário",
                                     modifier = Modifier.size(40.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = ComandaAiTheme.colorScheme.primary
                                 )
                             }
                         }
@@ -147,9 +148,9 @@ internal fun UserProfileModal(
                         // User Name
                         Text(
                             text = userName ?: "Usuário",
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = ComandaAiTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = ComandaAiTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center
                         )
                         
@@ -158,8 +159,8 @@ internal fun UserProfileModal(
                         // User Role
                         Text(
                             text = userRole?.lowercase()?.replaceFirstChar { it.uppercase() } ?: "Função",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            style = ComandaAiTheme.typography.bodyLarge,
+                            color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center
                         )
                         
@@ -175,12 +176,12 @@ internal fun UserProfileModal(
                                 .fillMaxWidth()
                                 .height(48.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
+                                containerColor = ComandaAiTheme.colorScheme.error
                             )
                         ) {
                             Text(
                                 text = "Logout",
-                                style = MaterialTheme.typography.labelLarge,
+                                style = ComandaAiTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -194,7 +195,7 @@ internal fun UserProfileModal(
                         ) {
                             Text(
                                 text = "Cancelar",
-                                style = MaterialTheme.typography.labelLarge
+                                style = ComandaAiTheme.typography.labelLarge
                             )
                         }
                     }

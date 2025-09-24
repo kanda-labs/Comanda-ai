@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -52,11 +53,11 @@ fun OrderCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = ComandaAiTheme.colorScheme.surface
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+            color = ComandaAiTheme.colorScheme.outline.copy(alpha = 0.12f)
         )
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -86,7 +87,7 @@ fun OrderCard(
                     if (index < order.items.size - 1) {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 4.dp),
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+                            color = ComandaAiTheme.colorScheme.outline.copy(alpha = 0.12f)
                         )
                     }
                 }
@@ -102,7 +103,7 @@ fun OrderCard(
                         .fillMaxWidth()
                         .height(32.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = ComandaAiTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(12.dp),
                     elevation = ButtonDefaults.buttonElevation(
@@ -117,7 +118,7 @@ fun OrderCard(
                     ) {
                         Text(
                             text = "Entregar pedido",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = ComandaAiTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -149,7 +150,7 @@ fun OrderHeader(order: KitchenOrder) {
         ) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                color = ComandaAiTheme.colorScheme.primary.copy(alpha = 0.1f),
                 modifier = Modifier.size(48.dp)
             ) {
                 Box(
@@ -159,7 +160,7 @@ fun OrderHeader(order: KitchenOrder) {
                     Icon(
                         imageVector = Icons.Default.TableRestaurant,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = ComandaAiTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -170,20 +171,20 @@ fun OrderHeader(order: KitchenOrder) {
             ) {
                 Text(
                     text = "Mesa ${order.tableNumber}",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = ComandaAiTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
                 Text(
                     text = order.userName,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = ComandaAiTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = ComandaAiTheme.colorScheme.primary
                 )
                 Text(
                     text = "${order.items.size} ${if (order.items.size == 1) "item" else "itens"}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    style = ComandaAiTheme.typography.bodyMedium,
+                    color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
         }
@@ -195,13 +196,13 @@ fun OrderHeader(order: KitchenOrder) {
         ) {
             Surface(
                 shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant
+                color = ComandaAiTheme.colorScheme.surfaceVariant
             ) {
                 Text(
                     text = "Pedido #${order.id}",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = ComandaAiTheme.typography.labelMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
@@ -217,14 +218,14 @@ fun OrderHeader(order: KitchenOrder) {
                 Icon(
                     imageVector = Icons.Default.AccessTime,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    tint = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
                     text = "${createdTime.hour.toString().padStart(2, '0')}:${createdTime.minute.toString().padStart(2, '0')}",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = ComandaAiTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                    color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
             }
             
@@ -238,9 +239,9 @@ fun OrderHeader(order: KitchenOrder) {
                     
                     Text(
                         text = "Atualizado em: ${updatedTime.hour.toString().padStart(2, '0')}:${updatedTime.minute.toString().padStart(2, '0')}",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = ComandaAiTheme.typography.bodySmall,
                         fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
             }

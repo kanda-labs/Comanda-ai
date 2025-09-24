@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 
 @Composable
 fun ConnectionStatusBullet(
@@ -18,7 +18,7 @@ fun ConnectionStatusBullet(
     onReconnectClick: (() -> Unit)? = null
 ) {
     val color = when {
-        isReconnecting -> MaterialTheme.colorScheme.primary
+        isReconnecting -> ComandaAiTheme.colorScheme.primary
         isConnected -> androidx.compose.ui.graphics.Color(0xFF4CAF50) // Green
         else -> androidx.compose.ui.graphics.Color(0xFFFF5252) // Red
     }

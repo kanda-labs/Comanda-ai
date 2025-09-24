@@ -2,9 +2,9 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.payment.
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -59,8 +59,8 @@ internal fun FinishPaymentConfirmationModal(
             } else {
                 "Tem certeza que deseja finalizar o pagamento?\n\nTotal: ${state.totalAmountPresentation}"
             },
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = ComandaAiTheme.typography.bodyLarge,
+            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()

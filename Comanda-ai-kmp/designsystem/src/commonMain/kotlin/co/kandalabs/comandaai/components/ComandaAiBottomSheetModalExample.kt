@@ -2,6 +2,7 @@ package co.kandalabs.comandaai.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -83,8 +84,8 @@ fun ExampleSmallModal(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "Esta ação não pode ser desfeita.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = ComandaAiTheme.typography.bodySmall,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -142,8 +143,8 @@ fun ExampleMidModal(
             
             Text(
                 "Preencha os campos acima para continuar.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = ComandaAiTheme.typography.bodySmall,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -184,7 +185,7 @@ fun ExampleFullModal(
         ) {
             Text(
                 "Resumo Financeiro",
-                style = MaterialTheme.typography.titleMedium
+                style = ComandaAiTheme.typography.titleMedium
             )
             
             // Simulação de conteúdo extenso
@@ -192,7 +193,7 @@ fun ExampleFullModal(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        containerColor = ComandaAiTheme.colorScheme.surfaceVariant
                     )
                 ) {
                     Column(
@@ -202,12 +203,12 @@ fun ExampleFullModal(
                     ) {
                         Text(
                             "Item ${index + 1}",
-                            style = MaterialTheme.typography.titleSmall
+                            style = ComandaAiTheme.typography.titleSmall
                         )
                         Text(
                             "Descrição detalhada do item ${index + 1} com informações relevantes.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = ComandaAiTheme.typography.bodyMedium,
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

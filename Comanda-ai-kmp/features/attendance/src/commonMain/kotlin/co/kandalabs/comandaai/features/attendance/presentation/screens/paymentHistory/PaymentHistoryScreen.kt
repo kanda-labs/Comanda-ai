@@ -138,13 +138,13 @@ private fun PaymentHistoryScreenContent(
                     ) {
                         Text(
                             text = "Erro ao carregar histórico",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.error
+                            style = ComandaAiTheme.typography.titleMedium,
+                            color = ComandaAiTheme.colorScheme.error
                         )
                         Text(
                             text = state.error.message ?: "Erro desconhecido",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = ComandaAiTheme.typography.bodyMedium,
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                         ComandaAiButton(
@@ -157,7 +157,7 @@ private fun PaymentHistoryScreenContent(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(ComandaAiColors.Background.value)
+                        .background(ComandaAiTheme.colorScheme.background)
                         .windowInsetsPadding(WindowInsets.safeDrawing)
                 ) {
                     Row(
@@ -170,14 +170,14 @@ private fun PaymentHistoryScreenContent(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                                 contentDescription = "Voltar",
-                                tint = MaterialTheme.colorScheme.onBackground
+                                tint = ComandaAiTheme.colorScheme.onBackground
                             )
                         }
                         Text(
                             text = "Histórico de Pagamentos",
-                            style = MaterialTheme.typography.titleLarge,
+                            style = ComandaAiTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = ComandaAiTheme.colorScheme.onBackground
                         )
                     }
                     Box(Modifier.fillMaxSize()) {
@@ -262,7 +262,7 @@ private fun FiltersSection(
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = ComandaAiSpacing.Large.value),
         colors = CardDefaults.cardColors(
-            containerColor = ComandaAiColors.Gray200.value
+            containerColor = ComandaAiTheme.colorScheme.gray200
         )
     ) {
         Column(
@@ -284,20 +284,20 @@ private fun FiltersSection(
                     Icon(
                         imageVector = Icons.Default.FilterList,
                         contentDescription = "Filtros",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = ComandaAiTheme.colorScheme.primary
                     )
                     Text(
                         text = "Filtros",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = ComandaAiTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = ComandaAiTheme.colorScheme.onSurface
                     )
                 }
 
                 Icon(
                     imageVector = Icons.Default.ExpandMore,
                     contentDescription = if (isExpanded) "Recolher" else "Expandir",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = ComandaAiTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.rotate(rotationAngle)
                 )
             }
@@ -314,7 +314,7 @@ private fun FiltersSection(
                         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    HorizontalDivider(color = ComandaAiTheme.colorScheme.outlineVariant)
 
                     // Switch for considering previous day
                     Row(
@@ -324,7 +324,7 @@ private fun FiltersSection(
                     ) {
                         Text(
                             text = "Considerar o dia anterior",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = ComandaAiTheme.typography.bodyMedium
                         )
                         Switch(
                             checked = state.tempConsiderPreviousDay,
@@ -389,7 +389,7 @@ private fun SummarySection(state: PaymentHistoryScreenState) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = ComandaAiTheme.colorScheme.primaryContainer
         )
     ) {
         Column(
@@ -405,25 +405,25 @@ private fun SummarySection(state: PaymentHistoryScreenState) {
             ) {
                 Text(
                     text = "Total de Pagamentos:",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = ComandaAiTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = ComandaAiTheme.colorScheme.onPrimaryContainer
                 )
 
                 Text(
                     text = state.totalAmountFormatted,
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = ComandaAiTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = ComandaAiTheme.colorScheme.primary
                 )
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
+            HorizontalDivider(color = ComandaAiTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
 
             Text(
                 text = "${state.payments.size} pagamento(s) encontrado(s)",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                style = ComandaAiTheme.typography.bodyMedium,
+                color = ComandaAiTheme.colorScheme.onPrimaryContainer
             )
         }
     }
@@ -443,15 +443,15 @@ private fun EmptyStateSection() {
         ) {
             Text(
                 text = "Nenhum pagamento encontrado",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = ComandaAiTheme.typography.titleMedium,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
 
             Text(
                 text = "Ajuste os filtros para encontrar seus pagamentos",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = ComandaAiTheme.typography.bodyMedium,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }

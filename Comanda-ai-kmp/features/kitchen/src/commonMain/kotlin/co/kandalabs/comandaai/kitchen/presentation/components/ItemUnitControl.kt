@@ -2,6 +2,7 @@ package co.kandalabs.comandaai.kitchen.presentation.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +38,7 @@ fun ItemUnitControl(
             StatusIndicator(status = currentStatus)
             Text(
                 text = "#$unitIndex",
-                style = MaterialTheme.typography.labelSmall
+                style = ComandaAiTheme.typography.labelSmall
             )
         }
     }
@@ -57,7 +58,7 @@ private fun StatusIndicator(status: ItemStatus) {
 @Composable
 private fun getStatusColor(status: ItemStatus): androidx.compose.ui.graphics.Color {
     return when (status) {
-        ItemStatus.PENDING -> MaterialTheme.colorScheme.error
+        ItemStatus.PENDING -> ComandaAiTheme.colorScheme.error
         ItemStatus.DELIVERED -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
         ItemStatus.CANCELED -> androidx.compose.ui.graphics.Color(0xFF757575)
     }

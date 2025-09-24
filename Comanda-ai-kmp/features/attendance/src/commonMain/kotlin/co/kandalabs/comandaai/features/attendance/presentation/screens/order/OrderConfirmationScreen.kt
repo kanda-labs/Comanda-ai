@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -165,8 +166,8 @@ private fun IdleContent(
             ) {
                 Text(
                     text = "Nenhum item selecionado",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = ComandaAiTheme.typography.bodyMedium,
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }
@@ -177,15 +178,15 @@ private fun IdleContent(
 
                 Text(
                     text = "Mesa $tableNumber",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = ComandaAiTheme.typography.titleMedium,
+                    color = ComandaAiTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
                 )
 
                 Text(
                     text = "Itens selecionados:",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = ComandaAiTheme.typography.titleMedium,
+                    color = ComandaAiTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
                 )
 
@@ -209,7 +210,7 @@ private fun IdleContent(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shadowElevation = 4.dp,
-            color = MaterialTheme.colorScheme.surface
+            color = ComandaAiTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -220,7 +221,7 @@ private fun IdleContent(
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                            containerColor = ComandaAiTheme.colorScheme.primaryContainer
                         )
                     ) {
                         Row(
@@ -232,15 +233,15 @@ private fun IdleContent(
                         ) {
                             Text(
                                 text = "Total:",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = ComandaAiTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = ComandaAiTheme.colorScheme.onPrimaryContainer
                             )
                             Text(
                                 text = "$totalItems ${if (totalItems == 1) "item" else "itens"}",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = ComandaAiTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = ComandaAiTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }
@@ -291,9 +292,9 @@ private fun LoadingContent(
 
         Text(
             text = "Processando pedido...",
-            style = MaterialTheme.typography.titleLarge,
+            style = ComandaAiTheme.typography.titleLarge,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = ComandaAiTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
 
@@ -301,8 +302,8 @@ private fun LoadingContent(
 
         Text(
             text = "Por favor, aguarde",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = ComandaAiTheme.typography.bodyMedium,
+            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
     }
@@ -330,9 +331,9 @@ private fun SuccessContent(
 
         Text(
             text = "Pedido realizado com sucesso!",
-            style = MaterialTheme.typography.headlineMedium,
+            style = ComandaAiTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = ComandaAiTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
 
@@ -340,8 +341,8 @@ private fun SuccessContent(
 
         Text(
             text = "Seu pedido foi enviado para a cozinha",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = ComandaAiTheme.typography.bodyLarge,
+            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
@@ -349,8 +350,8 @@ private fun SuccessContent(
 
         Text(
             text = "Voltando automaticamente...",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            style = ComandaAiTheme.typography.bodySmall,
+            color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             textAlign = TextAlign.Center
         )
     }
@@ -381,9 +382,9 @@ private fun ErrorContent(
 
         Text(
             text = "Erro ao processar pedido",
-            style = MaterialTheme.typography.headlineMedium,
+            style = ComandaAiTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = ComandaAiTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
 
@@ -391,8 +392,8 @@ private fun ErrorContent(
 
         Text(
             text = errorMessage ?: "Erro desconhecido",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = ComandaAiTheme.typography.bodyLarge,
+            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -428,7 +429,7 @@ private fun OrderConfirmationItem(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = ComandaAiTheme.colorScheme.surfaceVariant
         )
     ) {
         Row(
@@ -443,24 +444,24 @@ private fun OrderConfirmationItem(
             ) {
                 Text(
                     text = itemWithCount.item.name,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = ComandaAiTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
                 if (itemWithCount.item.description?.isNotEmpty() == true)
                     itemWithCount.item.description?.let { description ->
                         Text(
                             text = description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            style = ComandaAiTheme.typography.bodySmall,
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
                     }
                 if (!observation.isNullOrBlank()) {
                     Text(
                         text = "Obs: $observation",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = ComandaAiTheme.typography.bodySmall,
                         fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = ComandaAiTheme.colorScheme.tertiary,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -468,9 +469,9 @@ private fun OrderConfirmationItem(
 
             Text(
                 text = "${itemWithCount.count}x",
-                style = MaterialTheme.typography.titleMedium,
+                style = ComandaAiTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = ComandaAiTheme.colorScheme.primary
             )
         }
     }

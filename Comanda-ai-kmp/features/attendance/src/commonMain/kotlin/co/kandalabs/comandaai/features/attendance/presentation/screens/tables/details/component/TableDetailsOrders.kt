@@ -46,14 +46,14 @@ internal fun TableDetailsOrders(
                 Icon(
                     imageVector = Icons.Filled.Info,
                     contentDescription = "Nenhum pedido",
-                    tint = ComandaAiColors.Gray300.value,
+                    tint = ComandaAiTheme.colorScheme.gray300,
                     modifier = Modifier.size(40.dp)
                         .padding(bottom = ComandaAiSpacing.Medium.value)
                 )
                 Text(
                     text = "Não encontramos pedidos para essa mesa",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = ComandaAiTheme.typography.bodyMedium,
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = ComandaAiSpacing.Small.value)
                 )
             }
@@ -97,8 +97,8 @@ private fun TableDetailsOrdersComponentFilledPreview() {
                     time = "Realizado às 12:00",
                     status = TableDetailsScreenBadge(
                         text = "Aberto",
-                        color = ComandaAiColors.Green500,
-                        textColor = ComandaAiColors.Surface,
+                        color = ComandaAiColors.Tertiary,
+                        textColor = ComandaAiColors.OnTertiary,
                     ),
                     order = Order(
                         id = 1,

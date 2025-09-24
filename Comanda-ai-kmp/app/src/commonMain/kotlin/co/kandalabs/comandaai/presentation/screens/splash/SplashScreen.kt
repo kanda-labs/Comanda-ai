@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.CircularProgressIndicator
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,12 +78,12 @@ private fun SplashContent() {
         ) {
             Text(
                 text = "Comanda AI",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary
+                style = ComandaAiTheme.typography.headlineMedium,
+                color = ComandaAiTheme.colorScheme.primary
             )
 
             CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary,
+                color = ComandaAiTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp),
                 strokeWidth = 4.dp
             )

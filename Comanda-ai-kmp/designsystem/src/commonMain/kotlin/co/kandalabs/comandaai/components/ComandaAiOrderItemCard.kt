@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +32,7 @@ fun ComandaAiOrderItemCard(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = ComandaAiTheme.colorScheme.gray200
         )
     ) {
         Row(
@@ -50,17 +51,17 @@ fun ComandaAiOrderItemCard(
             ) {
                 Text(
                     text = item.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = ComandaAiTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
                 
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
                     text = CurrencyFormatter.formatCents(item.value),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = ComandaAiTheme.typography.bodyMedium,
+                    color = ComandaAiTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
                 )
                 
@@ -69,8 +70,8 @@ fun ComandaAiOrderItemCard(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = ComandaAiTheme.typography.bodySmall,
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

@@ -1,30 +1,42 @@
 package co.kandalabs.comandaai.kitchen.presentation.components
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenItemDetail
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 
 @Composable
 fun ItemRow(
@@ -54,20 +66,20 @@ fun ItemRow(
                 ) {
                     Text(
                         text = item.name,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = ComandaAiTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = ComandaAiTheme.colorScheme.onSurface
                     )
                     
                     // Mostrar quantidade
                     Surface(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        color = ComandaAiTheme.colorScheme.primary.copy(alpha = 0.1f),
                         shape = MaterialTheme.shapes.small
                     ) {
                         Text(
                             text = "${item.totalCount}x",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
+                            style = ComandaAiTheme.typography.labelMedium,
+                            color = ComandaAiTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         )
@@ -77,8 +89,8 @@ fun ItemRow(
                 if (!item.observation.isNullOrBlank()) {
                     Text(
                         text = "Obs: ${item.observation}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        style = ComandaAiTheme.typography.bodyMedium,
+                        color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
             }
@@ -129,7 +141,7 @@ fun ItemRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    color = ComandaAiTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -170,8 +182,8 @@ fun ItemRow(
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondary,
-                                        contentColor = MaterialTheme.colorScheme.onSecondary
+                                        containerColor = ComandaAiTheme.colorScheme.secondary,
+                                        contentColor = ComandaAiTheme.colorScheme.onSecondary
                                     )
                                 ) {
                                     Row(
@@ -185,7 +197,7 @@ fun ItemRow(
                                         )
                                         Text(
                                             text = "Reverter para Pendente",
-                                            style = MaterialTheme.typography.labelLarge,
+                                            style = ComandaAiTheme.typography.labelLarge,
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
@@ -197,8 +209,8 @@ fun ItemRow(
                                     modifier = Modifier.fillMaxWidth(),
                                     enabled = !isItemLoading,
                                     colors = ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                        containerColor = ComandaAiTheme.colorScheme.primary,
+                                        contentColor = ComandaAiTheme.colorScheme.onPrimary
                                     )
                                 ) {
                                     Row(
@@ -212,7 +224,7 @@ fun ItemRow(
                                         )
                                         Text(
                                             text = "Marcar Todos como Entregues",
-                                            style = MaterialTheme.typography.labelLarge,
+                                            style = ComandaAiTheme.typography.labelLarge,
                                             fontWeight = FontWeight.Medium
                                         )
                                     }

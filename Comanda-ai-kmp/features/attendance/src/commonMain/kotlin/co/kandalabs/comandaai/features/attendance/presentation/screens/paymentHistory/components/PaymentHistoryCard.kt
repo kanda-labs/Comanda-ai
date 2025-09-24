@@ -10,12 +10,15 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PartialPayment
+import co.kandalabs.comandaai.theme.ComandaAiTypography
+import co.kandalabs.comandaai.tokens.ComandaAiColors
 import kotlinx.datetime.*
 
 @Composable
@@ -27,7 +30,7 @@ internal fun PaymentHistoryCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = ComandaAiTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -45,16 +48,16 @@ internal fun PaymentHistoryCard(
             ) {
                 Text(
                     text = payment.amountFormatted,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = ComandaAiTypography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
 
                 payment.paymentMethod?.let { method ->
                     Text(
                         text = method.displayName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = ComandaAiTheme.typography.bodyMedium,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -62,30 +65,30 @@ internal fun PaymentHistoryCard(
             // Date and time
             Text(
                 text = formatDateTime(payment.createdAt),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = ComandaAiTheme.typography.bodyMedium,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
 
             // Table info
             Text(
                 text = "Mesa ${payment.tableId}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = ComandaAiTheme.typography.bodyMedium,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
 
             // Paid by
             Text(
                 text = "Pago por: ${payment.paidBy}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = ComandaAiTheme.typography.bodyMedium,
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
 
             // Received by
             payment.receivedBy?.let { receivedBy ->
                 Text(
                     text = "Recebido por: $receivedBy",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = ComandaAiTheme.typography.bodySmall,
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -94,8 +97,8 @@ internal fun PaymentHistoryCard(
                 if (description.isNotBlank()) {
                     Text(
                         text = "Observação: $description",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -141,11 +142,11 @@ private fun KitchenScreenContent(
                                 OrderFilter.DELIVERED -> "${state.deliveredOrders.size} pedidos entregues"
                             }
                             
-                            Text(titleText, style = MaterialTheme.typography.titleLarge)
+                            Text(titleText, style = ComandaAiTheme.typography.titleLarge)
                             Text(
                                 countText,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                style = ComandaAiTheme.typography.bodySmall,
+                                color = ComandaAiTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -252,7 +253,7 @@ private fun KitchenScreenContent(
                     onClick = onDismissDeliveryConfirmation,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurface
+                        contentColor = ComandaAiTheme.colorScheme.onSurface
                     )
                 ) {
                     Text("Cancelar")
@@ -262,7 +263,7 @@ private fun KitchenScreenContent(
                     onClick = { onConfirmDelivery(order.id) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = ComandaAiTheme.colorScheme.primary
                     )
                 ) {
                     Text("Confirmar entrega")
@@ -271,7 +272,7 @@ private fun KitchenScreenContent(
         ) {
             Text(
                 text = "Deseja marcar este pedido como entregue?",
-                style = MaterialTheme.typography.bodyLarge,
+                style = ComandaAiTheme.typography.bodyLarge,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
             
@@ -279,8 +280,8 @@ private fun KitchenScreenContent(
             
             Text(
                 text = "Mesa ${order.tableNumber} • ${order.userName}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                style = ComandaAiTheme.typography.bodyMedium,
+                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
         }

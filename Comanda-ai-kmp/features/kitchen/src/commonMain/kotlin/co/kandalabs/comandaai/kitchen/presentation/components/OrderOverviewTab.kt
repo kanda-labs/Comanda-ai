@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material3.Card
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -123,23 +124,23 @@ private fun CategoryFilterChip(
         modifier = Modifier.clickable { onClick() },
         shape = MaterialTheme.shapes.small,
         color = if (isSelected) {
-            MaterialTheme.colorScheme.primary
+            ComandaAiTheme.colorScheme.primary
         } else {
-            MaterialTheme.colorScheme.surfaceVariant
+            ComandaAiTheme.colorScheme.surfaceVariant
         },
         border = if (isSelected) null else BorderStroke(
             1.dp,
-            MaterialTheme.colorScheme.outline
+            ComandaAiTheme.colorScheme.outline
         )
     ) {
         Text(
             text = categoryName,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            style = MaterialTheme.typography.labelMedium,
+            style = ComandaAiTheme.typography.labelMedium,
             color = if (isSelected) {
-                MaterialTheme.colorScheme.onPrimary
+                ComandaAiTheme.colorScheme.onPrimary
             } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
+                ComandaAiTheme.colorScheme.onSurfaceVariant
             },
             fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
         )
@@ -160,18 +161,18 @@ private fun EmptyOverviewState() {
                 imageVector = Icons.Default.Analytics,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                tint = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.3f)
             )
             Text(
                 text = "Nenhum item encontrado",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                style = ComandaAiTheme.typography.headlineSmall,
+                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
             Text(
                 text = "Selecione outras categorias para ver o resumo",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                style = ComandaAiTheme.typography.bodyMedium,
+                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 textAlign = TextAlign.Center
             )
         }
@@ -213,13 +214,13 @@ private fun ItemSummaryCard(
             ) {
                 Text(
                     text = item.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = ComandaAiTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
             }
 
             Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = ComandaAiTheme.colorScheme.primaryContainer,
                 shape = MaterialTheme.shapes.medium
             ) {
                 Text(
@@ -228,8 +229,8 @@ private fun ItemSummaryCard(
                         horizontal = 12.dp,
                         vertical = 6.dp
                     ),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = ComandaAiTheme.typography.titleMedium,
+                    color = ComandaAiTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Bold
                 )
             }

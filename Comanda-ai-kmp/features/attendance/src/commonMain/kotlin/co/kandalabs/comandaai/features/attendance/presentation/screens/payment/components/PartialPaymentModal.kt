@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
@@ -128,8 +129,8 @@ internal fun PartialPaymentModal(
                 placeholder = { Text("Ex: João, Mesa 5, etc.") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary
+                    focusedBorderColor = ComandaAiTheme.colorScheme.primary,
+                    focusedLabelColor = ComandaAiTheme.colorScheme.primary
                 )
             )
 
@@ -170,8 +171,8 @@ internal fun PartialPaymentModal(
                     onDone = { confirmPayment() }
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary
+                    focusedBorderColor = ComandaAiTheme.colorScheme.primary,
+                    focusedLabelColor = ComandaAiTheme.colorScheme.primary
                 )
             )
 
@@ -192,8 +193,8 @@ internal fun PartialPaymentModal(
                         .fillMaxWidth()
                         .menuAnchor(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary
+                        focusedBorderColor = ComandaAiTheme.colorScheme.primary,
+                        focusedLabelColor = ComandaAiTheme.colorScheme.primary
                     )
                 )
 
@@ -227,8 +228,8 @@ internal fun PartialPaymentModal(
                     onDone = { confirmPayment() }
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary
+                    focusedBorderColor = ComandaAiTheme.colorScheme.primary,
+                    focusedLabelColor = ComandaAiTheme.colorScheme.primary
                 )
             )
         }

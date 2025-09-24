@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +31,8 @@ fun StatusBadge(
 ) {
     val (backgroundColor, textColor, icon) = when (status) {
         ItemStatus.PENDING -> Triple(
-            MaterialTheme.colorScheme.error.copy(alpha = 0.15f),
-            MaterialTheme.colorScheme.error,
+            ComandaAiTheme.colorScheme.error.copy(alpha = 0.15f),
+            ComandaAiTheme.colorScheme.error,
             Icons.Default.Schedule
         )
 
@@ -77,14 +78,14 @@ fun StatusBadge(
             if (count > 0)
                 Text(
                     text = count.toString(),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = ComandaAiTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = textColor
                 )
 
             Text(
                 text = getStatusText(status),
-                style = MaterialTheme.typography.labelMedium,
+                style = ComandaAiTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 color = textColor
             )

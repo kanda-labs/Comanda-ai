@@ -4,12 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,15 +39,16 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import co.kandalabs.comandaai.components.ComandaAiLoadingView
 import co.kandalabs.comandaai.components.ComandaAiTopAppBar
-import co.kandalabs.comandaai.tokens.ComandaAiSpacing
-import co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSelection.components.ErrorView
-import org.jetbrains.compose.resources.painterResource
 import co.kandalabs.comandaai.domain.Item
+import co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSelection.components.ErrorView
+import co.kandalabs.comandaai.theme.ComandaAiTheme
+import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import coil3.compose.AsyncImage
 import comandaai.features.attendance.generated.resources.Res
 import comandaai.features.attendance.generated.resources.golden_loading
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private const val PREVIEW_BACKGROUND_ALPHA = 0.7f
@@ -96,7 +97,7 @@ internal fun BreedsListingScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(ComandaAiTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
         ComandaAiTopAppBar(strings.title)
@@ -196,7 +197,7 @@ private fun BreedItem(
     ) {
         Text(
             text = item.name,
-            style = MaterialTheme.typography.bodyMedium.copy(
+            style = ComandaAiTheme.typography.bodyMedium.copy(
                 color = Color.White,
                 fontWeight = FontWeight.Bold
             ),

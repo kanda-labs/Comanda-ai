@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.DropdownMenu
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,7 +49,7 @@ internal fun PaymentMethodDropdown(
                 .clip(RoundedCornerShape(4.dp))
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
+                    color = ComandaAiTheme.colorScheme.outline,
                     shape = RoundedCornerShape(4.dp)
                 )
                 .clickable { expanded = true }
@@ -58,14 +59,14 @@ internal fun PaymentMethodDropdown(
         ) {
             Text(
                 text = selectedPaymentMethod?.displayName ?: "Todos os métodos",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                style = ComandaAiTheme.typography.bodyLarge,
+                color = ComandaAiTheme.colorScheme.onSurface
             )
 
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
                 contentDescription = "Expandir",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
         }
 

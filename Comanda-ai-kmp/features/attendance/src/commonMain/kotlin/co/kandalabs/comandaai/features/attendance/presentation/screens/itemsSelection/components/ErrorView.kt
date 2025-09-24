@@ -19,6 +19,7 @@ import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.sdk.error.ComandaAiException
 import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import comandaai.features.attendance.generated.resources.Res
 import comandaai.features.attendance.generated.resources.golden_connection_error
@@ -74,7 +75,7 @@ fun ErrorView(
             Text(
                 text = errorMessage,
                 style = ComandaAiTypography.titleLarge,
-                color = ComandaAiColors.Error.value,
+                color = ComandaAiTheme.colorScheme.error,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
 
@@ -84,7 +85,7 @@ fun ErrorView(
             Text(
                 text = "Code: ${error.code}",
                 style = ComandaAiTypography.bodySmall,
-                color = ComandaAiColors.Gray600.value
+                color = ComandaAiTheme.colorScheme.gray600
             )
 
             Spacer(modifier = Modifier.height(ComandaAiSpacing.Large.value))

@@ -11,12 +11,12 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -114,7 +114,7 @@ fun ComandaAiBottomSheetModal(
                             }
                         },
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                    color = MaterialTheme.colorScheme.surface,
+                    color = ComandaAiTheme.colorScheme.surface,
                     shadowElevation = 16.dp
                 ) {
                     // Para modo Dynamic, usamos layout normal
@@ -158,7 +158,7 @@ fun ComandaAiBottomSheetModal(
                             actions?.let { actionsContent ->
                                 Surface(
                                     modifier = Modifier.fillMaxWidth(),
-                                    color = MaterialTheme.colorScheme.surface
+                                    color = ComandaAiTheme.colorScheme.surface
                                 ) {
                                     ComandaAiBottomSheetModalActions(
                                         modifier = Modifier.padding(bottom = 16.dp),
@@ -193,7 +193,7 @@ private fun ModalHeader(
                         .width(40.dp)
                         .height(4.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                             shape = RoundedCornerShape(2.dp)
                         )
                 )
@@ -207,9 +207,9 @@ private fun ModalHeader(
         // Title
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineSmall,
+            style = ComandaAiTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = ComandaAiTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
