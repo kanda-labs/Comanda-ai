@@ -3,7 +3,6 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.admin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,8 +16,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
@@ -132,7 +131,7 @@ private fun AdminScreenContent(
             )
         } else if (state.error != null) {
             SimpleErrorView(
-                errorMessage = state.error ?: "Erro desconhecido",
+                errorMessage = state.error,
                 onRetry = { onAction(AdminAction.Retry) }
             )
         } else if (!state.hasAdminAccess) {
@@ -147,7 +146,7 @@ private fun AdminScreenContent(
                 ComandaAiTopAppBar(
                     title = state.title,
                     onBackOrClose = { onAction(AdminAction.NavigateBack) },
-                    icon = Icons.Default.ArrowBack,
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
                     actions = {
                         UserAvatar(
                             userName = userSession?.userName,
@@ -175,12 +174,6 @@ private fun AdminOptionsGrid(
     onAction: (AdminAction) -> Unit
 ) {
     val adminOptions = listOf(
-        AdminOption(
-            title = "Categorias",
-            description = "Gerenciar categorias de items",
-            icon = Icons.Default.Menu,
-            action = AdminAction.NavigateToCategoriesManagement
-        ),
         AdminOption(
             title = "Items",
             description = "Gerenciar items do cardápio",
@@ -300,7 +293,7 @@ private fun UnauthorizedView(
             )
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Voltar",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
