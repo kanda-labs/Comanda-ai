@@ -1,106 +1,121 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.itemsSelection.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.components.ComandaAiButton
 import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.sdk.error.ComandaAiException
-import co.kandalabs.comandaai.tokens.ComandaAiColors
 import co.kandalabs.comandaai.tokens.ComandaAiSpacing
 import co.kandalabs.comandaai.theme.ComandaAiTheme
-import co.kandalabs.comandaai.theme.ComandaAiTypography
-import comandaai.features.attendance.generated.resources.Res
-import comandaai.features.attendance.generated.resources.golden_connection_error
-import comandaai.features.attendance.generated.resources.golden_generic_error
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun ErrorView(
     error: ComandaAiException,
     onRetry: (() -> Unit)? = null
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(ComandaAiSpacing.Medium.value)
     ) {
+        // Content area (scrollable if needed)
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(ComandaAiSpacing.Medium.value),
+                .weight(1f)
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Select appropriate error image
-            val imageError = when (error) {
-                is ComandaAiException.NoInternetConnectionException,
-                is ComandaAiException.UnknownHttpException -> Res.drawable.golden_connection_error
-                else -> Res.drawable.golden_generic_error
+            // Select appropriate error icon and color
+            val (errorIcon, iconColor) = when (error) {
+                is ComandaAiException.NoInternetConnectionException ->
+                    Icons.Default.CloudOff to ComandaAiTheme.colorScheme.error
+                is ComandaAiException.UnknownHttpException ->
+                    Icons.Default.Warning to ComandaAiTheme.colorScheme.error
+                else ->
+                    Icons.Default.ErrorOutline to ComandaAiTheme.colorScheme.error
             }
 
-            // Display error image
-            Image(
-                painter = painterResource(imageError),
-                contentDescription = "Error Image",
-                modifier = Modifier
-                    .padding(horizontal = ComandaAiSpacing.xXLarge.value)
-                    .aspectRatio(1f)
+            // Display error icon
+            Icon(
+                imageVector = errorIcon,
+                contentDescription = "Error",
+                modifier = Modifier.size(80.dp),
+                tint = iconColor.copy(alpha = 0.8f)
             )
 
             Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
 
-            // Display error-specific message
-            val errorMessage = when (error) {
-                is ComandaAiException.NoInternetConnectionException ->
-                    "No internet connection. Please check your network and try again."
-                is ComandaAiException.UnknownHttpException ->
-                    "Network error (Code: ${error.code}). Please try again."
-                is ComandaAiException.UnknownException ->
-                    "An unexpected error occurred. Please try again."
-                else ->
-                    "Something went wrong. Please try again."
+            // Display error title
+            val errorTitle = when (error) {
+                is ComandaAiException.NoInternetConnectionException -> "Sem conexão"
+                is ComandaAiException.UnknownHttpException -> "Erro de rede"
+                else -> "Algo deu errado"
             }
 
             Text(
-                text = errorMessage,
-                style = ComandaAiTypography.titleLarge,
-                color = ComandaAiTheme.colorScheme.error,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                text = errorTitle,
+                style = ComandaAiTheme.typography.headlineSmall,
+                color = ComandaAiTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
 
-            // Display error code for debugging
-            Text(
-                text = "Code: ${error.code}",
-                style = ComandaAiTypography.bodySmall,
-                color = ComandaAiTheme.colorScheme.gray600
-            )
-
-            Spacer(modifier = Modifier.height(ComandaAiSpacing.Large.value))
-
-            // Display retry button if onRetry is provided
-            onRetry?.let {
-                ComandaAiButton(
-                    text = "Retry",
-                    onClick = it,
-                    variant = ComandaAiButtonVariant.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = ComandaAiSpacing.Medium.value)
-                )
+            // Display error-specific message
+            val errorMessage = when (error) {
+                is ComandaAiException.NoInternetConnectionException ->
+                    "Verifique sua conexão com a internet e tente novamente."
+                is ComandaAiException.UnknownHttpException ->
+                    "Problema na comunicação com o servidor. Tente novamente."
+                is ComandaAiException.UnknownException ->
+                    "Ocorreu um erro inesperado. Tente novamente."
+                else ->
+                    "Ocorreu um problema. Por favor, tente novamente."
             }
+
+            Text(
+                text = errorMessage,
+                style = ComandaAiTheme.typography.bodyLarge,
+                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        // Bottom button area
+        onRetry?.let {
+            Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
+            ComandaAiButton(
+                text = "Tentar novamente",
+                onClick = it,
+                variant = ComandaAiButtonVariant.Primary,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
