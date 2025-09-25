@@ -1,6 +1,7 @@
 package co.kandalabs.comandaai.kitchen.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -191,34 +192,77 @@ private fun KitchenScreenContent(
             }
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = ComandaAiTheme.colorScheme.surfaceVariant
-            ) {
-                NavigationBarItem(
-                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) },
-                    label = { Text("Controle") },
-                    selected = selectedTab == 0,
-                    onClick = { onTabChange(0) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = ComandaAiTheme.colorScheme.onSecondaryContainer,
-                        selectedTextColor = ComandaAiTheme.colorScheme.onSurface,
-                        indicatorColor = ComandaAiTheme.colorScheme.secondaryContainer,
-                        unselectedIconColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
-                        unselectedTextColor = ComandaAiTheme.colorScheme.onSurfaceVariant
-                    )
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Analytics, contentDescription = null) },
-                    label = { Text("Panorama") },
-                    selected = selectedTab == 1,
-                    onClick = { onTabChange(1) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = ComandaAiTheme.colorScheme.onSecondaryContainer,
-                        selectedTextColor = ComandaAiTheme.colorScheme.onSurface,
-                        indicatorColor = ComandaAiTheme.colorScheme.secondaryContainer,
-                        unselectedIconColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
-                        unselectedTextColor = ComandaAiTheme.colorScheme.onSurfaceVariant
-                    )
+            Column {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    color = ComandaAiTheme.colorScheme.surfaceVariant
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        // Tab Controle
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .clickable { onTabChange(0) },
+                            color = if (selectedTab == 0) ComandaAiTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.List,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = if (selectedTab == 0) ComandaAiTheme.colorScheme.onSecondaryContainer else ComandaAiTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    "Controle",
+                                    style = ComandaAiTheme.typography.labelSmall,
+                                    color = if (selectedTab == 0) ComandaAiTheme.colorScheme.onSurface else ComandaAiTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        // Tab Panorama
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .clickable { onTabChange(1) },
+                            color = if (selectedTab == 1) ComandaAiTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Analytics,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = if (selectedTab == 1) ComandaAiTheme.colorScheme.onSecondaryContainer else ComandaAiTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    "Panorama",
+                                    style = ComandaAiTheme.typography.labelSmall,
+                                    color = if (selectedTab == 1) ComandaAiTheme.colorScheme.onSurface else ComandaAiTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
+                        .background(ComandaAiTheme.colorScheme.surfaceVariant)
                 )
             }
         }

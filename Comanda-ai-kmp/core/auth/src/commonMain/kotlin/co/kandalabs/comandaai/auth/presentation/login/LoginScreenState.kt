@@ -11,7 +11,7 @@ internal data class LoginScreenState(
     val error: ComandaAiException? = null,
     val isPasswordVisible: Boolean = false
 ) {
-    val isFormValid: Boolean = username.isNotBlank() && password.isNotBlank() && usernameError == null && passwordError == null
+    val isFormValid: Boolean = username.isNotBlank() && password.isNotBlank()
     
     val isContinueButtonEnabled: Boolean = isFormValid && !isLoading
 }

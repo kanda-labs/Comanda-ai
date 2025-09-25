@@ -5,10 +5,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -29,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -59,7 +67,9 @@ object LoginScreen : Screen {
             onPasswordChanged = viewModel::onPasswordChanged,
             onLogin = viewModel::onLogin,
             onClearError = viewModel::clearError,
-            onTogglePasswordVisibility = viewModel::togglePasswordVisibility
+            onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
+            onValidateUsername = viewModel::validateUsernameField,
+            onValidatePassword = viewModel::validatePasswordField
         )
     }
 }
@@ -71,27 +81,31 @@ private fun LoginScreenContent(
     onPasswordChanged: (String) -> Unit,
     onLogin: () -> Unit,
     onClearError: () -> Unit,
-    onTogglePasswordVisibility: () -> Unit
+    onTogglePasswordVisibility: () -> Unit,
+    onValidateUsername: () -> Unit,
+    onValidatePassword: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
-    // Clear error when state changes
-    LaunchedEffect(state.username, state.password) {
-        if (state.error != null) {
-            onClearError()
-        }
-    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(ComandaAiTheme.colorScheme.background)
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
             .padding(ComandaAiSpacing.Medium.value)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(ComandaAiSpacing.xXLarge.value))
+        // Scrollable content
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Dynamic spacing that reduces when keyboard is up
+            Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
 
         // Logo/Title
         Text(
@@ -120,7 +134,13 @@ private fun LoginScreenContent(
             onValueChange = onUsernameChanged,
             label = { Text("Usuário") },
             placeholder = { Text("Digite seu usuário") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (!focusState.isFocused && state.username.isNotEmpty()) {
+                        onValidateUsername()
+                    }
+                },
             shape = RoundedCornerShape(ComandaAiSpacing.Small.value),
             isError = state.usernameError != null,
             supportingText = {
@@ -162,7 +182,13 @@ private fun LoginScreenContent(
             onValueChange = onPasswordChanged,
             label = { Text("Senha") },
             placeholder = { Text("Digite sua senha") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (!focusState.isFocused && state.password.isNotEmpty()) {
+                        onValidatePassword()
+                    }
+                },
             shape = RoundedCornerShape(ComandaAiSpacing.Small.value),
             isError = state.passwordError != null,
             supportingText = {
@@ -216,36 +242,48 @@ private fun LoginScreenContent(
 
         Spacer(modifier = Modifier.height(ComandaAiSpacing.xXLarge.value))
 
-        // Login Button
-        ComandaAiButton(
-            text = if (state.isLoading) "Entrando..." else "Continuar",
-            onClick = onLogin,
-            isEnabled = state.isContinueButtonEnabled,
-            variant = ComandaAiButtonVariant.Primary,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Error Message
-        state.error?.let { error ->
-            Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f)
-                ),
-                shape = RoundedCornerShape(ComandaAiSpacing.Small.value)
-            ) {
-                Text(
-                    text = error.message,
-                    color = ComandaAiTheme.colorScheme.error,
-                    style = ComandaAiTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(ComandaAiSpacing.Medium.value),
-                    textAlign = TextAlign.Center
-                )
-            }
+        // Extra space to ensure content is scrollable above keyboard
+        Spacer(modifier = Modifier.height(ComandaAiSpacing.xXLarge.value))
         }
 
-        Spacer(modifier = Modifier.height(ComandaAiSpacing.xXLarge.value))
+        // Bottom section with login button and error message
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .imePadding()
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            // Error Message
+            state.error?.let { error ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f)
+                    ),
+                    shape = RoundedCornerShape(ComandaAiSpacing.Small.value)
+                ) {
+                    Text(
+                        text = error.message,
+                        color = ComandaAiTheme.colorScheme.error,
+                        style = ComandaAiTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(ComandaAiSpacing.Medium.value),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Spacer(modifier = Modifier.height(ComandaAiSpacing.Medium.value))
+            }
+
+            // Login Button
+            ComandaAiButton(
+                text = if (state.isLoading) "Entrando..." else "Continuar",
+                onClick = onLogin,
+                isEnabled = state.isContinueButtonEnabled,
+                variant = ComandaAiButtonVariant.Primary,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 
     // Loading overlay
@@ -272,13 +310,15 @@ private fun LoginScreenPreview() {
                 username = "usuario",
                 password = "",
                 usernameError = null,
-                passwordError = "Senha deve ter pelo menos 4 caracteres"
+                passwordError = "A senha deve conter pelo menos 4 caracteres"
             ),
             onUsernameChanged = {},
             onPasswordChanged = {},
             onLogin = {},
             onClearError = {},
-            onTogglePasswordVisibility = {}
+            onTogglePasswordVisibility = {},
+            onValidateUsername = {},
+            onValidatePassword = {}
         )
     }
 }
