@@ -69,7 +69,7 @@ fun OrderScreenContent(
             modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
             topBar = {
                 ComandaAiTopAppBar(
-                    title = "Mesa $tableNumber",
+                    title = "Produtos",
                     onBackOrClose = onBackClick,
                     icon = Icons.AutoMirrored.Filled.ArrowBack
                 )
@@ -101,7 +101,7 @@ fun OrderScreenContent(
         ) {
             // Subtitle
             Text(
-                text = "Fazer pedido",
+                text = "Fazer pedido para Mesa $tableNumber",
                 style = ComandaAiTheme.typography.titleMedium,
                 color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)

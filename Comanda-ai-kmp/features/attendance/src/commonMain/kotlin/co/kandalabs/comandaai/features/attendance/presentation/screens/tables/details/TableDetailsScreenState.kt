@@ -29,20 +29,20 @@ internal data class TableDetailsScreenState(
     val badge: TableDetailsScreenBadge? = when (table?.status) {
         TableStatus.OCCUPIED -> TableDetailsScreenBadge(
             text = table.status.presentationName,
-            color = ComandaAiColors.Secondary,
-            textColor = ComandaAiColors.OnSurface
+            color = ComandaAiColors.Yellow,
+            textColor = ComandaAiColors.OnYellow
         )
 
         TableStatus.ON_PAYMENT -> TableDetailsScreenBadge(
             text = table.status.presentationName,
-            color = ComandaAiColors.Secondary,
-            textColor = ComandaAiColors.OnSurface
+            color = ComandaAiColors.Error,
+            textColor = ComandaAiColors.OnError
         )
 
         TableStatus.FREE -> TableDetailsScreenBadge(
             text = table.status.presentationName,
             color = ComandaAiColors.Primary,
-            textColor = ComandaAiColors.OnSurface
+            textColor = ComandaAiColors.OnPrimary
         )
 
         else -> null

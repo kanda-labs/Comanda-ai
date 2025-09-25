@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.components.ComandaAiButton
+import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.features.attendance.domain.model.ItemWithCount
 
 @Composable
@@ -190,13 +191,13 @@ fun OrderConfirmationModal(
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 // Cancel button
-                                OutlinedButton(
+                                ComandaAiButton(
+                                    text = "Cancelar",
                                     onClick = onDismiss,
                                     modifier = Modifier.weight(1f),
-                                    enabled = !isLoading
-                                ) {
-                                    Text("Cancelar")
-                                }
+                                    isEnabled = !isLoading,
+                                    variant = ComandaAiButtonVariant.Secondary
+                                )
                                 
                                 // Confirm button
                                 ComandaAiButton(
@@ -246,7 +247,7 @@ private fun OrderConfirmationItem(
                     Text(
                         text = description,
                         style = ComandaAiTheme.typography.bodySmall,
-                        color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

@@ -25,11 +25,11 @@ fun OrderFilterToggle(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+        modifier = modifier.fillMaxWidth().padding(vertical = 2.dp),
+        horizontalArrangement = Arrangement.Center,
     ) {
         Surface(
-            modifier = Modifier.fillMaxWidth(0.8f),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             shape = MaterialTheme.shapes.medium,
             color = ComandaAiTheme.colorScheme.surfaceVariant,
             border = BorderStroke(1.dp, ComandaAiTheme.colorScheme.outline.copy(alpha = 0.3f))
@@ -75,7 +75,7 @@ private fun FilterButton(
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(vertical = 12.dp),
+            modifier = Modifier.padding(vertical = 6.dp),
             style = ComandaAiTheme.typography.labelLarge,
             color = if (isSelected) {
                 ComandaAiTheme.colorScheme.onPrimary

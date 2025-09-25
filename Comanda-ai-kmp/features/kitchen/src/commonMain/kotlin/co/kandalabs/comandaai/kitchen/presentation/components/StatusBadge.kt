@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.domain.ItemStatus
+import co.kandalabs.comandaai.tokens.ComandaAiColors
 
 @Composable
 fun StatusBadge(
@@ -31,8 +32,8 @@ fun StatusBadge(
 ) {
     val (backgroundColor, textColor, icon) = when (status) {
         ItemStatus.PENDING -> Triple(
-            ComandaAiTheme.colorScheme.error.copy(alpha = 0.15f),
-            ComandaAiTheme.colorScheme.error,
+            ComandaAiColors.Error.value.copy(alpha = 0.30f),
+            ComandaAiColors.OnError.value,
             Icons.Default.Schedule
         )
 
@@ -43,8 +44,8 @@ fun StatusBadge(
         )
 
         ItemStatus.CANCELED -> Triple(
-            androidx.compose.ui.graphics.Color(0xFF757575).copy(alpha = 0.15f),
-            androidx.compose.ui.graphics.Color(0xFF757575),
+            ComandaAiTheme.colorScheme.surfaceVariant,
+            ComandaAiTheme.colorScheme.onSurfaceVariant,
             Icons.Default.Cancel
         )
     }

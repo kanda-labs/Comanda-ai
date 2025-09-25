@@ -26,6 +26,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             implementation(projects.core.network)
             implementation(libs.kodein.di)
+            implementation(libs.date.time)
         }
         
         androidMain.dependencies {

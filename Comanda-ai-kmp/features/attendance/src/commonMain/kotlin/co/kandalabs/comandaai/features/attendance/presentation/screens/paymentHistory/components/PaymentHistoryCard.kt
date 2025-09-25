@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.features.attendance.domain.models.model.PartialPayment
 import co.kandalabs.comandaai.theme.ComandaAiTypography
 import co.kandalabs.comandaai.tokens.ComandaAiColors
-import kotlinx.datetime.*
+import co.kandalabs.comandaai.core.utils.DateTimeFormatter
 
 @Composable
 internal fun PaymentHistoryCard(
@@ -64,7 +64,7 @@ internal fun PaymentHistoryCard(
 
             // Date and time
             Text(
-                text = formatDateTime(payment.createdAt),
+                text = DateTimeFormatter.formatDateTime(payment.createdAt),
                 style = ComandaAiTheme.typography.bodyMedium,
                 color = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
@@ -104,14 +104,4 @@ internal fun PaymentHistoryCard(
             }
         }
     }
-}
-
-private fun formatDateTime(localDateTime: kotlinx.datetime.LocalDateTime): String {
-    val date = localDateTime.date
-    val time = localDateTime.time
-
-    val formattedDate = "${date.dayOfMonth.toString().padStart(2, '0')}/${date.monthNumber.toString().padStart(2, '0')}/${date.year}"
-    val formattedTime = "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
-
-    return "$formattedDate às $formattedTime"
 }

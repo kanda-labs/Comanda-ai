@@ -11,14 +11,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Badge
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import co.kandalabs.comandaai.components.ComandaAiListItem
+import co.kandalabs.comandaai.components.CommandaBadge
 import co.kandalabs.comandaai.theme.ComandaAiTheme
 import co.kandalabs.comandaai.features.attendance.presentation.screens.tables.details.OrdersDetailsItemState
 import co.kandalabs.comandaai.tokens.ComandaAiColors
@@ -77,29 +76,11 @@ internal fun OrderListItem(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Ver detalhes",
                     modifier = Modifier.size(ComandaAiSpacing.Large.value),
-                    tint = ComandaAiTheme.colorScheme.gray400
+                    tint = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
     )
-}
-
-@Composable
-private fun CommandaBadge(
-    text: String,
-    containerColor: androidx.compose.ui.graphics.Color,
-    contentColor: androidx.compose.ui.graphics.Color
-) {
-    Badge(
-        containerColor = containerColor,
-        contentColor = contentColor
-    ) {
-        Text(
-            text = text,
-            style = ComandaAiTheme.typography.labelMedium,
-            modifier = Modifier.padding(horizontal = ComandaAiSpacing.Small.value)
-        )
-    }
 }
 
 @Preview

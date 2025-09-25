@@ -49,8 +49,8 @@ private fun CategoryTab(
     }
     val color = if (isSelected)
         FilterChipDefaults.filterChipColors(
-            containerColor = ComandaAiTheme.colorScheme.primary,
-            labelColor = ComandaAiTheme.colorScheme.onPrimary
+            selectedContainerColor = ComandaAiTheme.colorScheme.primary,
+            selectedLabelColor = ComandaAiTheme.colorScheme.onPrimary,
         )
     else
         FilterChipDefaults.filterChipColors(

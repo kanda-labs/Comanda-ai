@@ -1,5 +1,6 @@
 package co.kandalabs.comandaai.features.attendance.presentation.screens.paymentHistory.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +15,7 @@ import androidx.compose.material3.DropdownMenu
 import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -72,15 +73,28 @@ internal fun PaymentMethodDropdown(
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            containerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+            border =  BorderStroke(
+                width = 1.dp,
+                color = ComandaAiTheme.colorScheme.outline
+            )
         ) {
             paymentMethods.forEach { (method, displayName) ->
                 DropdownMenuItem(
-                    text = { Text(displayName) },
+                    text = {
+                        Text(
+                            text = displayName,
+                            color = ComandaAiTheme.colorScheme.onSurface
+                        )
+                    },
                     onClick = {
                         onPaymentMethodSelected(method)
                         expanded = false
-                    }
+                    },
+                    colors = MenuDefaults.itemColors(
+                        textColor = ComandaAiTheme.colorScheme.onSurface
+                    )
                 )
             }
         }

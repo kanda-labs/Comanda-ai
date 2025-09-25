@@ -15,8 +15,6 @@ import androidx.compose.material3.DropdownMenuItem
 import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -130,7 +128,14 @@ internal fun PartialPaymentModal(
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ComandaAiTheme.colorScheme.primary,
-                    focusedLabelColor = ComandaAiTheme.colorScheme.primary
+                    focusedLabelColor = ComandaAiTheme.colorScheme.primary,
+                    unfocusedLabelColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                    unfocusedBorderColor = ComandaAiTheme.colorScheme.outline,
+                    focusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                    unfocusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                    cursorColor = ComandaAiTheme.colorScheme.primary,
+                    focusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                    unfocusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
             )
 
@@ -172,7 +177,14 @@ internal fun PartialPaymentModal(
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ComandaAiTheme.colorScheme.primary,
-                    focusedLabelColor = ComandaAiTheme.colorScheme.primary
+                    focusedLabelColor = ComandaAiTheme.colorScheme.primary,
+                    unfocusedLabelColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                    unfocusedBorderColor = ComandaAiTheme.colorScheme.outline,
+                    focusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                    unfocusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                    cursorColor = ComandaAiTheme.colorScheme.primary,
+                    focusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                    unfocusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
             )
 
@@ -194,17 +206,29 @@ internal fun PartialPaymentModal(
                         .menuAnchor(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = ComandaAiTheme.colorScheme.primary,
-                        focusedLabelColor = ComandaAiTheme.colorScheme.primary
+                        focusedLabelColor = ComandaAiTheme.colorScheme.primary,
+                        unfocusedLabelColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                        unfocusedBorderColor = ComandaAiTheme.colorScheme.outline,
+                        focusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                        unfocusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                        focusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                        unfocusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                 )
 
                 ExposedDropdownMenu(
                     expanded = isPaymentMethodDropdownExpanded,
-                    onDismissRequest = { isPaymentMethodDropdownExpanded = false }
+                    onDismissRequest = { isPaymentMethodDropdownExpanded = false },
+                    containerColor = ComandaAiTheme.colorScheme.surfaceVariant
                 ) {
                     PaymentMethod.entries.forEach { method ->
                         DropdownMenuItem(
-                            text = { Text(method.displayName) },
+                            text = {
+                                Text(
+                                    text = method.displayName,
+                                    color = ComandaAiTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 selectedPaymentMethod = method
                                 isPaymentMethodDropdownExpanded = false
@@ -229,7 +253,14 @@ internal fun PartialPaymentModal(
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ComandaAiTheme.colorScheme.primary,
-                    focusedLabelColor = ComandaAiTheme.colorScheme.primary
+                    focusedLabelColor = ComandaAiTheme.colorScheme.primary,
+                    unfocusedLabelColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                    unfocusedBorderColor = ComandaAiTheme.colorScheme.outline,
+                    focusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                    unfocusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                    cursorColor = ComandaAiTheme.colorScheme.primary,
+                    focusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                    unfocusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
             )
         }

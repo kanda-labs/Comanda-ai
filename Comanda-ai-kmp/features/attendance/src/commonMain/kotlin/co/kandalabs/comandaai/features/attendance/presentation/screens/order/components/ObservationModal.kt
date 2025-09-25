@@ -138,26 +138,28 @@ fun ObservationModal(
                             .fillMaxWidth()
                             .height(120.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedLabelColor = ComandaAiTheme.colorScheme.gray500,
-                            cursorColor = ComandaAiTheme.colorScheme.gray900,
+                            unfocusedLabelColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                            cursorColor = ComandaAiTheme.colorScheme.primary,
                             focusedBorderColor = ComandaAiTheme.colorScheme.primary,
                             focusedLabelColor = ComandaAiTheme.colorScheme.primary,
-                            focusedContainerColor = ComandaAiTheme.colorScheme.gray100,
-                            unfocusedContainerColor = ComandaAiTheme.colorScheme.gray100,
-                            unfocusedBorderColor = ComandaAiTheme.colorScheme.gray300,
-                            disabledPlaceholderColor = ComandaAiTheme.colorScheme.gray500,
-                            focusedPlaceholderColor = ComandaAiTheme.colorScheme.gray500,
-                            focusedTextColor = ComandaAiTheme.colorScheme.gray700
+                            focusedContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                            unfocusedBorderColor = ComandaAiTheme.colorScheme.outline,
+                            disabledPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            focusedPlaceholderColor = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            focusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                            unfocusedTextColor = ComandaAiTheme.colorScheme.onSurface
                         )
                     )
 
                     // Espetinho-specific options
                     if (isSkewer) {
                         val switchColors = SwitchDefaults.colors(
-                            checkedThumbColor = ComandaAiTheme.colorScheme.gray300,
+                            checkedThumbColor = ComandaAiTheme.colorScheme.onPrimary,
                             checkedTrackColor = ComandaAiTheme.colorScheme.primary,
-                            uncheckedThumbColor = ComandaAiTheme.colorScheme.gray300,
-                            uncheckedIconColor = ComandaAiTheme.colorScheme.secondary,
+                            uncheckedThumbColor = ComandaAiTheme.colorScheme.outline,
+                            uncheckedTrackColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                            uncheckedBorderColor = ComandaAiTheme.colorScheme.outline
                         )
                         Text(
                             text = "Opções do Espetinho",
@@ -246,20 +248,20 @@ fun ObservationModal(
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = ComandaAiTheme.colorScheme.primary,
                                     focusedLabelColor = ComandaAiTheme.colorScheme.primary,
-                                    focusedContainerColor = ComandaAiTheme.colorScheme.gray100,
-                                    unfocusedBorderColor = ComandaAiTheme.colorScheme.gray500,
-                                    unfocusedContainerColor = ComandaAiTheme.colorScheme.gray100,
-                                    focusedTextColor = ComandaAiTheme.colorScheme.gray700,
-                                    unfocusedTextColor = ComandaAiTheme.colorScheme.gray700,
-                                    focusedTrailingIconColor = ComandaAiTheme.colorScheme.gray700,
-                                    unfocusedTrailingIconColor = ComandaAiTheme.colorScheme.gray700,
+                                    focusedContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                                    unfocusedBorderColor = ComandaAiTheme.colorScheme.outline,
+                                    unfocusedContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                                    focusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                                    unfocusedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                                    focusedTrailingIconColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                                    unfocusedTrailingIconColor = ComandaAiTheme.colorScheme.onSurfaceVariant
                                 )
                             )
 
                             ExposedDropdownMenu(
                                 expanded = meatDonenessExpanded,
                                 onDismissRequest = { meatDonenessExpanded = false },
-                                containerColor = ComandaAiTheme.colorScheme.gray100,
+                                containerColor = ComandaAiTheme.colorScheme.surface,
                             ) {
                                 meatDonenessOptions.forEachIndexed { index, option ->
                                     DropdownMenuItem(
@@ -271,7 +273,7 @@ fun ObservationModal(
                                                 Text(option, modifier = Modifier.padding(top = ComandaAiSpacing.Medium.value))
                                                 if (index != meatDonenessOptions.lastIndex)
                                                     HorizontalDivider(
-                                                        color = ComandaAiTheme.colorScheme.gray500,
+                                                        color = ComandaAiTheme.colorScheme.outlineVariant,
                                                         modifier = Modifier.padding(top = ComandaAiSpacing.Medium.value)
                                                     )
                                                 else
@@ -279,8 +281,8 @@ fun ObservationModal(
                                             }
                                         },
                                         colors = MenuDefaults.itemColors(
-                                            textColor = ComandaAiTheme.colorScheme.gray700,
-                                            disabledTextColor = ComandaAiTheme.colorScheme.gray300,
+                                            textColor = ComandaAiTheme.colorScheme.onSurface,
+                                            disabledTextColor = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                                         ),
                                         onClick = {
                                             meatDoneness = option

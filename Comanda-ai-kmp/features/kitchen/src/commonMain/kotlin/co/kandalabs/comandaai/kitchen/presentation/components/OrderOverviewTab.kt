@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -161,18 +162,18 @@ private fun EmptyOverviewState() {
                 imageVector = Icons.Default.Analytics,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
-                tint = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                tint = ComandaAiTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = "Nenhum item encontrado",
                 style = ComandaAiTheme.typography.headlineSmall,
-                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                color = ComandaAiTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
             Text(
                 text = "Selecione outras categorias para ver o resumo",
                 style = ComandaAiTheme.typography.bodyMedium,
-                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }
@@ -200,7 +201,10 @@ private fun ItemSummaryCard(
     totalQuantity: Int
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = ComandaAiTheme.colorScheme.surfaceVariant
+        )
     ) {
         Row(
             modifier = Modifier
@@ -215,7 +219,8 @@ private fun ItemSummaryCard(
                 Text(
                     text = item.name,
                     style = ComandaAiTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
             }
 

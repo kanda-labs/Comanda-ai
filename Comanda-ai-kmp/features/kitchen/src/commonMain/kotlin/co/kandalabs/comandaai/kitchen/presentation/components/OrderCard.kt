@@ -9,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.TableRestaurant
 import androidx.compose.material3.*
+import co.kandalabs.comandaai.components.ComandaAiButton
+import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,11 +55,11 @@ fun OrderCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = ComandaAiTheme.colorScheme.surface
+            containerColor = ComandaAiTheme.colorScheme.surfaceVariant
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = ComandaAiTheme.colorScheme.outline.copy(alpha = 0.12f)
+            color = ComandaAiTheme.colorScheme.outlineVariant
         )
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -87,42 +89,21 @@ fun OrderCard(
                     if (index < order.items.size - 1) {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 4.dp),
-                            color = ComandaAiTheme.colorScheme.outline.copy(alpha = 0.12f)
+                            color = ComandaAiTheme.colorScheme.outlineVariant
                         )
                     }
                 }
             }
             
-            // Enhanced action button
             if (!isDeliveredView && !allDelivered) {
                 Spacer(modifier = Modifier.height(24.dp))
                 
-                Button(
+                ComandaAiButton(
+                    text = "Entregar pedido",
                     onClick = { onShowDeliveryConfirmation(order) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(32.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ComandaAiTheme.colorScheme.primary
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 2.dp,
-                        pressedElevation = 6.dp
-                    )
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "Entregar pedido",
-                            style = ComandaAiTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                    modifier = Modifier.fillMaxWidth(),
+                    variant = ComandaAiButtonVariant.Primary
+                )
             }
         }
     }
@@ -150,7 +131,7 @@ fun OrderHeader(order: KitchenOrder) {
         ) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = ComandaAiTheme.colorScheme.primary.copy(alpha = 0.1f),
+                color = ComandaAiTheme.colorScheme.primaryContainer,
                 modifier = Modifier.size(48.dp)
             ) {
                 Box(
@@ -160,7 +141,7 @@ fun OrderHeader(order: KitchenOrder) {
                     Icon(
                         imageVector = Icons.Default.TableRestaurant,
                         contentDescription = null,
-                        tint = ComandaAiTheme.colorScheme.primary,
+                        tint = ComandaAiTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -184,7 +165,7 @@ fun OrderHeader(order: KitchenOrder) {
                 Text(
                     text = "${order.items.size} ${if (order.items.size == 1) "item" else "itens"}",
                     style = ComandaAiTheme.typography.bodyMedium,
-                    color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -196,13 +177,13 @@ fun OrderHeader(order: KitchenOrder) {
         ) {
             Surface(
                 shape = RoundedCornerShape(8.dp),
-                color = ComandaAiTheme.colorScheme.surfaceVariant
+                color = ComandaAiTheme.colorScheme.secondaryContainer
             ) {
                 Text(
                     text = "Pedido #${order.id}",
                     style = ComandaAiTheme.typography.labelMedium,
                     fontWeight = FontWeight.Medium,
-                    color = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                    color = ComandaAiTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
@@ -218,14 +199,14 @@ fun OrderHeader(order: KitchenOrder) {
                 Icon(
                     imageVector = Icons.Default.AccessTime,
                     contentDescription = null,
-                    tint = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    tint = ComandaAiTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
                     text = "${createdTime.hour.toString().padStart(2, '0')}:${createdTime.minute.toString().padStart(2, '0')}",
                     style = ComandaAiTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                    color = ComandaAiTheme.colorScheme.onSurface
                 )
             }
             
@@ -241,7 +222,7 @@ fun OrderHeader(order: KitchenOrder) {
                         text = "Atualizado em: ${updatedTime.hour.toString().padStart(2, '0')}:${updatedTime.minute.toString().padStart(2, '0')}",
                         style = ComandaAiTheme.typography.bodySmall,
                         fontWeight = FontWeight.Normal,
-                        color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

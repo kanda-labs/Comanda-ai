@@ -1,5 +1,6 @@
 package co.kandalabs.comandaai.kitchen.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,9 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import co.kandalabs.comandaai.auth.AuthModule
 import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
+import co.kandalabs.comandaai.components.ComandaAiButton
+import co.kandalabs.comandaai.components.ComandaAiButtonVariant
+import co.kandalabs.comandaai.components.ComandaAiTopAppBar
 import co.kandalabs.comandaai.sdk.session.UserSession
 import co.kandalabs.comandaai.domain.ItemStatus
 import co.kandalabs.comandaai.kitchen.domain.model.KitchenOrder
@@ -124,69 +128,97 @@ private fun KitchenScreenContent(
     // Preservar estado do scroll
     val listState = rememberLazyListState()
     Scaffold(
+        containerColor = ComandaAiTheme.colorScheme.surface,
         topBar = {
-            TopAppBar(
-                title = {
-                    Row {
-                        UserAvatar(
-                            userName = userSession?.userName,
-                            onClick = onUserAvatarClick
-                        )
-                        Column(modifier = Modifier.padding(start = 16.dp)) {
-                            val titleText = when (state.currentFilter) {
-                                OrderFilter.ACTIVE -> "Pedidos ativos"
-                                OrderFilter.DELIVERED -> "Pedidos entregues"
-                            }
-                            val countText = when (state.currentFilter) {
-                                OrderFilter.ACTIVE -> "${state.activeOrders.size} pedidos ativos"
-                                OrderFilter.DELIVERED -> "${state.deliveredOrders.size} pedidos entregues"
-                            }
-                            
-                            Text(titleText, style = ComandaAiTheme.typography.titleLarge)
-                            Text(
-                                countText,
-                                style = ComandaAiTheme.typography.bodySmall,
-                                color = ComandaAiTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(ComandaAiTheme.colorScheme.surfaceVariant)
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                UserAvatar(
+                    userName = userSession?.userName,
+                    onClick = onUserAvatarClick
+                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 16.dp)
+                ) {
+                    val titleText = when (state.currentFilter) {
+                        OrderFilter.ACTIVE -> "Pedidos ativos"
+                        OrderFilter.DELIVERED -> "Pedidos entregues"
                     }
-                },
-                actions = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // Connection Status Bullet
-                        ConnectionStatusBullet(
-                            isConnected = state.isConnected,
-                            isReconnecting = state.isReconnecting,
-                            onReconnectClick = if (!state.isConnected && !state.isReconnecting) onReconnect else null
+                    val countText = when (state.currentFilter) {
+                        OrderFilter.ACTIVE -> "${state.activeOrders.size} pedidos ativos"
+                        OrderFilter.DELIVERED -> "${state.deliveredOrders.size} pedidos entregues"
+                    }
+
+                    Text(
+                        text = titleText,
+                        style = ComandaAiTheme.typography.titleLarge,
+                        color = ComandaAiTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = countText,
+                        style = ComandaAiTheme.typography.bodySmall,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Connection Status Bullet
+                    ConnectionStatusBullet(
+                        isConnected = state.isConnected,
+                        isReconnecting = state.isReconnecting,
+                        onReconnectClick = if (!state.isConnected && !state.isReconnecting) onReconnect else null
+                    )
+
+                    // Refresh Button
+                    IconButton(onClick = onRefresh) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Atualizar pedidos",
+                            tint = ComandaAiTheme.colorScheme.onSurface
                         )
-                        
-                        // Refresh Button
-                        IconButton(onClick = onRefresh) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = "Atualizar pedidos"
-                            )
-                        }
                     }
                 }
-            )
+            }
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = ComandaAiTheme.colorScheme.surfaceVariant
+            ) {
                 NavigationBarItem(
                     icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) },
                     label = { Text("Controle") },
                     selected = selectedTab == 0,
-                    onClick = { onTabChange(0) }
+                    onClick = { onTabChange(0) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = ComandaAiTheme.colorScheme.onSecondaryContainer,
+                        selectedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                        indicatorColor = ComandaAiTheme.colorScheme.secondaryContainer,
+                        unselectedIconColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = ComandaAiTheme.colorScheme.onSurfaceVariant
+                    )
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Analytics, contentDescription = null) },
                     label = { Text("Panorama") },
                     selected = selectedTab == 1,
-                    onClick = { onTabChange(1) }
+                    onClick = { onTabChange(1) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = ComandaAiTheme.colorScheme.onSecondaryContainer,
+                        selectedTextColor = ComandaAiTheme.colorScheme.onSurface,
+                        indicatorColor = ComandaAiTheme.colorScheme.secondaryContainer,
+                        unselectedIconColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = ComandaAiTheme.colorScheme.onSurfaceVariant
+                    )
                 )
             }
         }
@@ -200,12 +232,34 @@ private fun KitchenScreenContent(
             
             // Erro
             state.error?.let { error ->
-                Snackbar(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    action = {
-                        TextButton(onClick = onErrorDismiss) { Text("OK") }
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = ComandaAiTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = error,
+                            style = ComandaAiTheme.typography.bodyMedium,
+                            color = ComandaAiTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ComandaAiButton(
+                            text = "OK",
+                            onClick = onErrorDismiss,
+                            variant = ComandaAiButtonVariant.Secondary
+                        )
                     }
-                ) { Text(error) }
+                }
             }
 
             when (selectedTab) {
@@ -249,39 +303,34 @@ private fun KitchenScreenContent(
             title = "Confirmar entrega",
             onDismiss = onDismissDeliveryConfirmation,
             actions = {
-                OutlinedButton(
+                ComandaAiButton(
+                    text = "Cancelar",
                     onClick = onDismissDeliveryConfirmation,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = ComandaAiTheme.colorScheme.onSurface
-                    )
-                ) {
-                    Text("Cancelar")
-                }
-                
-                Button(
+                    variant = ComandaAiButtonVariant.Secondary
+                )
+
+                ComandaAiButton(
+                    text = "Confirmar entrega",
                     onClick = { onConfirmDelivery(order.id) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ComandaAiTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Confirmar entrega")
-                }
+                    variant = ComandaAiButtonVariant.Primary
+                )
             }
         ) {
             Text(
                 text = "Deseja marcar este pedido como entregue?",
                 style = ComandaAiTheme.typography.bodyLarge,
+                color = ComandaAiTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Text(
                 text = "Mesa ${order.tableNumber} • ${order.userName}",
                 style = ComandaAiTheme.typography.bodyMedium,
-                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
         }

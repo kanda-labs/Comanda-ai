@@ -29,8 +29,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -119,8 +119,7 @@ private fun PaymentHistoryScreenContent(
     onClearFilters: () -> Unit,
     onRetry: () -> Unit
 ) {
-    ComandaAiTheme {
-        Column {
+    Column {
             if (state.isLoading) {
                 ComandaAiLoadingView(
                     loadingImage = painterResource(Res.drawable.golden_loading)
@@ -238,7 +237,6 @@ private fun PaymentHistoryScreenContent(
                     }
                 }
             }
-        }
     }
 }
 
@@ -262,7 +260,7 @@ private fun FiltersSection(
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = ComandaAiSpacing.Large.value),
         colors = CardDefaults.cardColors(
-            containerColor = ComandaAiTheme.colorScheme.gray200
+            containerColor = ComandaAiTheme.colorScheme.surfaceVariant
         )
     ) {
         Column(
@@ -324,11 +322,19 @@ private fun FiltersSection(
                     ) {
                         Text(
                             text = "Considerar o dia anterior",
-                            style = ComandaAiTheme.typography.bodyMedium
+                            style = ComandaAiTheme.typography.bodyMedium,
+                            color = ComandaAiTheme.colorScheme.onSurface
                         )
                         Switch(
                             checked = state.tempConsiderPreviousDay,
-                            onCheckedChange = onConsiderPreviousDayChanged
+                            onCheckedChange = onConsiderPreviousDayChanged,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = ComandaAiTheme.colorScheme.onPrimary,
+                                checkedTrackColor = ComandaAiTheme.colorScheme.primary,
+                                uncheckedThumbColor = ComandaAiTheme.colorScheme.outline,
+                                uncheckedTrackColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                                uncheckedBorderColor = ComandaAiTheme.colorScheme.outline
+                            )
                         )
                     }
 
@@ -374,6 +380,7 @@ private fun FiltersSection(
                         ComandaAiButton(
                             text = "Aplicar Filtros",
                             onClick = onApplyFilters,
+                            variant = ComandaAiButtonVariant.PrimaryAboveSurfaceVariant,
                             modifier = Modifier.weight(1f),
                             isEnabled = state.hasUnappliedChanges
                         )

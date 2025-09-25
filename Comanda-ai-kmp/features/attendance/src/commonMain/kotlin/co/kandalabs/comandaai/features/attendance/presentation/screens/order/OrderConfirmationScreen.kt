@@ -12,11 +12,11 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
 import co.kandalabs.comandaai.theme.ComandaAiTheme
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -99,6 +99,8 @@ private fun OrderConfirmationContent(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.safeDrawing),
+        containerColor = ComandaAiTheme.colorScheme.background,
+        contentColor = ComandaAiTheme.colorScheme.onBackground,
         topBar = {
             ComandaAiTopAppBar(
                 title = "Confirmar Pedido",
@@ -255,7 +257,12 @@ private fun IdleContent(
                 ) {
                     OutlinedButton(
                         onClick = onBackClick,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = ComandaAiTheme.colorScheme.primary,
+                            disabledContentColor = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                        ),
+                        border = ButtonDefaults.outlinedButtonBorder(enabled = true)
                     ) {
                         Text("Voltar")
                     }
@@ -323,7 +330,7 @@ private fun SuccessContent(
         Icon(
             imageVector = Icons.Default.CheckCircle,
             contentDescription = null,
-            tint = Color(0xFF4CAF50),
+            tint = ComandaAiTheme.colorScheme.primary,
             modifier = Modifier.size(80.dp)
         )
 
@@ -351,7 +358,7 @@ private fun SuccessContent(
         Text(
             text = "Voltando automaticamente...",
             style = ComandaAiTheme.typography.bodySmall,
-            color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
     }
@@ -374,7 +381,7 @@ private fun ErrorContent(
         Icon(
             imageVector = Icons.Default.Error,
             contentDescription = null,
-            tint = Color(0xFFF44336),
+            tint = ComandaAiTheme.colorScheme.error,
             modifier = Modifier.size(80.dp)
         )
 
@@ -406,7 +413,12 @@ private fun ErrorContent(
         ) {
             OutlinedButton(
                 onClick = onBackClick,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = ComandaAiTheme.colorScheme.primary,
+                    disabledContentColor = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                ),
+                border = ButtonDefaults.outlinedButtonBorder(enabled = true)
             ) {
                 Text("Voltar")
             }
@@ -453,7 +465,7 @@ private fun OrderConfirmationItem(
                         Text(
                             text = description,
                             style = ComandaAiTheme.typography.bodySmall,
-                            color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 if (!observation.isNullOrBlank()) {
@@ -461,7 +473,7 @@ private fun OrderConfirmationItem(
                         text = "Obs: $observation",
                         style = ComandaAiTheme.typography.bodySmall,
                         fontWeight = FontWeight.Normal,
-                        color = ComandaAiTheme.colorScheme.tertiary,
+                        color = ComandaAiTheme.colorScheme.primary,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }

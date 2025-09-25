@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -265,7 +264,7 @@ private fun TableDetailsScreenContent(
                         "Pedidos",
                         modifier = Modifier
                             .padding(horizontal = ComandaAiSpacing.Medium.value),
-                        color = ComandaAiTheme.colorScheme.gray700,
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                         style = ComandaAiTypography.titleMedium
                     )
 
@@ -333,7 +332,7 @@ private fun TableDetailsButtons(
 @Preview
 @Composable
 private fun TableDetailsScreenPreview() {
-    MaterialTheme {
+    ComandaAiTheme {
         TableDetailsScreenContent(
             state = TableDetailsScreenState(
                 table =

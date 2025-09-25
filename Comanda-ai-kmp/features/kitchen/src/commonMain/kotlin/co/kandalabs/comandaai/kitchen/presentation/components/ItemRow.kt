@@ -103,10 +103,8 @@ fun ItemRow(
                 isLoading = isItemLoading,
                 onClick = {
                     if (item.totalCount > 1) {
-                        // Toggle accordion for multiple items
                         isExpanded = !isExpanded
                     } else {
-                        // Toggle status between OPEN and DELIVERED for single item
                         val newStatus = if (item.overallStatus == ItemStatus.DELIVERED) {
                             ItemStatus.PENDING
                         } else {

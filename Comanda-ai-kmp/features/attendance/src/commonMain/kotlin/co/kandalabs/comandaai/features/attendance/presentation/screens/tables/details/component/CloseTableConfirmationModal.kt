@@ -3,7 +3,6 @@ package co.kandalabs.comandaai.features.attendance.presentation.screens.tables.d
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.runtime.Composable
@@ -11,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import co.kandalabs.comandaai.components.ComandaAiBottomSheetModal
 import co.kandalabs.comandaai.components.ComandaAiButton
+import co.kandalabs.comandaai.components.ComandaAiButtonVariant
 import co.kandalabs.comandaai.components.ComandaAiModalPresentationMode
 
 
@@ -29,15 +29,16 @@ internal fun CloseTableConfirmationModal(
             ComandaAiButton(
                 text = "Fechar Conta",
                 onClick = onConfirm,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                variant = ComandaAiButtonVariant.Destructive
             )
-            
-            OutlinedButton(
+
+            ComandaAiButton(
+                text = "Cancelar",
                 onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Cancelar")
-            }
+                modifier = Modifier.fillMaxWidth(),
+                variant = ComandaAiButtonVariant.Secondary
+            )
         }
     ) {
         Text(

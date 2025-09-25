@@ -34,7 +34,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -205,12 +204,12 @@ private fun OrderControlScreenContent(
                         state.order?.let { order ->
                             val (statusContainerColor, statusContentColor) = when (order.status) {
                                 OrderStatus.DELIVERED -> Pair(
-                                    ComandaAiTheme.colorScheme.green500,
-                                    ComandaAiTheme.colorScheme.onSurface
+                                    ComandaAiTheme.colorScheme.primary,
+                                    ComandaAiTheme.colorScheme.onPrimary
                                 )
                                 OrderStatus.PENDING -> Pair(
-                                    ComandaAiTheme.colorScheme.yellow500,
-                                    ComandaAiTheme.colorScheme.onSurface
+                                    ComandaAiColors.Yellow.value,
+                                    ComandaAiColors.OnYellow.value
                                 )
                                 OrderStatus.CANCELED -> Pair(
                                     ComandaAiTheme.colorScheme.error,
@@ -234,7 +233,7 @@ private fun OrderControlScreenContent(
 
                                 Text(
                                     "Criado por: ${state.createdBy}",
-                                    color = ComandaAiTheme.colorScheme.surface,
+                                    color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                                     style = ComandaAiTypography.titleMedium
                                 )
 
@@ -254,7 +253,7 @@ private fun OrderControlScreenContent(
                             "Itens do pedido:",
                             modifier = Modifier
                                 .padding(horizontal = ComandaAiSpacing.Medium.value),
-                            color = ComandaAiTheme.colorScheme.gray700,
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant,
                             style = ComandaAiTypography.titleMedium
                         )
 
@@ -472,13 +471,13 @@ private fun OrderControlItemAccordion(
 ) {
     val (containerColor, contentColor) = when (item.status) {
         ItemStatus.DELIVERED -> Pair(
-            ComandaAiTheme.colorScheme.green500,
-            ComandaAiTheme.colorScheme.onSurface
+            ComandaAiTheme.colorScheme.primary,
+            ComandaAiTheme.colorScheme.onPrimary
         )
 
         ItemStatus.PENDING -> Pair(
-            ComandaAiTheme.colorScheme.yellow500,
-            ComandaAiTheme.colorScheme.onSurface
+            ComandaAiColors.Yellow.value,
+            ComandaAiColors.OnYellow.value
         )
 
         ItemStatus.CANCELED -> Pair(
@@ -522,14 +521,12 @@ private fun OrderControlItemAccordion(
                     Text(
                         text = "Quantidade: ${item.count}",
                         style = ComandaAiTheme.typography.bodySmall,
-                        color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                    )
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant                    )
                     item.observation?.let { observation ->
                         Text(
                             text = "Obs: $observation",
                             style = ComandaAiTheme.typography.bodySmall,
-                            color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                        )
+                            color = ComandaAiTheme.colorScheme.onSurfaceVariant                        )
                     }
                 }
 
@@ -579,8 +576,7 @@ private fun OrderControlItemAccordion(
                     ) {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 8.dp),
-                            color = ComandaAiTheme.colorScheme.outline.copy(alpha = 0.3f)
-                        )
+                            color = ComandaAiTheme.colorScheme.outline                        )
 
                         Text(
                             text = "Itens individuais:",
@@ -627,18 +623,18 @@ private fun IndividualItemRow(
 ) {
     val (containerColor, contentColor) = when (individualStatus) {
         ItemStatus.DELIVERED -> Pair(
-            ComandaAiTheme.colorScheme.green500.copy(alpha = 0.1f),
-            ComandaAiTheme.colorScheme.green500
+            ComandaAiTheme.colorScheme.primaryContainer,
+            ComandaAiTheme.colorScheme.onPrimaryContainer
         )
 
         ItemStatus.PENDING -> Pair(
-            ComandaAiTheme.colorScheme.blue500.copy(alpha = 0.1f),
-            ComandaAiTheme.colorScheme.blue500
+            ComandaAiTheme.colorScheme.yellowContainer,
+            ComandaAiTheme.colorScheme.onYellowContainer
         )
 
         ItemStatus.CANCELED -> Pair(
-            ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f),
-            ComandaAiTheme.colorScheme.error
+            ComandaAiTheme.colorScheme.errorContainer,
+            ComandaAiTheme.colorScheme.onErrorContainer
         )
     }
 
@@ -690,13 +686,13 @@ private fun OrderControlItem(
 ) {
     val (containerColor, contentColor) = when (item.status) {
         ItemStatus.DELIVERED -> Pair(
-            ComandaAiTheme.colorScheme.green500,
-            ComandaAiTheme.colorScheme.onSurface
+            ComandaAiTheme.colorScheme.primary,
+            ComandaAiTheme.colorScheme.onPrimary
         )
 
         ItemStatus.PENDING -> Pair(
-            ComandaAiTheme.colorScheme.yellow500,
-            ComandaAiTheme.colorScheme.onSurface
+            ComandaAiColors.Yellow.value,
+            ComandaAiColors.OnYellow.value
         )
 
         ItemStatus.CANCELED -> Pair(
@@ -736,14 +732,12 @@ private fun OrderControlItem(
                 Text(
                     text = "Quantidade: ${item.count}",
                     style = ComandaAiTheme.typography.bodySmall,
-                    color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                )
+                    color = ComandaAiTheme.colorScheme.onSurfaceVariant                )
                 item.observation?.let { observation ->
                     Text(
                         text = "Obs: $observation",
                         style = ComandaAiTheme.typography.bodySmall,
-                        color = ComandaAiTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                    )
+                        color = ComandaAiTheme.colorScheme.onSurfaceVariant                    )
                 }
             }
 
@@ -826,18 +820,18 @@ private fun StatusSelectionModal(
 
                     val (bgColor, textColor) = when (status) {
                         ItemStatus.DELIVERED -> Pair(
-                            ComandaAiTheme.colorScheme.green500.copy(alpha = 0.1f),
-                            ComandaAiTheme.colorScheme.green500
+                            ComandaAiTheme.colorScheme.primaryContainer,
+                            ComandaAiTheme.colorScheme.onPrimaryContainer
                         )
 
                         ItemStatus.PENDING -> Pair(
-                            ComandaAiTheme.colorScheme.yellow500.copy(alpha = 0.1f),
-                            ComandaAiTheme.colorScheme.yellow500
+                            ComandaAiTheme.colorScheme.yellowContainer,
+                            ComandaAiTheme.colorScheme.onYellowContainer
                         )
 
                         ItemStatus.CANCELED -> Pair(
-                            ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f),
-                            ComandaAiTheme.colorScheme.error
+                            ComandaAiTheme.colorScheme.errorContainer,
+                            ComandaAiTheme.colorScheme.onErrorContainer
                         )
                     }
 
@@ -935,18 +929,18 @@ private fun IndividualItemStatusModal(
 
                     val (bgColor, textColor) = when (status) {
                         ItemStatus.DELIVERED -> Pair(
-                            ComandaAiTheme.colorScheme.green500.copy(alpha = 0.1f),
-                            ComandaAiTheme.colorScheme.green500
+                            ComandaAiTheme.colorScheme.primaryContainer,
+                            ComandaAiTheme.colorScheme.onPrimaryContainer
                         )
 
                         ItemStatus.PENDING -> Pair(
-                            ComandaAiTheme.colorScheme.yellow500.copy(alpha = 0.1f),
-                            ComandaAiTheme.colorScheme.yellow500
+                            ComandaAiTheme.colorScheme.yellowContainer,
+                            ComandaAiTheme.colorScheme.onYellowContainer
                         )
 
                         ItemStatus.CANCELED -> Pair(
-                            ComandaAiTheme.colorScheme.error.copy(alpha = 0.1f),
-                            ComandaAiTheme.colorScheme.error
+                            ComandaAiTheme.colorScheme.errorContainer,
+                            ComandaAiTheme.colorScheme.onErrorContainer
                         )
                     }
 

@@ -19,7 +19,6 @@ import androidx.compose.material3.Card
 import co.kandalabs.comandaai.theme.ComandaAiTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import co.kandalabs.comandaai.core.utils.DateTimeFormatter
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -96,11 +96,10 @@ private fun PartialPaymentDetailsScreenContent(
     state: PartialPaymentDetailsScreenState,
     action: (PartialPaymentDetailsAction) -> Unit
 ) {
-    MaterialTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = ComandaAiTheme.colorScheme.background
-        ) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = ComandaAiTheme.colorScheme.background
+    ) {
             if (state.isLoading) {
                 ComandaAiLoadingView(
                     loadingImage = painterResource(Res.drawable.golden_loading)
@@ -133,7 +132,7 @@ private fun PartialPaymentDetailsScreenContent(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
-                                containerColor = ComandaAiTheme.colorScheme.surface
+                                containerColor = ComandaAiTheme.colorScheme.surfaceVariant
                             ),
                             shape = RoundedCornerShape(12.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -147,12 +146,12 @@ private fun PartialPaymentDetailsScreenContent(
                                 PaymentDetailRow(
                                     label = "Valor",
                                     value = state.payment?.amountFormatted ?: "",
-                                    valueColor = ComandaAiTheme.colorScheme.green500,
+                                    valueColor = ComandaAiTheme.colorScheme.primary,
                                     isHighlighted = true
                                 )
 
                                 Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
-                                HorizontalDivider(color = ComandaAiTheme.colorScheme.gray300)
+                                HorizontalDivider(color = ComandaAiTheme.colorScheme.outlineVariant)
                                 Spacer(modifier = Modifier.height(ComandaAiSpacing.Small.value))
 
                                 // Paid By
@@ -199,7 +198,7 @@ private fun PartialPaymentDetailsScreenContent(
                                 state.payment?.createdAt?.let { dateTime ->
                                     PaymentDetailRow(
                                         label = "Data/Hora",
-                                        value = dateTime
+                                        value = DateTimeFormatter.formatDateTime(dateTime)
                                     )
                                 }
                             }
@@ -239,7 +238,6 @@ private fun PartialPaymentDetailsScreenContent(
                     onConfirm = { action(PartialPaymentDetailsAction.CONFIRM_CANCEL) }
                 )
             }
-        }
     }
 }
 
@@ -258,7 +256,7 @@ private fun PaymentDetailRow(
         Text(
             text = label,
             style = ComandaAiTypography.bodyMedium,
-            color = ComandaAiTheme.colorScheme.gray600
+            color = ComandaAiTheme.colorScheme.onSurfaceVariant
         )
 
         Text(
@@ -301,7 +299,7 @@ private fun CancelPaymentConfirmationModal(
         Text(
             text = "Cancelar pagamento de $amount?",
             style = ComandaAiTypography.bodyMedium,
-            color = ComandaAiTheme.colorScheme.gray700,
+            color = ComandaAiTheme.colorScheme.onSurface,
             modifier = Modifier.padding(20.dp)
         )
     }

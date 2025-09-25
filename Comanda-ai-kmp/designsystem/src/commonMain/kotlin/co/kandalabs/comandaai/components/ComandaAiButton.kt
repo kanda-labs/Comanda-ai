@@ -16,8 +16,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 enum class ComandaAiButtonVariant {
     Primary,
+    PrimaryAboveSurfaceVariant,
     Secondary,
-    Destructive
+    Destructive,
+    Warning
 }
 
 
@@ -38,9 +40,16 @@ fun ComandaAiButton(
                 disabledContentColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
             )
 
+            ComandaAiButtonVariant.PrimaryAboveSurfaceVariant -> ButtonDefaults.buttonColors(
+                containerColor = ComandaAiTheme.colorScheme.primary,
+                contentColor = ComandaAiTheme.colorScheme.onPrimary,
+                disabledContainerColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+                disabledContentColor = ComandaAiTheme.colorScheme.gray50,
+            )
+
             ComandaAiButtonVariant.Secondary -> ButtonDefaults.buttonColors(
-                containerColor = ComandaAiTheme.colorScheme.blue200,
-                contentColor = ComandaAiTheme.colorScheme.onSecondary,
+                containerColor = ComandaAiTheme.colorScheme.secondaryContainer,
+                contentColor = ComandaAiTheme.colorScheme.onSecondaryContainer,
                 disabledContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
                 disabledContentColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
             )
@@ -51,13 +60,14 @@ fun ComandaAiButton(
                 disabledContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
                 disabledContentColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
             )
-        }
 
-    val textColor = when (variant) {
-        ComandaAiButtonVariant.Primary -> ComandaAiTheme.colorScheme.onPrimary
-        ComandaAiButtonVariant.Secondary -> ComandaAiTheme.colorScheme.onSecondary
-        ComandaAiButtonVariant.Destructive -> ComandaAiTheme.colorScheme.onError
-    }
+            ComandaAiButtonVariant.Warning -> ButtonDefaults.buttonColors(
+                containerColor = ComandaAiTheme.colorScheme.yellow,
+                contentColor = ComandaAiTheme.colorScheme.onYellow,
+                disabledContainerColor = ComandaAiTheme.colorScheme.surfaceVariant,
+                disabledContentColor = ComandaAiTheme.colorScheme.onSurfaceVariant,
+            )
+        }
 
     Button(
         modifier = modifier
@@ -67,7 +77,10 @@ fun ComandaAiButton(
         colors = buttonColors,
         enabled = isEnabled,
         content = {
-            Text(text, color = textColor, modifier = Modifier.padding(ComandaAiSpacing.xXSmall.value))
+            Text(
+                text = text,
+                modifier = Modifier.padding(ComandaAiSpacing.xXSmall.value)
+            )
         }
     )
 }
@@ -83,10 +96,13 @@ fun ComandaAiTextButton(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick,
         enabled = isEnabled,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = ComandaAiTheme.colorScheme.primary,
+            disabledContentColor = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+        ),
         content = {
             Text(
                 text = text,
-                color = ComandaAiTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.padding(ComandaAiSpacing.xXSmall.value)
             )
         }
@@ -95,6 +111,77 @@ fun ComandaAiTextButton(
 
 @Preview
 @Composable
-fun ComandaAiButtonPreview() {
-    ComandaAiButton(text = "Teste", onClick = {}, isEnabled = true, variant = ComandaAiButtonVariant.Secondary)
+fun ComandaAiButtonPrimaryPreview() {
+    ComandaAiTheme {
+        ComandaAiButton(
+            text = "Botão Primário",
+            onClick = {},
+            isEnabled = true,
+            variant = ComandaAiButtonVariant.Primary
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ComandaAiButtonSecondaryPreview() {
+    ComandaAiTheme {
+        ComandaAiButton(
+            text = "Botão Secundário",
+            onClick = {},
+            isEnabled = true,
+            variant = ComandaAiButtonVariant.Secondary
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ComandaAiButtonDestructivePreview() {
+    ComandaAiTheme {
+        ComandaAiButton(
+            text = "Botão Destrutivo",
+            onClick = {},
+            isEnabled = true,
+            variant = ComandaAiButtonVariant.Destructive
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ComandaAiButtonDisabledPreview() {
+    ComandaAiTheme {
+        ComandaAiButton(
+            text = "Botão Desabilitado",
+            onClick = {},
+            isEnabled = false,
+            variant = ComandaAiButtonVariant.Primary
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ComandaAiButtonWarningPreview() {
+    ComandaAiTheme {
+        ComandaAiButton(
+            text = "Botão Warning",
+            onClick = {},
+            isEnabled = true,
+            variant = ComandaAiButtonVariant.Warning
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ComandaAiTextButtonPreview() {
+    ComandaAiTheme {
+        ComandaAiTextButton(
+            text = "Botão de Texto",
+            onClick = {},
+            isEnabled = true
+        )
+    }
 }
