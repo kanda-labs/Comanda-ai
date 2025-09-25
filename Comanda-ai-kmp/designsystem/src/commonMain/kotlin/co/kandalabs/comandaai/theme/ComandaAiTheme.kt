@@ -246,7 +246,7 @@ fun ComandaAiThemeProvider(
     colorScheme: ComandaAiColorScheme? = null,
     content: @Composable () -> Unit
 ) {
-    val colors = colorScheme ?: if (isDark) {
+    val colors = if (isDark) {
         darkComandaAiColorScheme
     } else {
         lightComandaAiColorScheme

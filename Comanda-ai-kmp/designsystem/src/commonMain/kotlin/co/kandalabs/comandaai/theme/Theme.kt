@@ -7,6 +7,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import co.kandalabs.comandaai.theme.LocalComandaAiTypography
+import co.kandalabs.comandaai.theme.ComandaAiThemeProvider
 import co.kandalabs.comandaai.theme.backgroundDarkHighContrast
 import co.kandalabs.comandaai.theme.backgroundLightHighContrast
 import co.kandalabs.comandaai.theme.errorContainerDarkHighContrast
@@ -159,19 +160,11 @@ private val highContrastDarkColorScheme = darkColorScheme(
 @Composable
 fun ComandaAiTheme(
     isDarkThemeOn: Boolean = isSystemInDarkTheme(),
-    lightTheme: ColorScheme = highContrastLightColorScheme,
-    darkTheme: ColorScheme = highContrastDarkColorScheme,
     content: @Composable() () -> Unit,
 ) {
-    val colorScheme = when {
-        isDarkThemeOn -> darkTheme
-        else -> lightTheme
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content,
-        typography = LocalComandaAiTypography.current,
+    ComandaAiThemeProvider(
+        isDark = isDarkThemeOn,
+        content = content
     )
 }
 

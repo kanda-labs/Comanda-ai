@@ -121,7 +121,7 @@ private fun TablesScreenContent(
     onDismissUserModal: () -> Unit,
     onLogout: () -> Unit
 ) {
-    MaterialTheme {
+    ComandaAiTheme {
         if (state.isLoading) {
             ComandaAiLoadingView(
                 loadingImage = painterResource(Res.drawable.golden_loading)
